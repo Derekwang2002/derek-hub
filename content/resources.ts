@@ -1,4 +1,4 @@
-export type ResourceType = "note" | "skill" | "demo";
+export type ResourceType = "skill" | "demo";
 
 export type ResourceStatus = "public" | "unlisted" | "draft";
 
@@ -44,16 +44,6 @@ export const resources = [
     href: "https://github.com/Derekwang2002/skills/tree/main/agent-eval",
     source: "skills",
     tags: ["codex", "skill", "automation"],
-    status: "public"
-  },
-  {
-    title: "MySQL 八股",
-    description: "MySQL 执行流程、存储、索引和事务学习记录。",
-    type: "note",
-    href: "/blog/mysql-notes",
-    source: "vercel-site",
-    tags: ["mysql", "database"],
-    date: "2026-05-01",
     status: "public"
   }
 ] satisfies Resource[];

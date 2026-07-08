@@ -6,14 +6,25 @@ type HubNavProps = {
   active: "all" | ResourceSection;
 };
 
+type NavItem = {
+  slug: "all" | ResourceSection;
+  label: string;
+  href: string;
+};
+
 export function HubNav({ active }: HubNavProps) {
-  const items = [
+  const items: NavItem[] = [
+    ...RESOURCE_SECTIONS.filter((section) => section.slug === "featured").map((section) => ({
+      slug: section.slug,
+      label: section.label,
+      href: `/hub/${section.slug}`
+    })),
     { slug: "all", label: "All", href: "/hub" },
     ...RESOURCE_SECTIONS.map((section) => ({
       slug: section.slug,
       label: section.label,
       href: `/hub/${section.slug}`
-    }))
+    })).filter((item) => item.slug !== "featured")
   ];
 
   return (

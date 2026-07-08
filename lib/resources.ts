@@ -9,21 +9,20 @@ export {
   isExternalResourceHref
 } from "./resource-display";
 
-export type ResourceSection = "notes" | "skills" | "demos";
+export type ResourceSection = "featured" | "skills" | "demos";
 
 export type ResourceSectionDefinition = {
   slug: ResourceSection;
   label: string;
-  type: ResourceType;
+  type?: ResourceType;
   description: string;
 };
 
 export const RESOURCE_SECTIONS: ResourceSectionDefinition[] = [
   {
-    slug: "notes",
-    label: "Notes",
-    type: "note",
-    description: "Long-term notes that live in the personal site repository."
+    slug: "featured",
+    label: "Featured",
+    description: "Selected resources worth opening first."
   },
   {
     slug: "skills",
@@ -55,6 +54,14 @@ export function getResourcesBySection(section: ResourceSection): Resource[] {
   const definition = getResourceSection(section);
 
   if (!definition) {
+    return [];
+  }
+
+  if (definition.slug === "featured") {
+    return getFeaturedResources();
+  }
+
+  if (!definition.type) {
     return [];
   }
 

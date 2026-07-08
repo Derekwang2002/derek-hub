@@ -8,7 +8,6 @@ const SOURCE_LABELS: Record<ResourceSource, string> = {
 };
 
 const TYPE_LABELS: Record<ResourceType, string> = {
-  note: "Note",
   skill: "Skill",
   demo: "Demo"
 };
