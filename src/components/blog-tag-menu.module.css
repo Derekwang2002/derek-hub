@@ -40,16 +40,29 @@
   z-index: 1;
 }
 
+.panelHeader {
+  display: flex;
+  justify-content: flex-end;
+  line-height: 1.25;
+  margin-bottom: 0.45rem;
+  min-height: 1.25em;
+}
+
 .clear {
-  color: #111111;
-  display: inline-block;
-  margin-bottom: 0.5rem;
+  color: #666666;
+  font-size: 0.86rem;
   text-decoration: none;
 }
 
 .clear:hover,
 .clear:focus-visible {
+  color: #111111;
   text-decoration: underline;
+}
+
+.clearPlaceholder {
+  font-size: 0.86rem;
+  visibility: hidden;
 }
 
 .list {

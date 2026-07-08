@@ -64,11 +64,17 @@ export function BlogTagMenu({ activeTab, selectedTags, tags }: BlogTagMenuProps)
 
       {open ? (
         <div className={styles.panel}>
-          {selectedTags.length > 0 ? (
-            <Link className={styles.clear} href={buildBlogHref(activeTab, [])} scroll={false}>
-              Clear filter
-            </Link>
-          ) : null}
+          <div className={styles.panelHeader}>
+            {selectedTags.length > 0 ? (
+              <Link className={styles.clear} href={buildBlogHref(activeTab, [])} scroll={false}>
+                Clear
+              </Link>
+            ) : (
+              <span aria-hidden="true" className={styles.clearPlaceholder}>
+                Clear
+              </span>
+            )}
+          </div>
 
           <div className={styles.list}>
             {tags.map((tag) => {
