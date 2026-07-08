@@ -18,6 +18,16 @@ export type Resource = {
 
 export const resources = [
   {
+    title: "数据结构可视化讲解",
+    description: "Skip List 与 LRU Cache 的交互式讲解入口，包含动态演示、实现代码和工程取舍。",
+    type: "demo",
+    href: "https://derekwang2002.github.io/skills/",
+    source: "github-pages",
+    tags: ["algorithm", "data-structure", "visualization", "leetcode"],
+    status: "public",
+    featured: true
+  },
+  {
     title: "Skip List 跳表讲解",
     description: "交互式解释跳表的搜索、插入、层高和复杂度。",
     type: "demo",
