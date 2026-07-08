@@ -61,6 +61,32 @@
   text-align: left;
 }
 
+.tagFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.75rem;
+  justify-content: center;
+  margin: 0.8rem auto 1.35rem;
+  max-width: 620px;
+}
+
+.tagFilter {
+  color: #666666;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.tagFilter:hover,
+.tagFilter:focus-visible {
+  color: #111111;
+  text-decoration: underline;
+}
+
+.tagFilterActive {
+  color: #111111;
+  font-weight: 600;
+}
+
 .postRow {
   border-top: 1px solid #e5e5e5;
   padding: 1rem 0;
@@ -96,10 +122,24 @@
 }
 
 .postMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
   color: #777777;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0.35rem 0 0;
+}
+
+.postMeta a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.postMeta a:hover,
+.postMeta a:focus-visible {
+  color: #111111;
+  text-decoration: underline;
 }
 
 .postDate {

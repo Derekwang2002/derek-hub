@@ -4,7 +4,7 @@ import "./globals.css";
 
 const SITE_NAME = "Personal Website";
 const DEFAULT_DESCRIPTION =
-  "Minimal personal website for timeline-first writing and tag-based navigation.";
+  "Minimal personal website for writing, resources, and visual demos.";
 const DEFAULT_OG_IMAGE = "/og-default.svg";
 
 const SITE_URL = (() => {
@@ -50,7 +50,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <Link href="/">Home</Link>
               <Link href="/blog">Blog</Link>
               <Link href="/hub/all">Hub</Link>
-              <Link href="/tags">Tags</Link>
             </nav>
           </header>
 

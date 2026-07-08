@@ -68,7 +68,6 @@ export default async function HubSectionPage({ params }: HubSectionPageProps) {
     <main className={styles.hubPage}>
       <header className={styles.hero}>
         <h1 className={styles.title}>Hub</h1>
-        <p className={styles.description}>Reusable skills, demos, and public resources.</p>
       </header>
 
       <HubNav active={section.slug} />

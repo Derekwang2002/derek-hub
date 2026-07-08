@@ -4,7 +4,7 @@ export const dynamic = "force-static";
 
 const SITE_TITLE = "Personal Website";
 const SITE_DESCRIPTION =
-  "Minimal personal website for timeline-first writing and tag-based navigation.";
+  "Minimal personal website for writing, resources, and visual demos.";
 
 function getSiteUrl(): string {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";

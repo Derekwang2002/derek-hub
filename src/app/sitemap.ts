@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllPosts, getAllTagsWithCounts, normalizeTagSlug } from "../../lib/posts";
+import { getAllPosts } from "../../lib/posts";
 import { RESOURCE_SECTIONS, getPublicResources } from "../../lib/resources";
 
 export const dynamic = "force-static";
@@ -20,7 +20,7 @@ function toDate(date: string): Date {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
-  const [posts, tags] = await Promise.all([getAllPosts(), getAllTagsWithCounts()]);
+  const posts = await getAllPosts();
   const publicResources = getPublicResources();
 
   const latestPostDate = posts.length > 0 ? toDate(posts[0].date) : undefined;
@@ -34,21 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return !latest || resourceDate > latest ? resourceDate : latest;
     }, undefined) ?? latestPostDate;
 
-  const latestTagDateBySlug = new Map<string, Date>();
-  for (const post of posts) {
-    const postDate = toDate(post.date);
-
-    for (const tag of post.tags) {
-      const slug = normalizeTagSlug(tag);
-      if (!slug) continue;
-
-      const current = latestTagDateBySlug.get(slug);
-      if (!current || postDate > current) {
-        latestTagDateBySlug.set(slug, postDate);
-      }
-    }
-  }
-
   const staticEntries: MetadataRoute.Sitemap = [
     {
       url: toAbsoluteUrl(siteUrl, "/"),
@@ -61,12 +46,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: latestPostDate,
       changeFrequency: "daily",
       priority: 0.9
-    },
-    {
-      url: toAbsoluteUrl(siteUrl, "/tags"),
-      lastModified: latestPostDate,
-      changeFrequency: "weekly",
-      priority: 0.8
     }
   ];
 
@@ -84,12 +63,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7
   }));
 
-  const tagEntries: MetadataRoute.Sitemap = tags.map((tag) => ({
-    url: toAbsoluteUrl(siteUrl, `/tags/${tag.slug}`),
-    lastModified: latestTagDateBySlug.get(tag.slug),
-    changeFrequency: "weekly",
-    priority: 0.6
-  }));
-
-  return [...staticEntries, ...resourceSectionEntries, ...postEntries, ...tagEntries];
+  return [...staticEntries, ...resourceSectionEntries, ...postEntries];
 }

@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <ul className={styles.tags}>
           {post.tags.map((tag) => (
             <li key={tag}>
-              <Link className={styles.tagLink} href={`/tags/${normalizeTagSlug(tag)}`}>
+              <Link className={styles.tagLink} href={`/blog?tag=${normalizeTagSlug(tag)}`}>
                 {tag}
               </Link>
             </li>

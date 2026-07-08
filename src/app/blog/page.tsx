@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BlogTabs, type BlogTab } from "@/components/blog-tabs";
-import { getAllPosts, getSelectedPosts, type Post } from "../../../lib/posts";
+import {
+  getAllPosts,
+  getAllTagsWithCounts,
+  getSelectedPosts,
+  normalizeTagSlug,
+  type Post,
+  type TagCount
+} from "../../../lib/posts";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -25,14 +32,18 @@ export const metadata: Metadata = {
 type BlogPageProps = {
   searchParams?: Promise<{
     tab?: string | string[];
+    tag?: string | string[];
   }>;
 };
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const activeTab = resolveTab(resolvedSearchParams?.tab);
-  const { allPosts, selectedPosts } = await loadBlogData();
-  const posts = activeTab === "selected" ? selectedPosts : allPosts;
+  const requestedTag = resolveTag(resolvedSearchParams?.tag);
+  const { allPosts, selectedPosts, tags } = await loadBlogData();
+  const activeTag = tags.find((tag) => tag.slug === requestedTag);
+  const basePosts = activeTab === "selected" ? selectedPosts : allPosts;
+  const posts = activeTag ? filterPostsByTag(basePosts, activeTag.slug) : basePosts;
   const latestPost = allPosts[0];
 
   return (
@@ -58,7 +69,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </dl>
       </header>
 
-      <BlogTabs activeTab={activeTab} />
+      <BlogTabs activeTab={activeTab} activeTag={activeTag?.slug} />
+      <TagFilters activeTab={activeTab} activeTag={activeTag?.slug} tags={tags} />
 
       {posts.length === 0 ? (
         activeTab === "selected" ? (
@@ -89,7 +101,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 </time>
               </div>
               <p className={styles.postSummary}>{post.summary}</p>
-              <p className={styles.postMeta}>{formatPostMeta(post)}</p>
+              <PostMeta activeTab={activeTab} post={post} />
             </li>
           ))}
         </ul>
@@ -98,18 +110,38 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   );
 }
 
-async function loadBlogData(): Promise<{ allPosts: Post[]; selectedPosts: Post[] }> {
+async function loadBlogData(): Promise<{
+  allPosts: Post[];
+  selectedPosts: Post[];
+  tags: TagCount[];
+}> {
   try {
-    const [allPosts, selectedPosts] = await Promise.all([getAllPosts(), getSelectedPosts()]);
-    return { allPosts, selectedPosts };
+    const [allPosts, selectedPosts, tags] = await Promise.all([
+      getAllPosts(),
+      getSelectedPosts(),
+      getAllTagsWithCounts()
+    ]);
+    return { allPosts, selectedPosts, tags };
   } catch {
-    return { allPosts: [], selectedPosts: [] };
+    return { allPosts: [], selectedPosts: [], tags: [] };
   }
 }
 
 function resolveTab(tab: string | string[] | undefined): BlogTab {
   const value = Array.isArray(tab) ? tab[0] : tab;
   return value === "selected" ? "selected" : "all";
+}
+
+function resolveTag(tag: string | string[] | undefined): string | undefined {
+  const value = Array.isArray(tag) ? tag[0] : tag;
+  const slug = value ? normalizeTagSlug(value) : "";
+  return slug || undefined;
+}
+
+function filterPostsByTag(posts: Post[], tagSlug: string): Post[] {
+  return posts.filter((post) =>
+    post.tags.some((postTag) => normalizeTagSlug(postTag) === tagSlug)
+  );
 }
 
 function formatPostDate(date: string): string {
@@ -123,12 +155,70 @@ function formatPostDate(date: string): string {
   }).format(parsed);
 }
 
-function formatPostMeta(post: Post): string {
-  const parts = [...post.tags];
-
-  if (post.selected) {
-    parts.unshift("Selected");
+function TagFilters({
+  activeTab,
+  activeTag,
+  tags
+}: {
+  activeTab: BlogTab;
+  activeTag: string | undefined;
+  tags: TagCount[];
+}) {
+  if (tags.length === 0) {
+    return null;
   }
 
-  return parts.join(" · ");
+  return (
+    <nav aria-label="Blog tags" className={styles.tagFilters}>
+      <Link
+        aria-current={activeTag ? undefined : "page"}
+        className={activeTag ? styles.tagFilter : `${styles.tagFilter} ${styles.tagFilterActive}`}
+        href={buildBlogHref(activeTab)}
+        scroll={false}
+      >
+        All Tags
+      </Link>
+      {tags.map((tag) => (
+        <Link
+          aria-current={activeTag === tag.slug ? "page" : undefined}
+          className={
+            activeTag === tag.slug
+              ? `${styles.tagFilter} ${styles.tagFilterActive}`
+              : styles.tagFilter
+          }
+          href={buildBlogHref(activeTab, tag.slug)}
+          key={tag.slug}
+          scroll={false}
+        >
+          {tag.tag}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+function PostMeta({ activeTab, post }: { activeTab: BlogTab; post: Post }) {
+  return (
+    <p className={styles.postMeta}>
+      {post.selected ? <span>Selected</span> : null}
+      {post.tags.map((tag) => {
+        const slug = normalizeTagSlug(tag);
+        return (
+          <Link href={buildBlogHref(activeTab, slug)} key={slug} scroll={false}>
+            {tag}
+          </Link>
+        );
+      })}
+    </p>
+  );
+}
+
+function buildBlogHref(tab: BlogTab, tag?: string): string {
+  const params = new URLSearchParams({ tab });
+
+  if (tag) {
+    params.set("tag", tag);
+  }
+
+  return `/blog?${params.toString()}`;
 }
