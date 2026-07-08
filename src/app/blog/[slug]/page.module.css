@@ -65,7 +65,7 @@
   align-items: start;
   display: grid;
   gap: 2.4rem;
-  grid-template-columns: minmax(0, 720px) 13rem;
+  grid-template-columns: 13rem minmax(0, 720px);
 }
 
 .paragraph {
@@ -132,9 +132,9 @@
 }
 
 .toc {
-  border-left: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
   color: #666666;
-  padding-left: 1rem;
+  padding-right: 1rem;
   position: sticky;
   top: 1.5rem;
 }
@@ -207,7 +207,7 @@
 
   .bodyLayout {
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
     gap: 1.25rem;
   }
 

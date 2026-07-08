@@ -95,8 +95,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </header>
 
       <div className={styles.bodyLayout}>
-        <article className={styles.content}>{renderMarkdown(post.content, tocItems)}</article>
         <PostToc items={tocItems} />
+        <article className={styles.content}>{renderMarkdown(post.content, tocItems)}</article>
       </div>
     </main>
   );
