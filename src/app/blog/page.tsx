@@ -31,11 +31,33 @@ type BlogPageProps = {
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const activeTab = resolveTab(resolvedSearchParams?.tab);
-  const posts = await loadPosts(activeTab);
+  const { allPosts, selectedPosts } = await loadBlogData();
+  const posts = activeTab === "selected" ? selectedPosts : allPosts;
+  const latestPost = allPosts[0];
 
   return (
     <main className={styles.blogPage}>
-      <h1 className={styles.title}>Blog</h1>
+      <header className={styles.hero}>
+        <h1 className={styles.title}>Blog</h1>
+        <p className={styles.description}>
+          Writing, study notes, and implementation records collected chronologically.
+        </p>
+        <dl className={styles.metaStrip} aria-label="Blog summary">
+          <div>
+            <dt>Posts</dt>
+            <dd>{allPosts.length}</dd>
+          </div>
+          <div>
+            <dt>Selected</dt>
+            <dd>{selectedPosts.length}</dd>
+          </div>
+          <div>
+            <dt>Latest</dt>
+            <dd>{latestPost ? formatPostDate(latestPost.date) : "None"}</dd>
+          </div>
+        </dl>
+      </header>
+
       <BlogTabs activeTab={activeTab} />
 
       {posts.length === 0 ? (
@@ -58,12 +80,16 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         <ul className={styles.postList}>
           {posts.map((post) => (
             <li className={styles.postRow} key={post.slug}>
-              <Link className={styles.postLink} href={`/blog/${post.slug}`}>
-                {post.title}
-              </Link>
-              <time className={styles.postDate} dateTime={post.date}>
-                {formatPostDate(post.date)}
-              </time>
+              <div className={styles.postHeader}>
+                <Link className={styles.postLink} href={`/blog/${post.slug}`}>
+                  {post.title}
+                </Link>
+                <time className={styles.postDate} dateTime={post.date}>
+                  {formatPostDate(post.date)}
+                </time>
+              </div>
+              <p className={styles.postSummary}>{post.summary}</p>
+              <p className={styles.postMeta}>{formatPostMeta(post)}</p>
             </li>
           ))}
         </ul>
@@ -72,11 +98,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   );
 }
 
-async function loadPosts(activeTab: BlogTab): Promise<Post[]> {
+async function loadBlogData(): Promise<{ allPosts: Post[]; selectedPosts: Post[] }> {
   try {
-    return activeTab === "selected" ? await getSelectedPosts() : await getAllPosts();
+    const [allPosts, selectedPosts] = await Promise.all([getAllPosts(), getSelectedPosts()]);
+    return { allPosts, selectedPosts };
   } catch {
-    return [];
+    return { allPosts: [], selectedPosts: [] };
   }
 }
 
@@ -94,4 +121,14 @@ function formatPostDate(date: string): string {
     day: "numeric",
     timeZone: "UTC"
   }).format(parsed);
+}
+
+function formatPostMeta(post: Post): string {
+  const parts = [...post.tags];
+
+  if (post.selected) {
+    parts.unshift("Selected");
+  }
+
+  return parts.join(" · ");
 }
