@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { PostToc, type TocItem } from "@/components/post-toc";
 import { getAllPosts, getPostBySlug, normalizeTagSlug } from "../../../../lib/posts";
 import styles from "./page.module.css";
 
@@ -67,6 +68,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound();
   }
 
+  const tocItems = getMarkdownHeadings(post.content);
+
   return (
     <main className={styles.postPage}>
       <p className={styles.backWrap}>
@@ -91,7 +94,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </ul>
       </header>
 
-      <article className={styles.content}>{renderMarkdown(post.content)}</article>
+      <div className={styles.bodyLayout}>
+        <article className={styles.content}>{renderMarkdown(post.content, tocItems)}</article>
+        <PostToc items={tocItems} />
+      </div>
     </main>
   );
 }
@@ -107,11 +113,12 @@ function formatPostDate(date: string): string {
   }).format(parsed);
 }
 
-function renderMarkdown(markdown: string): React.ReactNode[] {
+function renderMarkdown(markdown: string, headings: TocItem[]): React.ReactNode[] {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const blocks: React.ReactNode[] = [];
   let i = 0;
   let key = 0;
+  let headingIndex = 0;
 
   while (i < lines.length) {
     const line = lines[i];
@@ -150,28 +157,30 @@ function renderMarkdown(markdown: string): React.ReactNode[] {
     if (heading) {
       const level = heading[1].length;
       const text = heading[2];
+      const headingId = headings[headingIndex]?.id;
+      headingIndex += 1;
 
       if (level === 1) {
         blocks.push(
-          <h1 className={styles.h1} key={`block-${key}`}>
+          <h1 className={styles.h1} id={headingId} key={`block-${key}`}>
             {parseInline(text, `inline-${key}`)}
           </h1>
         );
       } else if (level === 2) {
         blocks.push(
-          <h2 className={styles.h2} key={`block-${key}`}>
+          <h2 className={styles.h2} id={headingId} key={`block-${key}`}>
             {parseInline(text, `inline-${key}`)}
           </h2>
         );
       } else if (level === 3) {
         blocks.push(
-          <h3 className={styles.h3} key={`block-${key}`}>
+          <h3 className={styles.h3} id={headingId} key={`block-${key}`}>
             {parseInline(text, `inline-${key}`)}
           </h3>
         );
       } else {
         blocks.push(
-          <h4 className={styles.h4} key={`block-${key}`}>
+          <h4 className={styles.h4} id={headingId} key={`block-${key}`}>
             {parseInline(text, `inline-${key}`)}
           </h4>
         );
@@ -240,6 +249,52 @@ function renderMarkdown(markdown: string): React.ReactNode[] {
   }
 
   return blocks;
+}
+
+function getMarkdownHeadings(markdown: string): TocItem[] {
+  const usedIds = new Map<string, number>();
+  const items: TocItem[] = [];
+
+  for (const line of markdown.replace(/\r\n/g, "\n").split("\n")) {
+    const heading = /^(#{1,6})\s+(.+)$/.exec(line.trim());
+    if (!heading) {
+      continue;
+    }
+
+    const level = heading[1].length;
+    const text = stripInlineMarkdown(heading[2]);
+    const baseId = slugifyHeading(text) || `section-${items.length + 1}`;
+    const count = usedIds.get(baseId) ?? 0;
+    usedIds.set(baseId, count + 1);
+
+    items.push({
+      id: count === 0 ? baseId : `${baseId}-${count + 1}`,
+      level,
+      text
+    });
+  }
+
+  return items;
+}
+
+function stripInlineMarkdown(text: string): string {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .trim();
+}
+
+function slugifyHeading(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .normalize("NFKC")
+    .replace(/[^\p{L}\p{N}\s_-]+/gu, "")
+    .replace(/[\s_]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function parseInline(text: string, keyPrefix: string): React.ReactNode[] {
