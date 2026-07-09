@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   getFeaturedResources,
@@ -40,7 +41,15 @@ export default function HomePage() {
   return (
     <main className={styles.home}>
       <section className={styles.profile} aria-labelledby="home-title">
-        <div className={styles.avatar} aria-hidden="true" />
+        <Image
+          alt="Derek Wang"
+          className={styles.avatar}
+          height={112}
+          priority
+          sizes="112px"
+          src="/avatar.png"
+          width={112}
+        />
         <h1 className={styles.name} id="home-title">
           Derek Wang
         </h1>
