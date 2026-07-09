@@ -2,10 +2,10 @@
 
 This repository contains the initial project skeleton for a minimalist personal website using Next.js App Router and TypeScript.
 
-Current scope matches T1 in `TASKS.md`:
-- Initialize project skeleton
-- Add base routes: `/`, `/blog`, `/tags`, `/404`
-- Keep implementation minimal (no Markdown blog pipeline yet)
+Project planning docs live in `docs/`:
+- `docs/PRD.md`
+- `docs/ARCHITECTURE.md`
+- `docs/TASKS.md`
 
 ## Tech Stack
 
@@ -82,23 +82,30 @@ Environment variable:
 
 ```text
 .
+|- archive/
+|  |- logs/
+|  `- notes/
 |- content/
-|  `- posts/
-|     `- .gitkeep
+|  |- posts/
+|  `- resources.ts
+|- data/
+|  `- nextjs/
+|- docs/
+|  |- ARCHITECTURE.md
+|  |- PERFORMANCE_BASELINE.md
+|  |- PRD.md
+|  `- TASKS.md
+|- lib/
+|  |- posts.ts
+|  |- resource-display.ts
+|  `- resources.ts
 |- public/
-|  `- .gitkeep
+|  |- leetcode-cookbook/
+|  |- avatar.png
+|  `- og-default.svg
 |- src/
-|  `- app/
-|     |- 404/
-|     |  `- page.tsx
-|     |- blog/
-|     |  `- page.tsx
-|     |- tags/
-|     |  `- page.tsx
-|     |- globals.css
-|     |- layout.tsx
-|     |- not-found.tsx
-|     `- page.tsx
+|  |- app/
+|  `- components/
 |- .eslintrc.json
 |- .gitignore
 |- next-env.d.ts
@@ -110,5 +117,6 @@ Environment variable:
 
 ## Notes
 
-- Markdown content loading/parsing and post detail routes are intentionally not implemented yet.
-- This is a clean foundation for upcoming tasks in `TASKS.md`.
+- Historical logs and one-off notes are archived under `archive/`.
+- GitHub/Next.js data snapshots are archived under `data/nextjs/`.
+- Upcoming implementation tasks are tracked in `docs/TASKS.md`.

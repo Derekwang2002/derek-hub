@@ -411,7 +411,7 @@ Handle:
 Use this every time:
 
 ```
-Read PRD.md, ARCHITECTURE.md, and TASKS_NEXTJS.md.
+Read docs/PRD.md, docs/ARCHITECTURE.md, and docs/TASKS.md.
 Implement task {TASK_ID}.
 Only modify allowed files.
 Do not add new dependencies.
