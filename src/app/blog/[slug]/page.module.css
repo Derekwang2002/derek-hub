@@ -61,25 +61,22 @@
 
 .content {
   color: #111111;
-  grid-column: 3;
+  grid-column: 2;
   min-width: 0;
 }
 
 .bodyLayout {
   align-items: start;
   border-top: 1px solid #e5e5e5;
+  column-gap: 0;
   display: grid;
-  grid-template-columns:
-    14rem clamp(3.5rem, 5vw, 5rem) minmax(0, 760px)
-    clamp(1.5rem, 3vw, 2rem) 8rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
   padding-top: 2rem;
   transition: grid-template-columns 160ms ease;
 }
 
 .bodyLayoutCollapsed {
-  grid-template-columns:
-    5.5rem clamp(2.5rem, 4vw, 3.5rem) minmax(0, 760px)
-    clamp(1rem, 2vw, 1.5rem) 2.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 760px) minmax(0, 1fr);
 }
 
 .paragraph {
@@ -149,13 +146,17 @@
   border-right: 1px solid #e5e5e5;
   color: #666666;
   grid-column: 1;
+  justify-self: end;
+  margin-right: clamp(2.5rem, 4vw, 4rem);
   padding-right: 1rem;
   position: sticky;
   top: 1.5rem;
+  width: 14rem;
 }
 
 .tocCollapsed {
   padding-right: 0.65rem;
+  width: 5.5rem;
 }
 
 .tocToggle {
