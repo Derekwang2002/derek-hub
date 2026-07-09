@@ -355,7 +355,7 @@ async function highlightCode(code: string, language: string): Promise<string> {
     return await codeToHtml(code, {
       lang: language,
       themes: {
-        light: "github-light",
+        light: "github-dark",
         dark: "github-dark"
       },
       defaultColor: false
@@ -364,7 +364,7 @@ async function highlightCode(code: string, language: string): Promise<string> {
     return codeToHtml(code, {
       lang: "text",
       themes: {
-        light: "github-light",
+        light: "github-dark",
         dark: "github-dark"
       },
       defaultColor: false
