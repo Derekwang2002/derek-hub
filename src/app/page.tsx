@@ -35,8 +35,8 @@ const SOCIAL_LINKS = [
   { label: "Email", href: "mailto:derekwang0282@gmail.com", icon: "email" }
 ] as const;
 
-export default function HomePage() {
-  const pinnedResources = getFeaturedResources().slice(0, 3);
+export default async function HomePage() {
+  const pinnedResources = (await getFeaturedResources()).slice(0, 3);
 
   return (
     <main className={styles.home}>

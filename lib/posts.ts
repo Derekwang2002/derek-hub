@@ -1,7 +1,22 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import {
+  blogPostCollections,
+  blogPostSources,
+  type BlogPostCollection,
+  type BlogPostSource
+} from "../content/blog";
+import {
+  getMarkdownCollectionSourceId,
+  getMarkdownSourceId,
+  listMarkdownSourcesFromCollection,
+  readMarkdownSource,
+  type LocalMarkdownSource,
+  type MarkdownSource
+} from "./markdown-sources";
 
 const POSTS_DIRECTORY = path.join(process.cwd(), "content", "posts");
+const POSTS_DIRECTORY_RELATIVE = path.join("content", "posts");
 const FILE_NAME_PATTERN = /^(\d{4}-\d{2}-\d{2})-(.+)\.md$/;
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 
@@ -15,6 +30,8 @@ export type Post = {
   selected?: boolean;
   content: string;
   fileName: string;
+  sourceId: string;
+  sourceUrl?: string;
 };
 
 export type TagCount = {
@@ -94,39 +111,25 @@ export async function getAllTagsWithCounts(): Promise<TagCount[]> {
 }
 
 async function loadAllPosts(): Promise<Post[]> {
-  const entries = await fs.readdir(POSTS_DIRECTORY, { withFileTypes: true });
-  const markdownFiles = entries
-    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
-    .map((entry) => entry.name)
-    .sort((a, b) => a.localeCompare(b, "en"));
+  const postSources = await getPostSources();
+  assertUniquePostSources(postSources);
 
-  const posts = await Promise.all(markdownFiles.map((fileName) => readPostFile(fileName)));
+  const posts = await Promise.all(postSources.map((postSource) => readPostSource(postSource)));
   return posts;
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  const entries = await fs.readdir(POSTS_DIRECTORY, { withFileTypes: true });
-  const markdownFiles = entries
-    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
-    .map((entry) => entry.name)
-    .sort((a, b) => a.localeCompare(b, "en"));
+  const postSources = await getPostSources();
+  assertUniquePostSources(postSources);
+  const postSource = postSources.find((source) => source.slug === slug);
 
-  for (const fileName of markdownFiles) {
-    const fileNameMatch = FILE_NAME_PATTERN.exec(fileName);
-    if (!fileNameMatch) {
-      continue;
-    }
-
-    const postSlug = fileNameMatch[2].trim();
-    if (postSlug !== slug) {
-      continue;
-    }
-
-    const post = await readPostFile(fileName);
-    return post.draft ? null : post;
+  if (!postSource) {
+    return null;
   }
 
-  return null;
+  const post = await readPostSource(postSource);
+
+  return post.draft ? null : post;
 }
 
 function toPublicPosts(posts: Post[]): Post[] {
@@ -157,7 +160,32 @@ function pickCanonicalTag(variants: Set<string>): string {
   )[0];
 }
 
-async function readPostFile(fileName: string): Promise<Post> {
+type ResolvedPostSource = {
+  slug: string;
+  label: string;
+  source: MarkdownSource;
+};
+
+async function getPostSources(): Promise<ResolvedPostSource[]> {
+  const localSources = await getLocalPostSources();
+  const configuredSources = blogPostSources.map(toResolvedConfiguredPostSource);
+  const collectionSources = (
+    await Promise.all(blogPostCollections.map(resolvePostCollection))
+  ).flat();
+
+  return [...localSources, ...configuredSources, ...collectionSources];
+}
+
+async function getLocalPostSources(): Promise<ResolvedPostSource[]> {
+  const entries = await fs.readdir(POSTS_DIRECTORY, { withFileTypes: true });
+
+  return entries
+    .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith(".md"))
+    .map((entry) => toLocalPostSource(entry.name))
+    .sort((a, b) => a.label.localeCompare(b.label, "en"));
+}
+
+function toLocalPostSource(fileName: string): ResolvedPostSource {
   const fileNameMatch = FILE_NAME_PATTERN.exec(fileName);
   if (!fileNameMatch) {
     throw new Error(
@@ -171,29 +199,115 @@ async function readPostFile(fileName: string): Promise<Post> {
     throw new Error(`Invalid post filename \"${fileName}\". Slug segment cannot be empty.`);
   }
 
-  const fullPath = path.join(POSTS_DIRECTORY, fileName);
-  const source = await fs.readFile(fullPath, "utf8");
-  const { frontmatter, content } = parseFrontmatter(source, fileName);
+  const source: LocalMarkdownSource = {
+    type: "local",
+    path: path.join(POSTS_DIRECTORY_RELATIVE, fileName)
+  };
 
-  const title = readRequiredString(frontmatter, "title", fileName);
-  const date = readRequiredString(frontmatter, "date", fileName);
-  const summary = readRequiredString(frontmatter, "summary", fileName);
-  const tags = readRequiredTags(frontmatter, fileName);
-  const draft = readOptionalBoolean(frontmatter, "draft", false, fileName) ?? false;
-  const selected = readOptionalBoolean(frontmatter, "selected", undefined, fileName);
+  return {
+    slug,
+    source,
+    label: fileName
+  };
+}
 
-  validateDate(date, fileName);
+function toResolvedConfiguredPostSource(postSource: BlogPostSource): ResolvedPostSource {
+  return {
+    slug: postSource.slug,
+    source: postSource.source,
+    label: `content/blog.ts:${postSource.slug}`
+  };
+}
+
+async function resolvePostCollection(
+  collection: BlogPostCollection
+): Promise<ResolvedPostSource[]> {
+  const collectionId = getMarkdownCollectionSourceId(collection.source);
+  const sources = await listMarkdownSourcesFromCollection(
+    collection.source,
+    `content/blog.ts:${collectionId}`
+  );
+
+  return sources.map((source) => {
+    const label = `${collectionId}:${source.path}`;
+
+    return {
+      slug: getPostSlugFromMarkdownPath(source.path, label),
+      source,
+      label
+    };
+  });
+}
+
+function assertUniquePostSources(postSources: ResolvedPostSource[]): void {
+  const seenSlugs = new Map<string, ResolvedPostSource>();
+  const seenSources = new Map<string, ResolvedPostSource>();
+
+  for (const postSource of postSources) {
+    const existingSlug = seenSlugs.get(postSource.slug);
+    if (existingSlug) {
+      throw new Error(
+        `Duplicate post slug "${postSource.slug}" in "${existingSlug.label}" and "${postSource.label}". Each article must use exactly one Markdown source.`
+      );
+    }
+
+    seenSlugs.set(postSource.slug, postSource);
+
+    const sourceId = getMarkdownSourceId(postSource.source);
+    const existingSource = seenSources.get(sourceId);
+    if (existingSource) {
+      throw new Error(
+        `Duplicate post source "${sourceId}" in "${existingSource.label}" and "${postSource.label}". Each article must use exactly one Markdown source.`
+      );
+    }
+
+    seenSources.set(sourceId, postSource);
+  }
+}
+
+function getPostSlugFromMarkdownPath(markdownPath: string, label: string): string {
+  const fileName = path.posix.basename(markdownPath);
+  const fileNameMatch = FILE_NAME_PATTERN.exec(fileName);
+  const slug = fileNameMatch?.[2] ?? fileName.replace(/\.md$/i, "");
+  const normalizedSlug = slug.trim();
+
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(normalizedSlug)) {
+    throw new Error(
+      `Invalid post source "${label}". Markdown filename must resolve to a lowercase kebab-case slug.`
+    );
+  }
+
+  return normalizedSlug;
+}
+
+async function readPostSource(postSource: ResolvedPostSource): Promise<Post> {
+  const source = await readMarkdownSource(postSource.source, postSource.label);
+  const { frontmatter, content } = parseFrontmatter(source.content, postSource.label);
+
+  const title = readRequiredString(frontmatter, "title", postSource.label);
+  const date = readRequiredString(frontmatter, "date", postSource.label);
+  const summary = readRequiredString(frontmatter, "summary", postSource.label);
+  const tags = readRequiredTags(frontmatter, postSource.label);
+  const draft = readOptionalBoolean(frontmatter, "draft", false, postSource.label) ?? false;
+  const selected = readOptionalBoolean(frontmatter, "selected", undefined, postSource.label);
+
+  validateDate(date, postSource.label);
 
   const post: Post = {
-    slug,
+    slug: postSource.slug,
     title,
     date,
     summary,
     tags,
     draft,
     content,
-    fileName
+    fileName: postSource.label,
+    sourceId: source.sourceId
   };
+
+  if (source.sourceUrl) {
+    post.sourceUrl = source.sourceUrl;
+  }
 
   if (selected !== undefined) {
     post.selected = selected;

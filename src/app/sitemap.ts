@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "../../lib/posts";
-import { RESOURCE_SECTIONS, getPublicResources } from "../../lib/resources";
+import {
+  RESOURCE_SECTIONS,
+  getPublicResources,
+  isExternalResourceHref
+} from "../../lib/resources";
 
 export const dynamic = "force-static";
 
@@ -21,7 +25,7 @@ function toDate(date: string): Date {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
   const posts = await getAllPosts();
-  const publicResources = getPublicResources();
+  const publicResources = await getPublicResources();
 
   const latestPostDate = posts.length > 0 ? toDate(posts[0].date) : undefined;
   const latestResourceDate =
@@ -63,5 +67,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7
   }));
 
-  return [...staticEntries, ...resourceSectionEntries, ...postEntries];
+  const resourceEntries: MetadataRoute.Sitemap = publicResources
+    .filter((resource) => !isExternalResourceHref(resource.href))
+    .map((resource) => ({
+      url: toAbsoluteUrl(siteUrl, resource.href),
+      lastModified: resource.date ? toDate(resource.date) : latestResourceDate,
+      changeFrequency: "monthly",
+      priority: resource.type === "skill" ? 0.7 : 0.6
+    }));
+
+  return [...staticEntries, ...resourceSectionEntries, ...resourceEntries, ...postEntries];
 }

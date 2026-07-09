@@ -1,82 +1,181 @@
-# Personal Website (MVP Skeleton)
+# Personal Website
 
-This repository contains the initial project skeleton for a minimalist personal website using Next.js App Router and TypeScript.
+This repository contains a Next.js App Router personal website for writing, resource curation, and interactive demos.
 
-Project planning docs live in `docs/`:
-- `docs/PRD.md`
-- `docs/ARCHITECTURE.md`
-- `docs/TASKS.md`
+## Current Capabilities
+
+- Home page with profile links and pinned resources.
+- Blog index, post detail pages, tag index, and tag detail pages.
+- Hub sections for all resources, skills, and demos.
+- Skill articles rendered as internal hub pages instead of direct repository links.
+- Static HTML demos served from `public/leetcode-cookbook/`.
+- RSS feed at `/rss.xml`.
+- Static sitemap at `/sitemap.xml` with blog posts and internal hub resources.
+- Markdown rendering with headings, table of contents, code highlighting, links, lists, tables, and blockquotes.
+- Shared Markdown source layer for local files, GitHub files, and GitHub folders.
+- Duplicate slug/source validation so one article is resolved from exactly one source.
+
+## Content Model
+
+### Blog
+
+Blog posts can come from three source types:
+
+- Local Markdown files in `content/posts/`.
+- Explicit remote Markdown files configured in `content/blog.ts`.
+- Remote Markdown folders configured in `content/blog.ts`.
+
+Local blog filenames must use:
+
+```text
+YYYY-MM-DD-slug.md
+```
+
+Each blog post requires frontmatter:
+
+```md
+---
+title: "Post title"
+date: "2026-05-01"
+summary: "Short summary."
+tags:
+  - tag
+draft: false
+selected: true
+---
+```
+
+Remote blog folders are expanded into individual Markdown file sources. The generated slug comes from the filename, or from the `YYYY-MM-DD-slug.md` filename pattern when present.
+
+### Hub
+
+Hub resources are configured in `content/resources.ts`.
+
+- `resources` stores direct resources, such as static demos.
+- `resourceCollections` stores folder-backed Markdown article collections.
+
+The current skills hub is backed by:
+
+```ts
+{
+  type: "githubFolder",
+  repository: "Derekwang2002/skills",
+  branch: "main",
+  path: "docs"
+}
+```
+
+Each Markdown file in that folder becomes one internal article page:
+
+```text
+docs/agent-eval.md -> /hub/skills/agent-eval
+```
+
+`README.md` files are ignored when expanding GitHub folders. Article pages can still include repository links inside the Markdown body.
+
+Collection overrides can customize generated metadata:
+
+- `title`
+- `description`
+- `tags`
+- `date`
+- `status`
+- `featured`
+
+## Markdown Sources
+
+The shared source layer lives in `lib/markdown-sources.ts`.
+
+Supported source types:
+
+- `local` - read a Markdown file from this repository.
+- `github` - fetch one Markdown file from GitHub raw content.
+- `githubFolder` - list a GitHub folder through the GitHub Contents API and expand direct `.md` files into file sources.
+
+The article loader validates duplicates by both public slug/href and source id. This keeps local, single-file remote, and folder remote sources available at the same time without overlapping ownership of the same article.
+
+## Routes
+
+- `/` - Home page.
+- `/blog` - Blog index.
+- `/blog/[slug]` - Blog post page.
+- `/tags` - Tag index.
+- `/tags/[tag]` - Tag detail page.
+- `/hub` - Hub redirect/entry.
+- `/hub/all` - All public hub resources.
+- `/hub/skills` - Skill articles.
+- `/hub/demos` - Static demos.
+- `/hub/skills/[slug]` - Skill article page.
+- `/rss.xml` - RSS feed.
+- `/sitemap.xml` - Sitemap.
+- `/404` and `not-found` - Error pages.
 
 ## Tech Stack
 
-- Next.js (App Router)
+- Next.js 15 App Router
+- React 19
 - TypeScript
-- React
-
-No non-essential dependencies were added.
+- Shiki for code highlighting
+- ESLint and TypeScript checks
 
 ## Requirements
 
-- Node.js 20+
-- npm 10+ (recommended)
+- Node.js `>=20 <24`
+- npm 10+
 
 ## Run Locally
 
 ```bash
 npm install
-npm run dev
+npm run dev:host
 ```
 
 Open `http://localhost:3000`.
 
+For production preview:
+
+```bash
+npm run build
+npm run start -- -p 3000
+```
+
 ## Available Scripts
 
-- `npm run dev` - start local dev server
-- `npm run lint` - run ESLint checks
-- `npm run typecheck` - run TypeScript checks (`tsc --noEmit`)
-- `npm run build` - create production build
-- `npm run start` - run production server after build
+- `npm run dev` - start local dev server with the repository's custom dev command.
+- `npm run dev:host` - start a standard Next.js dev server.
+- `npm run lint` - run ESLint checks.
+- `npm run typecheck` - run TypeScript checks with `tsc --noEmit`.
+- `npm run build` - create a production build.
+- `npm run start` - run the production server after a build.
 
-## CI (GitHub Actions)
+## CI
 
-This project uses a minimal CI workflow at `.github/workflows/ci.yml`.
+GitHub Actions workflow: `.github/workflows/ci.yml`.
 
-Triggers:
-- Pull requests to `main`
-- Pushes to `main`
+Checks:
 
-Checks run in CI:
 - `npm ci`
 - `npm run lint`
 - `npm run typecheck`
 - `npm run build`
 
-CI uses Node.js 22 to match the project's runtime constraints.
+CI uses Node.js 22.
 
-## Deployment (Vercel)
+## Deployment
 
-The project is intended to deploy on Vercel with the standard Next.js setup.
-
-Expected behavior:
-- Every push to `main` can deploy to Production.
-- Every pull request can generate a Vercel Preview deployment.
+The project is designed for Vercel with the standard Next.js setup.
 
 Recommended Vercel settings:
+
 - Install command: `npm ci`
 - Build command: `npm run build`
 - Node.js runtime: `22.x`
 
 Environment variable:
-- `NEXT_PUBLIC_SITE_URL` (canonical site URL, e.g. `https://example.com`)
-  - Local fallback exists (`http://localhost:3000`) if unset.
 
-## Current Routes
+- `NEXT_PUBLIC_SITE_URL` - canonical site URL used by metadata and sitemap.
 
-- `/` - Home placeholder
-- `/blog` - Blog placeholder
-- `/tags` - Tags placeholder
-- `/404` - Explicit 404 route placeholder
-- `not-found` UI handled by `src/app/not-found.tsx`
+If `NEXT_PUBLIC_SITE_URL` is unset, sitemap generation falls back to `http://localhost:3000`.
 
 ## Directory Structure
 
@@ -86,6 +185,7 @@ Environment variable:
 |  |- logs/
 |  `- notes/
 |- content/
+|  |- blog.ts
 |  |- posts/
 |  `- resources.ts
 |- data/
@@ -96,9 +196,11 @@ Environment variable:
 |  |- PRD.md
 |  `- TASKS.md
 |- lib/
+|  |- markdown-sources.ts
 |  |- posts.ts
 |  |- resource-display.ts
-|  `- resources.ts
+|  |- resources.ts
+|  `- skill-docs.ts
 |- public/
 |  |- leetcode-cookbook/
 |  |- avatar.png
@@ -106,9 +208,7 @@ Environment variable:
 |- src/
 |  |- app/
 |  `- components/
-|- .eslintrc.json
-|- .gitignore
-|- next-env.d.ts
+|- .github/
 |- next.config.ts
 |- package-lock.json
 |- package.json
@@ -117,6 +217,6 @@ Environment variable:
 
 ## Notes
 
-- Historical logs and one-off notes are archived under `archive/`.
-- GitHub/Next.js data snapshots are archived under `data/nextjs/`.
-- Upcoming implementation tasks are tracked in `docs/TASKS.md`.
+- Historical logs and one-off notes live under `archive/`.
+- GitHub/Next.js data snapshots live under `data/nextjs/`.
+- Planning docs live under `docs/`.

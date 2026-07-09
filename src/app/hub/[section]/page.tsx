@@ -62,7 +62,7 @@ export default async function HubSectionPage({ params }: HubSectionPageProps) {
     notFound();
   }
 
-  const resources = getResourcesBySection(section.slug);
+  const resources = await getResourcesBySection(section.slug);
 
   return (
     <main className={styles.hubPage}>
