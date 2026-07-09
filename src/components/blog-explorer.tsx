@@ -70,6 +70,7 @@ export function BlogExplorer({ posts, tags }: BlogExplorerProps) {
           activeTags={filters.activeTags}
           onNavigate={navigate}
         />
+        <span aria-hidden="true" className={styles.filterDivider} />
         <BlogTagMenu
           activeTab={filters.activeTab}
           onNavigate={navigate}

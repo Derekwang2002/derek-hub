@@ -42,10 +42,18 @@
 .filterBar {
   align-items: flex-start;
   display: inline-flex;
-  gap: 1.35rem;
+  gap: 0.9rem;
   justify-content: center;
   margin: 0 auto;
   max-width: 620px;
+}
+
+.filterDivider {
+  align-self: flex-start;
+  background: var(--color-border);
+  height: 1.05rem;
+  margin-top: 0.46rem;
+  width: 1px;
 }
 
 .postRow {
@@ -120,5 +128,9 @@
     align-items: center;
     flex-direction: column;
     row-gap: 0.35rem;
+  }
+
+  .filterDivider {
+    display: none;
   }
 }
