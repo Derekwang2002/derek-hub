@@ -76,7 +76,7 @@
 .postLink {
   color: var(--color-text);
   flex: 1 1 24rem;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.35;
@@ -203,7 +203,7 @@
   }
 
   .postLink {
-    font-size: 1.16rem;
+    font-size: 1.12rem;
     grid-row: 2;
   }
 
