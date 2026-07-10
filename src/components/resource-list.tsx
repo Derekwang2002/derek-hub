@@ -69,6 +69,12 @@ function ResourceMeta({ resource }: { resource: Resource }) {
       <span className={styles.typeBadge}>{getResourceTypeLabel(resource.type)}</span>
 
       {resource.tags.length > 0 ? (
+        <span aria-hidden="true" className={styles.metaSeparator}>
+          |
+        </span>
+      ) : null}
+
+      {resource.tags.length > 0 ? (
         <span aria-label="Tags" className={styles.tagList} role="group">
           {resource.tags.map((tag) => (
             <span className={styles.tag} key={tag}>
