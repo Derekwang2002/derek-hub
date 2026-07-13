@@ -56,6 +56,14 @@ function ResourceLink({ resource }: { resource: Resource }) {
     );
   }
 
+  if (resource.type === "demo") {
+    return (
+      <a className={styles.resourceLink} href={resource.href}>
+        {resource.title}
+      </a>
+    );
+  }
+
   return (
     <Link className={styles.resourceLink} href={resource.href}>
       {resource.title}

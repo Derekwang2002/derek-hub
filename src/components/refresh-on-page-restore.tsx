@@ -4,17 +4,31 @@ import { useEffect } from "react";
 
 export function RefreshOnPageRestore() {
   useEffect(() => {
-    function handlePageShow(event: PageTransitionEvent) {
-      if (event.persisted) {
-        // A BFCache snapshot can belong to an older deployment.
+    let refreshing = false;
+
+    function wasRestoredFromHistory() {
+      const navigation = window.performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming | undefined;
+
+      return navigation?.type === "back_forward";
+    }
+
+    function refreshIfRestored(event?: PageTransitionEvent) {
+      if (!refreshing && (event?.persisted === true || wasRestoredFromHistory())) {
+        refreshing = true;
+        // A history snapshot can belong to an older deployment.
         window.location.reload();
       }
     }
 
-    window.addEventListener("pageshow", handlePageShow);
+    // pageshow may fire before React hydrates, so also inspect the navigation
+    // entry immediately after mounting.
+    refreshIfRestored();
+    window.addEventListener("pageshow", refreshIfRestored);
 
     return () => {
-      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("pageshow", refreshIfRestored);
     };
   }, []);
 

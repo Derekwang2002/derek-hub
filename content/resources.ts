@@ -55,20 +55,20 @@ export const resources = [
     featured: true
   },
   {
-    title: "数据结构可视化讲解",
-    description: "Skip List 与 LRU Cache 的交互式讲解入口，包含动态演示、实现代码和工程取舍。",
-    type: "demo",
-    href: "/leetcode-cookbook/",
-    tags: ["algorithm", "data-structure", "visualization", "leetcode"],
-    status: "public",
-    featured: true
-  },
-  {
     title: "Skip List 跳表讲解",
     description: "交互式解释跳表的搜索、插入、层高和复杂度。",
     type: "demo",
     href: "/leetcode-cookbook/skiplist-explained.html",
     tags: ["algorithm", "data-structure", "visualization"],
+    status: "public",
+    featured: true
+  },
+  {
+    title: "LRU Cache 缓存讲解",
+    description: "交互式讲解 HashMap 与双向链表如何实现 O(1) 读写，并比较淘汰策略和并发方案。",
+    type: "demo",
+    href: "/leetcode-cookbook/lru-cache-explained.html",
+    tags: ["algorithm", "data-structure", "cache", "visualization"],
     status: "public",
     featured: true
   }
