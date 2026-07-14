@@ -295,8 +295,11 @@
   list-style: none;
   margin: 0.65rem 0 0;
   max-height: calc(100vh - 5rem);
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 0;
+  padding-inline-end: 0.75rem;
+  scrollbar-gutter: stable;
 }
 
 .tocList a {
@@ -429,6 +432,13 @@
   transform: translateY(1px);
 }
 
+@media (min-width: 921px) {
+  .toc {
+    margin-left: -2rem;
+    width: 14rem;
+  }
+}
+
 @media (max-width: 920px) {
   .postPage,
   .header {
@@ -522,7 +532,6 @@
 
   .tocList {
     max-height: min(50dvh, 22rem);
-    padding-right: 0.25rem;
     scrollbar-width: thin;
   }
 
