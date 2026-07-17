@@ -80,6 +80,13 @@ export async function renderMarkdown(
       continue;
     }
 
+    if (isThematicBreak(line)) {
+      blocks.push(<hr className={styles.thematicBreak} key={`block-${key}`} />);
+      key += 1;
+      i += 1;
+      continue;
+    }
+
     const tableBlock = parseTableBlock(lines, i, `block-${key}`);
     if (tableBlock) {
       blocks.push(tableBlock.node);
@@ -126,6 +133,7 @@ export async function renderMarkdown(
       lines[i].trim() &&
       !/^```/.test(lines[i].trim()) &&
       !/^(#{1,6})\s+/.test(lines[i].trim()) &&
+      !isThematicBreak(lines[i]) &&
       !isTableStart(lines, i) &&
       !/^>\s?/.test(lines[i].trim()) &&
       !parseListMarker(lines[i])
@@ -143,6 +151,21 @@ export async function renderMarkdown(
   }
 
   return blocks;
+}
+
+function isThematicBreak(line: string): boolean {
+  const trimmed = line.trim();
+  const leadingWhitespaceLength = line.length - line.trimStart().length;
+
+  if (leadingWhitespaceLength > 3) {
+    return false;
+  }
+
+  return (
+    /^(?:\*[\t ]*){3,}$/.test(trimmed) ||
+    /^(?:_[\t ]*){3,}$/.test(trimmed) ||
+    /^(?:-[\t ]*){3,}$/.test(trimmed)
+  );
 }
 
 type TableBlock = {
