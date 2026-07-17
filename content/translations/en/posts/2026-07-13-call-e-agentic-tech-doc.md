@@ -1,6 +1,6 @@
 ---
-title: "prod-dive-in Architecture: How an Agent Turns One Sentence into a Real Phone Call"
-summary: "From CALL-E and the desktop Agent to browser takeover, this article explains prod-dive-in's main flows, layered architecture, technology stack, and the Agentic design behind Goal, RunSpec, Run, and Report."
+title: "Agentic CALL-E Technical Documentation"
+summary: "From CALL-E and the desktop Agent to browser takeover, this article explains the main flows, layered architecture, technology stack, and the Agentic design behind Goal, RunSpec, Run, and Report."
 ---
 
 Many AI applications can chat, but the hardest work usually happens outside the chat box. When a user provides one natural-language request, how does a system confirm the objective, fill in missing information, call real services, keep working for minutes or days, and continue after failures?

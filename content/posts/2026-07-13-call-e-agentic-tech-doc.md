@@ -1,9 +1,9 @@
 ---
-title: "prod-dive-in 技术全景：Agent 如何把一句话变成一通真实电话"
+title: "Agentic CALL-E 技术文档"
 date: 2026-07-13
-summary: "从 CALL-E、桌面 Agent 到浏览器接管，拆解 prod-dive-in 的主要链路、分层架构、技术栈，以及 Goal、RunSpec、Run、Report 背后的 Agentic 设计。"
+summary: "从 CALL-E、桌面 Agent 到浏览器接管，拆解主要链路、分层架构、技术栈，以及 Goal、RunSpec、Run、Report 背后的 Agentic 设计。"
 tags: [agent, architecture, voice-ai, python]
-selected: true
+selected: false
 draft: false
 ---
 

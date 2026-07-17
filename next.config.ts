@@ -10,6 +10,20 @@ const deploymentId = [
 const nextConfig: NextConfig = {
   ...(deploymentId ? { deploymentId: deploymentId.trim() } : {}),
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  async redirects() {
+    return [
+      {
+        source: "/blog/prod-dive-in-agentic-architecture",
+        destination: "/blog/call-e-agentic-tech-doc",
+        permanent: true
+      },
+      {
+        source: "/zh/blog/prod-dive-in-agentic-architecture",
+        destination: "/zh/blog/call-e-agentic-tech-doc",
+        permanent: true
+      }
+    ];
+  },
   experimental: {
     devtoolSegmentExplorer: false
   },

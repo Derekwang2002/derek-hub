@@ -3,7 +3,7 @@ title: "Docker 从零理解：从 Dockerfile 到 Container"
 date: 2026-07-10
 summary: "用一个虚构的五服务商店，从构建 Image、启动 Container，一路讲清 Compose、网络、Volume 与 Docker 的底层运行链路。"
 tags: [docker, container, devops]
-selected: true
+selected: false
 draft: false
 ---
 

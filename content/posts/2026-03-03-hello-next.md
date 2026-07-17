@@ -3,7 +3,7 @@ title: Hello Next
 date: 2026-03-03
 summary: A simple test post for validating the blog list and post detail pages.
 tags: [Test, Next.js]
-selected: true
+selected: false
 draft: false
 ---
 
