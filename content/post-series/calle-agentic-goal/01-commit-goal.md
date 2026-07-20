@@ -1,5 +1,5 @@
 ---
-title: "第 1 篇：追踪 commit_goal——Goal、Event 与 Dispatch 如何持久化"
+title: "追踪 commit_goal——Goal、Event 与 Dispatch 如何持久化"
 summary: "从 MainAgent 的工具调用一路追到三张数据库表，解释 commit_goal 的事务、幂等和异步派发边界。"
 ---
 

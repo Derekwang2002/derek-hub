@@ -1,5 +1,5 @@
 ---
-title: "Part 1: Tracing commit_goal—How Goal, Event, and Dispatch Are Persisted"
+title: "Tracing commit_goal—How Goal, Event, and Dispatch Are Persisted"
 summary: "Follow the path from MainAgent's tool call to three database tables, explaining commit_goal's transaction, idempotency, and asynchronous dispatch boundaries."
 ---
 

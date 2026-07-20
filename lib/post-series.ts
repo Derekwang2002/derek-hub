@@ -19,16 +19,6 @@ export type PostSeriesDocument = {
   title: string;
 };
 
-export type PostSeriesNavigation = {
-  label: string;
-  items: Array<{
-    current: boolean;
-    href: string;
-    label: string;
-    order: number;
-  }>;
-};
-
 const SERIES_DEFINITIONS: PostSeriesDefinition[] = [
   {
     directoryName: "calle-agentic-goal",
@@ -67,45 +57,6 @@ export function getPostSeriesDefinitionByParentPostSlug(
       (definition) => definition.parentPostSlug === parentPostSlug
     ) ?? null
   );
-}
-
-export function toPostSeriesNavigation(input: {
-  currentSlug: string | null;
-  documents: PostSeriesDocument[];
-  label: string;
-  locale: PostSeriesLocale;
-  parentHref: string;
-  parentTitle: string;
-  seriesSlug: string;
-}): PostSeriesNavigation {
-  const documentItems = [...input.documents]
-    .sort((a, b) => a.order - b.order)
-    .map((document) => ({
-      current: input.currentSlug === document.slug,
-      href: `/${input.locale === "zh" ? "zh/" : ""}blog/${input.seriesSlug}/${document.slug}`,
-      label: document.title,
-      order: document.order
-    }));
-
-  if (
-    input.currentSlug !== null &&
-    documentItems.filter((item) => item.current).length !== 1
-  ) {
-    throw new Error(`Exactly one document must match current slug "${input.currentSlug}".`);
-  }
-
-  return {
-    label: input.label,
-    items: [
-      {
-        current: input.currentSlug === null,
-        href: input.parentHref,
-        label: input.parentTitle,
-        order: 0
-      },
-      ...documentItems
-    ]
-  };
 }
 
 export async function loadPostSeriesDocumentsFromRoots(input: {

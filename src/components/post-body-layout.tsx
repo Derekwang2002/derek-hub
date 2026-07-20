@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
 import { useActiveHeading } from "./use-active-heading";
-import type { PostSeriesLocale, PostSeriesNavigation } from "../../lib/post-series";
+import type { PostSeriesLocale } from "../../lib/post-series";
 import styles from "../app/blog/[slug]/page.module.css";
 
 const TOC_PREFERENCE_KEY = "derek-hub:toc-open";
@@ -16,7 +16,6 @@ type PostBodyLayoutProps = {
   articleTitle: string;
   children: ReactNode;
   locale?: PostSeriesLocale;
-  seriesNavigation?: PostSeriesNavigation;
   tocItems: TocItem[];
 };
 
@@ -24,7 +23,6 @@ export function PostBodyLayout({
   articleTitle,
   children,
   locale = "en",
-  seriesNavigation,
   tocItems
 }: PostBodyLayoutProps) {
   const [viewportMode, setViewportMode] = useState<ViewportMode>("pending");
@@ -105,7 +103,6 @@ export function PostBodyLayout({
         onOpenChange={setTocOpen}
         open={tocOpen}
         overlay={tocOverlay}
-        seriesNavigation={seriesNavigation}
       />
       <article className={styles.content}>{children}</article>
       <PostReadingRail activeId={activeId} items={tocItems} />

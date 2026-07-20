@@ -15,7 +15,6 @@ import {
   getPostSeriesDefinition,
   getPostSeriesDocument,
   getPostSeriesDocuments,
-  toPostSeriesNavigation,
   type PostSeriesLocale
 } from "../../lib/post-series";
 import styles from "../app/blog/[slug]/page.module.css";
@@ -58,39 +57,35 @@ export async function PostSeriesDocumentPage({
   const previous = documents[documentIndex - 1] ?? null;
   const next = documents[documentIndex + 1] ?? null;
   const previousLink: PostSeriesPagerLink = previous
-    ? toPagerLink(previous.slug, previous.title)
-    : { href: localizedParentHref, label: parentPost.title };
-  const nextLink = next ? toPagerLink(next.slug, next.title) : null;
-  const seriesNavigation = toPostSeriesNavigation({
-    currentSlug: docSlug,
-    documents,
-    label: locale === "zh" ? "系列导航" : "Series navigation",
-    locale,
-    parentHref: localizedParentHref,
-    parentTitle: parentPost.title,
-    seriesSlug
-  });
+    ? toPagerLink(previous.order, previous.slug, previous.title)
+    : {
+        href: localizedParentHref,
+        label: locale === "zh" ? "第 0 篇：架构总览" : "Part 0: Architecture overview"
+      };
+  const nextLink = next ? toPagerLink(next.order, next.slug, next.title) : null;
   const tocItems = getMarkdownHeadings(document.content);
   const renderedContent = await renderMarkdown(document.content, tocItems);
 
-  function toPagerLink(slug: string, label: string): PostSeriesPagerLink {
+  function toPagerLink(order: number, slug: string, title: string): PostSeriesPagerLink {
+    const label = locale === "zh"
+      ? `第 ${order} 篇：${title}`
+      : `Part ${order}: ${title}`;
     return { href: `${blogHref}/${seriesSlug}/${slug}`, label };
   }
 
   return (
     <main className={styles.postPage} lang={locale === "zh" ? "zh-CN" : "en"}>
-      <nav aria-label={locale === "zh" ? "面包屑" : "Breadcrumb"} className={styles.seriesBreadcrumbs}>
-        <Link href={blogHref}>Blog</Link>
-        <span aria-hidden="true">/</span>
-        <Link href={localizedParentHref}>{parentPost.title}</Link>
-      </nav>
-
       <header className={styles.header}>
-        <p className={styles.seriesKicker}>
-          {locale === "zh"
-            ? `CALL-E Agentic Goal · 第 ${document.order} 篇`
-            : `CALL-E Agentic Goal · Part ${document.order}`}
-        </p>
+        <nav
+          aria-label={locale === "zh" ? "系列位置" : "Series position"}
+          className={styles.seriesContext}
+        >
+          <Link href={localizedParentHref}>CALL-E Agentic Goal</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">
+            {locale === "zh" ? `第 ${document.order} 篇` : `Part ${document.order}`}
+          </span>
+        </nav>
         <h1 className={styles.title}>{document.title}</h1>
         <time className={styles.date} dateTime={parentPost.date}>
           {formatContentDate(parentPost.date, locale)}
@@ -112,7 +107,6 @@ export async function PostSeriesDocumentPage({
       <PostBodyLayout
         articleTitle={document.title}
         locale={locale}
-        seriesNavigation={seriesNavigation}
         tocItems={tocItems}
       >
         {renderedContent}

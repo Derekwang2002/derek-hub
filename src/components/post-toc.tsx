@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
-import Link from "next/link";
-import type { PostSeriesLocale, PostSeriesNavigation } from "../../lib/post-series";
+import type { PostSeriesLocale } from "../../lib/post-series";
 import styles from "../app/blog/[slug]/page.module.css";
 
 export type TocItem = {
@@ -20,7 +19,6 @@ type PostTocProps = {
   onOpenChange: (open: boolean) => void;
   open: boolean;
   overlay: boolean;
-  seriesNavigation?: PostSeriesNavigation;
 };
 
 const FOCUSABLE_SELECTOR =
@@ -33,13 +31,12 @@ export function PostToc({
   locale = "en",
   onOpenChange,
   open,
-  overlay,
-  seriesNavigation
+  overlay
 }: PostTocProps) {
   const contentsRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const hasContents = items.length > 0 || Boolean(seriesNavigation?.items.length);
+  const hasContents = items.length > 0;
 
   useEffect(() => {
     if (!open || !activeId) {
@@ -261,21 +258,6 @@ export function PostToc({
           id="post-toc-list"
           ref={contentsRef}
         >
-          {seriesNavigation ? (
-            <nav aria-label={seriesNavigation.label} className={styles.seriesNav}>
-              <p className={styles.tocGroupLabel}>{seriesNavigation.label}</p>
-              <ol className={styles.seriesList}>
-                {seriesNavigation.items.map((item) => (
-                  <li className={item.current ? styles.seriesCurrent : undefined} key={item.href}>
-                    <Link aria-current={item.current ? "page" : undefined} href={item.href}>
-                      <span aria-hidden="true">{item.order}</span>
-                      <span>{item.label}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          ) : null}
           <p className={styles.tocGroupLabel}>
             {locale === "zh" ? "本页目录" : "On this page"}
           </p>

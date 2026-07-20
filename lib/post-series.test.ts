@@ -7,8 +7,7 @@ import {
   getAllPostSeriesDocuments,
   getPostSeriesDefinitionByParentPostSlug,
   loadPostSeriesDocumentsFromRoots,
-  parsePostSeriesFileName,
-  toPostSeriesNavigation
+  parsePostSeriesFileName
 } from "./post-series";
 
 const temporaryRoots: string[] = [];
@@ -40,78 +39,6 @@ test("parses order and public slug from NN-slug.md", () => {
     slug: "commit-goal"
   });
   assert.throws(() => parsePostSeriesFileName("commit-goal.md"), /NN-lowercase-kebab-slug/);
-});
-
-test("builds deterministic series navigation with exactly one current item", () => {
-  const navigation = toPostSeriesNavigation({
-    currentSlug: "runner",
-    documents: [
-      {
-        content: "Runner body",
-        fileName: "02-runner.md",
-        order: 2,
-        seriesSlug: "calle-agentic-goal",
-        slug: "runner",
-        summary: "Runner summary",
-        title: "Runner"
-      },
-      {
-        content: "Commit Goal body",
-        fileName: "01-commit-goal.md",
-        order: 1,
-        seriesSlug: "calle-agentic-goal",
-        slug: "commit-goal",
-        summary: "Commit Goal summary",
-        title: "Commit Goal"
-      }
-    ],
-    label: "CALL-E Agentic Goal",
-    locale: "en",
-    parentHref: "/blog/calle-agentic-goal",
-    parentTitle: "Architecture Guide",
-    seriesSlug: "calle-agentic-goal"
-  });
-
-  assert.deepEqual(
-    navigation.items.map(({ current, href, label, order }) => ({ current, href, label, order })),
-    [
-      {
-        current: false,
-        href: "/blog/calle-agentic-goal",
-        label: "Architecture Guide",
-        order: 0
-      },
-      {
-        current: false,
-        href: "/blog/calle-agentic-goal/commit-goal",
-        label: "Commit Goal",
-        order: 1
-      },
-      {
-        current: true,
-        href: "/blog/calle-agentic-goal/runner",
-        label: "Runner",
-        order: 2
-      }
-    ]
-  );
-  assert.equal(navigation.items.filter((item) => item.current).length, 1);
-});
-
-test("rejects series navigation without exactly one matching current document", () => {
-  assert.throws(
-    () =>
-      toPostSeriesNavigation({
-        currentSlug: "missing-document",
-        documents: [],
-        label: "CALL-E Agentic Goal",
-        locale: "en",
-        parentHref: "/blog/calle-agentic-goal",
-        parentTitle: "Architecture Guide",
-        seriesSlug: "calle-agentic-goal"
-      }),
-    /exactly one document must match current slug/i
-  );
 });
 
 test("loads ordered canonical documents and exact English mirrors", async () => {
