@@ -3,10 +3,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
+import { PostSeriesPager } from "@/components/post-series-pager";
 import { formatContentDate } from "../../../../../lib/locale";
 import { getAllPosts, normalizeTagSlug } from "../../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../../lib/localized-posts";
-import { getPostSeriesDefinitionByParentPostSlug } from "../../../../../lib/post-series";
+import {
+  getPostSeriesDefinitionByParentPostSlug,
+  getPostSeriesDocuments
+} from "../../../../../lib/post-series";
 import styles from "../../../blog/[slug]/page.module.css";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -30,6 +34,15 @@ export default async function ChineseBlogPostPage({ params }: Props) {
   const tocItems = getMarkdownHeadings(post.content);
   const renderedContent = await renderMarkdown(post.content, tocItems);
   const seriesDefinition = getPostSeriesDefinitionByParentPostSlug(post.slug);
+  const firstSeriesDocument = seriesDefinition
+    ? (await getPostSeriesDocuments(seriesDefinition.slug, "zh"))[0]
+    : null;
+  const nextSeriesLink = firstSeriesDocument && seriesDefinition
+    ? {
+        href: `/zh/blog/${seriesDefinition.slug}/${firstSeriesDocument.slug}`,
+        label: `第 ${firstSeriesDocument.order} 篇：${firstSeriesDocument.title}`
+      }
+    : null;
 
   return (
     <main className={styles.postPage} lang="zh-CN">
@@ -53,6 +66,9 @@ export default async function ChineseBlogPostPage({ params }: Props) {
       >
         {renderedContent}
       </PostBodyLayout>
+      {nextSeriesLink ? (
+        <PostSeriesPager locale="zh" next={nextSeriesLink} previous={null} />
+      ) : null}
     </main>
   );
 }
