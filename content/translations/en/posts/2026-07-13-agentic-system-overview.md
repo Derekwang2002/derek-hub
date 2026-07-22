@@ -1,5 +1,5 @@
 ---
-title: "Agentic Systems Overview: CALL-E, the Desktop Agent, and Browser Takeover"
+title: "CALL-E Overview"
 summary: "A systems-level tour of CALL-E, the desktop Agent, and browser takeover: their product boundaries, layered architecture, technology stack, and evolving Agent runtimes."
 ---
 

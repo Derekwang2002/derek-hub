@@ -1,11 +1,9 @@
 ---
-title: "Understanding the CALL-E Agentic Goal Architecture: From a Chat Request to a Real Phone Call"
+title: "CALL-E Agentic Goal Architecture"
 summary: "A beginner-friendly guide to CALL-E's Agentic Goal system and how MainAgent, GoalBrief, GoalAgent, Iteration, RunSpec, Run, Event, Report, and the persistent runtime work together."
 ---
 
-Many AI products look like little more than a chat box. The moment they must complete a real-world task for the user, however, the problem becomes much more complicated. Does the task continue after the user closes the page? Should the system retry after an unanswered call? Who decides whether the task is finished? Can the system treat “done” from the model as a fact?
-
-CALL-E's Goal system is designed for these questions. It does not hand one user sentence to a large model and ask it to execute everything. It turns a natural-language objective into a persistent, recoverable, and auditable long-lived work order, then lets several roles advance that work in stages.
+CALL-E's Goal system does not hand one user sentence to a large model and ask it to execute everything. It turns a natural-language objective into a persistent, recoverable, and auditable long-lived work order, then lets several roles advance that work in stages.
 
 This article describes the implementation around commit `aa7af64` of the `prod-dive-in` repository. It focuses on:
 
@@ -121,7 +119,7 @@ The main CALL-E Goal flow looks like this:
     │ Natural-language objective
     ▼
 ┌─────────────────────┐
-│ MainAgent            │
+│ MainAgent           │
 │ Understand, clarify, │
 │ and commit objective │
 └──────────┬──────────┘

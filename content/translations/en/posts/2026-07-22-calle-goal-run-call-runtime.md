@@ -1,5 +1,5 @@
 ---
-title: "CALL-E Goals, Runs, and Calls: Conceptual Structure, Actors, and the Complete Execution Flow"
+title: "CALL-E Agentic Goal: Complete Execution Flow"
 summary: "Starting from the relationships among Session, Goal, RunSpec, RunGroup, Run, and Call, this article progressively explains the responsibility boundaries of MainAgent, GoalAgent, the CALL-E Runtime, the Voice Runtime, and external Providers in a real outbound call."
 ---
 

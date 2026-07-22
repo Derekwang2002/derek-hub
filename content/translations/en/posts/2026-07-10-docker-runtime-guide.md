@@ -1,5 +1,5 @@
 ---
-title: "Understanding Docker from Scratch: From Dockerfile to Container"
+title: "Introduction to Docker"
 summary: "A fictional five-service shop explains how Docker builds Images, starts Containers, and connects Compose, networking, Volumes, and the underlying runtime."
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Agentic 系统全景：CALL-E、桌面 Agent 与浏览器接管"
+title: "CALL-E 全景"
 date: 2026-07-13
 summary: "从系统级视角认识 CALL-E、桌面 Agent 与浏览器接管的产品边界、分层架构、技术栈，以及多代 Agent runtime 的演进关系。"
 tags: [agent, architecture, voice-ai, python]

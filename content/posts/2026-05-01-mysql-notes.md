@@ -1,7 +1,7 @@
 ---
-title: MySQL八股
+title: MySQL 八股
 date: 2026-05-01
-summary: 小林coding学习记录
+summary: 小林 coding 学习笔记
 tags: [mysql, database]
 selected: true
 draft: false

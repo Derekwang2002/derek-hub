@@ -1,5 +1,5 @@
 ---
-title: "Ponytail Review: A Code Review Skill Dedicated to Removing Overengineering"
+title: "Ponytail Review Skill: Streamlining Redundant Code"
 summary: "An introduction to how ponytail-review checks only the current diff for overengineering, using five categories of suggestions—delete, stdlib, native, yagni, and shrink—to add the deletion perspective that ordinary code review rarely covers."
 ---
 
@@ -11,7 +11,7 @@ Most code reviews look for “what is still missing”: Is error handling incomp
 
 It is an Agent Skill in the [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail) project, dedicated to reviewing overengineering. It does not check correctness, security, or performance, does not modify code directly, and does not produce an exhaustive review report. It only lists code that can be deleted, inlined, or replaced with existing capabilities, and requires every suggestion to explain the replacement.
 
-The protagonist of the Ponytail project is a “lazy senior engineer”: give him fifty lines of code and, rather than discussing grand architecture, he reduces it to the few lines actually needed. `ponytail-review` is the most restrained and practical version of this persona.
+The protagonist of the Ponytail project is a “lazy senior engineer”: rather than discussing grand architecture, he reduces code to the few lines actually needed. `ponytail-review` is the most restrained and practical version of this persona.
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: "Ponytail Review：专门删除过度设计的 Code Review Skill"
+title: "Ponytail Review skill: 精简冗余代码"
 date: 2026-07-20
 summary: "介绍 ponytail-review 如何只检查当前 Diff 中的过度设计，用 delete、stdlib、native、yagni 与 shrink 五类建议，补上普通代码审查很少覆盖的删除视角。"
 tags: [ai-agent, code-review, software-engineering, yagni]
@@ -15,7 +15,7 @@ draft: false
 
 它是 [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail) 项目中的一个 Agent Skill，专门审查过度设计。它不检查正确性、安全性或性能，不直接修改代码，也不输出一篇面面俱到的审查报告。它只列出可以删除、内联或换成现成能力的代码，并要求每条建议都说明替代方案。
 
-Ponytail 项目的主角是一位“懒惰的资深工程师”：你拿五十行代码给他看，他不讨论宏大架构，只把它改成真正需要的几行。`ponytail-review` 是这个角色最克制、也最实用的版本。
+Ponytail 项目的主角是一位“懒惰的资深工程师”：不讨论宏大架构，只把它改成真正需要的几行。`ponytail-review` 是这个角色最克制、也最实用的版本。
 
 ---
 

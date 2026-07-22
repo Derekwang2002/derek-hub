@@ -1,5 +1,5 @@
 ---
-title: "Matt Pocock Skills AI-coding 工作流"
+title: "Matt Pocock Skills 工作流"
 date: 2026-07-17
 summary: "一套适用于 AI-coding 的完整软件开发流程，覆盖需求澄清、规格设计、Ticket 拆分、TDD 实现、代码审查与 Bug 诊断。"
 tags: [ai-agent, software-engineering, tdd]

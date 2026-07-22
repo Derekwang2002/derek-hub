@@ -1,5 +1,5 @@
 ---
-title: "Matt Pocock Skills AI Coding Workflow"
+title: "Matt Pocock Skills Workflow"
 summary: "A complete software development workflow for coding Agents such as Codex and Claude Code, covering requirements clarification, specification design, Ticket decomposition, TDD implementation, code review, and Bug diagnosis."
 ---
 

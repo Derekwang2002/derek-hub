@@ -1,5 +1,5 @@
 ---
-title: Algo notes
+title: Leetcode notes
 summary: Notes and code snippets on data structures and algorithms.
 ---
 
@@ -46,8 +46,6 @@ for (Map.Entry<String, Integer> entry : map.entrySet()) {
 
 # Strings
 
-[Common interview traps](https://www.notion.so/3052cf069c088093b073e108f8c127f3?pvs=21)
-
 - A string is a finite sequence of characters and can be viewed as a character array, though languages add their own rules.
   - C stores the terminator `\0` in the array and uses it to detect the end.
   - C++ provides `string` and its `size` interface, so termination need not be detected with `\0`.
@@ -59,8 +57,6 @@ for (Map.Entry<String, Integer> entry : map.entrySet()) {
 StringBuilder sb = new StringBuilder();
 ```
 
-[Untitled attachment](Untitled%203102cf069c0880eda69adbbad7cda137.csv)
-
 # Two Pointers
 
 ### Summary
@@ -69,8 +65,6 @@ StringBuilder sb = new StringBuilder();
 - **For many array or string filling problems, resize to the final length first, then operate backward.**
 - **For cycle detection, move `fast` two nodes and `slow` one node at a time. If they meet, the linked list has a cycle.**
 - N-sum: **move front and back pointers toward each other to replace an inner loop.**
-
-[Untitled attachment](Untitled%203102cf069c08801f83b9eea59cbe15bc.csv)
 
 # Stack and Queue
 
@@ -145,20 +139,6 @@ public class TreeNode {
 }
 ```
 
-[Binary Tree Traversal](https://www.notion.so/Binary-Tree-Traversal-3022cf069c0880dbbf7fe7251c054711?pvs=21)
-
-> https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20200927%E4%BA%8C%E5%8F%89%E6%A0%91%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E5%85%AD
-
-> https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201003%E4%BA%8C%E5%8F%89%E6%A0%91%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-> https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201010%E4%BA%8C%E5%8F%89%E6%A0%91%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-> https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201017%E4%BA%8C%E5%8F%89%E6%A0%91%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-> February 16 — Happy Chinese New Year!
-
-> https://programmercarl.com/%E4%BA%8C%E5%8F%89%E6%A0%91%E6%80%BB%E7%BB%93%E7%AF%87.html#%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80
-
 # Backtracking
 
 - Backtracking uses recursion; a recursion tree is a useful mental model.
@@ -186,30 +166,8 @@ void backtracking(parameters) {
 }
 ```
 
-(https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201030%E5%9B%9E%E6%BA%AF%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80)
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201107%E5%9B%9E%E6%BA%AF%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201112%E5%9B%9E%E6%BA%AF%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-https://programmercarl.com/%E5%9B%9E%E6%BA%AF%E7%AE%97%E6%B3%95%E5%8E%BB%E9%87%8D%E9%97%AE%E9%A2%98%E7%9A%84%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%86%99%E6%B3%95.html#_90-%E5%AD%90%E9%9B%86ii
-
-https://programmercarl.com/%E5%9B%9E%E6%BA%AF%E6%80%BB%E7%BB%93.html#%E5%9B%9E%E6%BA%AF%E6%B3%95%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%80
-
 # Greedy Algorithms
 
 - Can a local optimum produce the global optimum?
 - Test the idea by looking for a counterexample.
 - Deliberately consider a greedy formulation when solving problems.
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201126%E8%B4%AA%E5%BF%83%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201203%E8%B4%AA%E5%BF%83%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html#%E5%91%A8%E4%B8%80
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201217%E8%B4%AA%E5%BF%83%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html
-
-https://programmercarl.com/%E5%91%A8%E6%80%BB%E7%BB%93/20201224%E8%B4%AA%E5%BF%83%E5%91%A8%E6%9C%AB%E6%80%BB%E7%BB%93.html
-
----
-
-[PR to-do](https://www.notion.so/PR-to-do-3152cf069c088015a16cd57186c7fb5c?pvs=21)

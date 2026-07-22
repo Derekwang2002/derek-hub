@@ -1,5 +1,5 @@
 ---
-title: "CALL-E Agentic Goal 架构从零理解：从聊天目标到真实电话执行"
+title: "CALL-E Agentic Goal 架构"
 date: 2026-07-20
 summary: "面向新手拆解 CALL-E Agentic Goal 系统，讲清 MainAgent、GoalBrief、GoalAgent、Iteration、RunSpec、Run、Event、Report 与持久化运行时如何协作。"
 tags: [ai-agent, architecture, voice-ai, domain-modeling]
@@ -7,9 +7,7 @@ selected: false
 draft: false
 ---
 
-很多 AI 产品看起来只是一个聊天框，但当它需要真正替用户完成现实世界任务时，问题会迅速变复杂：用户关闭网页后任务是否继续？一次电话没打通是否应该重试？谁负责判断任务是否完成？模型说“完成了”能不能直接当成系统事实？
-
-CALL-E 的 Goal 系统就是为这些问题设计的。它不把用户的一句话简单地交给一个大模型执行，而是把自然语言目标转换成一张可持久化、可恢复、可审计的长期工单，再由不同角色分阶段推进。
+CALL-E 的 Goal 系统不把用户的一句话简单地交给一个大模型执行，而是把自然语言目标转换成一张可持久化、可恢复、可审计的长期工单，再由不同角色分阶段推进。
 
 本文主要关注：
 
@@ -125,7 +123,7 @@ CALL-E Goal 主链路可以画成下面这样：
     │ 自然语言目标
     ▼
 ┌─────────────────────┐
-│ MainAgent            │
+│ MainAgent           │
 │ 理解、澄清、提交目标   │
 └──────────┬──────────┘
            │ commit_goal / notify_goal
@@ -138,7 +136,7 @@ CALL-E Goal 主链路可以画成下面这样：
            ▼
 ┌──────────────────────────────┐
 │ Goal Runtime                 │
-│ 游标、租约、派发、事务、恢复   │
+│ 游标、租约、派发、事务、恢复      │
 └──────────┬───────────────────┘
            │ 根据 goal_type
            ├───────────────┐

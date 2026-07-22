@@ -1,5 +1,5 @@
 ---
-title: "Docker 入门：从 Dockerfile 到 Container"
+title: "Docker 简介"
 date: 2026-07-10
 summary: "用一个虚构的五服务项目，从构建 Image、启动 Container，一路讲清 Compose、网络、Volume 与 Docker 的底层运行链路。"
 tags: [docker, devops]
