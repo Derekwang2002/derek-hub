@@ -594,7 +594,7 @@ function slugifyHeading(text: string): string {
 function parseInline(text: string, keyPrefix: string): ReactNode[] {
   const nodes: ReactNode[] = [];
   const pattern =
-    /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|<((?:https?:\/\/|mailto:)[^>\s]+)>|`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*|(?<!\\)\$((?:\\.|[^$\n])+?)(?<!\\)\$/g;
+    /!\[([^\]]*)\]\(([^)]+)\)|\[([^\]]+)\]\(([^)]+)\)|<((?:https?:\/\/|mailto:)[^>\s]+)>|(`+)(.+?)\6|\*\*([^*]+)\*\*|\*([^*]+)\*|(?<!\\)\$((?:\\.|[^$\n])+?)(?<!\\)\$/g;
   let lastIndex = 0;
   let match = pattern.exec(text);
 
@@ -646,29 +646,29 @@ function parseInline(text: string, keyPrefix: string): ReactNode[] {
           {href}
         </a>
       );
-    } else if (match[6] !== undefined) {
+    } else if (match[6] !== undefined && match[7] !== undefined) {
       nodes.push(
         <code className={styles.inlineCode} key={`${keyPrefix}-code-${match.index}`}>
-          {match[6]}
+          {match[7]}
         </code>
-      );
-    } else if (match[7] !== undefined) {
-      nodes.push(
-        <strong key={`${keyPrefix}-strong-${match.index}`}>
-          {parseInline(match[7], `${keyPrefix}-strong-${match.index}`)}
-        </strong>
       );
     } else if (match[8] !== undefined) {
       nodes.push(
-        <em key={`${keyPrefix}-em-${match.index}`}>
-          {parseInline(match[8], `${keyPrefix}-em-${match.index}`)}
-        </em>
+        <strong key={`${keyPrefix}-strong-${match.index}`}>
+          {parseInline(match[8], `${keyPrefix}-strong-${match.index}`)}
+        </strong>
       );
     } else if (match[9] !== undefined) {
       nodes.push(
+        <em key={`${keyPrefix}-em-${match.index}`}>
+          {parseInline(match[9], `${keyPrefix}-em-${match.index}`)}
+        </em>
+      );
+    } else if (match[10] !== undefined) {
+      nodes.push(
         <span
           className={styles.inlineMath}
-          dangerouslySetInnerHTML={{ __html: renderMath(match[9], false) }}
+          dangerouslySetInnerHTML={{ __html: renderMath(match[10], false) }}
           key={`${keyPrefix}-math-${match.index}`}
         />
       );
