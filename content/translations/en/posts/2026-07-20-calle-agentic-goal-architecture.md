@@ -25,7 +25,7 @@ This series moves from intuition toward source-level understanding. Each article
 - **[Part 3: Trace `RunSpec → Run → VoiceRunExecutor`](/blog/calle-agentic-goal/voice-run-execution):** Understand asynchronous submission, state transitions, and the evidence chain for a real phone call.
 - **Part 4 (planned):** Trace the result path from `Report → Context Delivery → MainAgent`.
 
-If the relationship between CALL-E, the desktop Agent, the Bridge, and the browser capabilities is not yet clear, start with [The Agentic Systems Overview](/blog/agentic-system-overview).
+If the relationship between CALL-E, the desktop Agent, the Bridge, and the browser capabilities is not yet clear, start with [The CALL-E System Overview](/blog/call-e-overview).
 
 ## 1. Start with an everyday example
 
@@ -510,6 +510,34 @@ VoiceRunExecutor
 ```
 
 Batch tasks use a RunGroup to organize multiple Runs. When different recipients need different scripts, they should receive different RunSpecs instead of forcing all recipient differences into one prompt.
+
+### 12.1 RunGroup and Call: do not conflate execution-layer IDs
+
+A `RunGroup` is an organizational unit for one or many executions: a Goal can have multiple RunGroups, and a RunGroup can contain multiple Runs. It groups a related business operation; it does not replace the meaning of a Run as one attempt.
+
+For outbound calls, a `Call` is likewise not a core product entity parallel to Goal and Run. It is the record left in an external calling system by a voice-type Run. Keep these identifiers distinct:
+
+| Identifier | Layer | Purpose |
+|---|---|---|
+| `Run ID` | CALL-E | One auditable business-execution attempt |
+| Calling `task_id` / `external_run_id` | Calling Runtime | The external execution task and its asynchronous state |
+| Provider `call_id` | Telephony Provider | The record for one concrete call |
+
+A Run can create a Calling task before a provider call exists; a retry creates a new Run or external task. When debugging, use the Run as the business anchor and follow its external IDs to the concrete call. Do not treat any `call_id` as the identity of the entire Goal.
+
+### 12.2 The complete outbound flow: who decides and who executes
+
+Separating the flow by responsibility prevents model decisions, persistent state, and real dialing from becoming one apparent synchronous call:
+
+1. **MainAgent** receives the user's goal, fills blocking information, creates a GoalBrief, and uses `commit_goal` to write the Goal and initial Events.
+2. **Goal Runtime** acquires a Lease, reads Events after its Cursor, restores the GoalAgent Session, and starts a GoalAgent iteration.
+3. **GoalAgent** decides the next business step: it creates or updates a RunSpec and, when authorization is needed, uses Context Delivery to ask MainAgent to obtain confirmation.
+4. After confirmation, **GoalAgent** calls `submit_voice_run`, which only creates a `queued` Run. The iteration ends without waiting for the call.
+5. **VoiceRunExecutor / Calling Runtime** claims the Run, creates the external task, places the call, and writes status, Transcript, results, and evidence back as Run Events and Goal Events.
+6. The new Events wake **GoalAgent** again. It evaluates the success criteria, retries, continues, fails, or completes, and creates and `commit_report`s a report when needed.
+7. **Context Delivery** returns structured results to MainAgent; only MainAgent composes the final user-facing response.
+
+The critical boundary is that GoalAgent decides the next business action, Runtime durably persists and schedules it, Voice Runtime performs real-world side effects, and MainAgent owns the user conversation. A task must remain recoverable when any one of those components restarts.
 
 ## 13. `complete_goal_iteration`: ending a round structurally
 

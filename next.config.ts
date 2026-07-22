@@ -53,6 +53,16 @@ const nextConfig: NextConfig = {
         source: "/zh/blog/calle-agentic-goal-architecture-guide",
         destination: "/zh/blog/calle-agentic-goal-architecture",
         permanent: true
+      },
+      {
+        source: "/blog/calle-agentic-goal-full-chain",
+        destination: "/blog/calle-agentic-goal-architecture",
+        permanent: true
+      },
+      {
+        source: "/zh/blog/calle-agentic-goal-full-chain",
+        destination: "/zh/blog/calle-agentic-goal-architecture",
+        permanent: true
       }
     ];
   },
