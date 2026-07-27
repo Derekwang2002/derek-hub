@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CALL-E · Agentic Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ground:#0E1216; --ground-2:#0B0F13; --panel:#161D24; --panel-hi:#1B232C;
+    --wire:#34404C; --wire-dim:#212A32; --ink:#CBD6E0; --ink-bright:#EAF1F7; --muted:#6C7A88;
+    --signal:#FF6A3D;   /* outbound / active */
+    --inbound:#7FA6FF;  /* inbound */
+    --live:#46D8AC;     /* report-back · event bus · extension points */
+    --plan:#F2B14C;     /* planned · scheduled */
+    /* per-layer accents */
+    --l-entry:#FF6A3D; --l-agents:#7FA6FF; --l-compose:#46D8AC;
+    --l-runtime:#F2B14C; --l-state:#C58BF0; --l-events:#5BD0E0; --l-disk:#8DE08A;
+    --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+    --disp:"Space Grotesk",system-ui,sans-serif;
+    --body:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:
+      radial-gradient(1000px 520px at 22% -12%, rgba(255,106,61,.09), transparent 60%),
+      radial-gradient(900px 560px at 90% -6%, rgba(127,166,255,.09), transparent 58%),
+      var(--ground);
+    color:var(--ink); font-family:var(--body); line-height:1.5; -webkit-font-smoothing:antialiased;}
+  .shell{width:100%; max-width:none; margin:0; padding:52px clamp(16px,2vw,32px) 96px;}
+  code{font-family:var(--mono); font-size:.86em; color:var(--ink-bright); background:rgba(255,255,255,.045); padding:1px 5px; border-radius:4px;}
+
+  /* top navigation + language toggle */
+  .topbar{display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:flex-start; gap:18px;}
+  .site-nav{display:flex; flex-wrap:wrap; justify-content:center; gap:5px; padding:3px; border:1px solid var(--wire-dim);
+    border-radius:999px; background:rgba(11,15,19,.72); backdrop-filter:blur(10px);}
+  .navlink{font-family:var(--mono); font-size:10.5px; color:var(--muted); text-decoration:none; white-space:nowrap;
+    padding:5px 10px; border-radius:999px; transition:background .15s,color .15s;}
+  .navlink:hover,.navlink:focus-visible{color:var(--ink-bright); background:rgba(255,255,255,.06); outline:none;}
+  .langtoggle{display:inline-flex; flex:0 0 auto; border:1px solid var(--wire); border-radius:999px;
+    overflow:hidden; background:var(--ground-2); font-family:var(--mono); font-size:11px;}
+  .langbtn{appearance:none; border:0; background:transparent; color:var(--muted); padding:6px 14px;
+    cursor:pointer; letter-spacing:.05em; transition:background .15s,color .15s;}
+  .langbtn.on{background:var(--signal); color:#0E1216; font-weight:600;}
+  .langbtn:not(.on):hover{color:var(--ink-bright);}
+
+  /* hero */
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.3em; text-transform:uppercase;
+    color:var(--signal); display:flex; align-items:center; gap:12px;}
+  .eyebrow::before{content:""; width:26px; height:1px; background:var(--signal);}
+  h1{font-family:var(--disp); font-weight:600; font-size:clamp(32px,5vw,54px);
+    line-height:1.03; letter-spacing:-.02em; margin:18px 0 0; color:var(--ink-bright);}
+  h1 em{font-style:normal; color:var(--signal);}
+  .thesis{max-width:720px; margin:18px 0 0; font-size:15.5px; color:var(--muted);}
+  .thesis b{color:var(--ink); font-weight:600;}
+
+  /* ===== slim flow reference strip ===== */
+  .flowstrip{margin-top:30px; border:1px solid var(--wire-dim); border-radius:12px; background:rgba(255,255,255,.012);
+    padding:13px 16px;}
+  .flowstrip .fs-label{font-family:var(--mono); font-size:9.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;}
+  .fs-track{display:flex; align-items:center; gap:7px; flex-wrap:nowrap; overflow-x:auto; padding-bottom:3px;}
+  .fs-node{font-family:var(--mono); font-size:11px; color:var(--ink); white-space:nowrap; padding:4px 9px;
+    border:1px solid var(--wire); border-radius:7px; background:var(--ground-2);}
+  .fs-node.rep{color:var(--live); border-color:color-mix(in srgb,var(--live) 45%,transparent);}
+  .fs-node.plan{color:var(--plan); border-color:color-mix(in srgb,var(--plan) 45%,transparent); border-style:dashed;}
+  .fs-arr{font-family:var(--mono); font-size:11px; color:var(--wire); white-space:nowrap;}
+  .fs-arr b{color:var(--signal); font-weight:500;}
+  .fs-loop{margin-top:9px; font-family:var(--mono); font-size:10px; color:var(--muted); display:flex; gap:18px; flex-wrap:wrap;}
+  .fs-loop .lp::before{content:"↺ "; }
+  .fs-loop .live{color:var(--live);} .fs-loop .pl{color:var(--plan);} .fs-loop .rp{color:var(--live);}
+
+  /* ===== layer stack ===== */
+  .stack{margin-top:42px; display:flex; flex-direction:column; gap:14px;}
+  .layer{display:grid; grid-template-columns:118px 1fr; gap:18px; align-items:stretch;
+    border:1px solid var(--wire); border-radius:16px; overflow:hidden;
+    background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 7%,var(--panel)), var(--panel-hi));}
+  .rail{position:relative; display:flex; flex-direction:column; justify-content:center; gap:7px;
+    padding:18px 14px; background:color-mix(in srgb,var(--accent) 12%,transparent);
+    border-right:1px solid color-mix(in srgb,var(--accent) 35%,var(--wire));}
+  .rail::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent);}
+  .rail .lname{font-family:var(--disp); font-weight:600; font-size:16px; letter-spacing:.04em; color:var(--ink-bright);}
+  .rail .lnum{font-family:var(--mono); font-size:10px; color:var(--accent); letter-spacing:.1em;}
+  .rail .lsub{font-family:var(--mono); font-size:9.5px; color:var(--muted); line-height:1.45;}
+
+  .comps{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; padding:16px;}
+  .comp{position:relative; border:1px solid var(--wire); border-radius:11px; padding:13px 14px 12px;
+    background:linear-gradient(180deg,var(--panel),var(--panel-hi)); box-shadow:0 10px 26px -22px rgba(0,0,0,.9);}
+  .comp.planned{border-style:dashed; border-color:color-mix(in srgb,var(--plan) 55%,var(--wire));
+    background:linear-gradient(180deg,#1a1813,#181712);}
+  .comp .chead{display:flex; align-items:baseline; justify-content:space-between; gap:8px;}
+  .comp h3{font-family:var(--disp); font-weight:600; font-size:14.5px; margin:0; color:var(--ink-bright); line-height:1.15;}
+  .comp .planpill{font-family:var(--mono); font-size:8.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--plan);
+    border:1px solid color-mix(in srgb,var(--plan) 50%,transparent); padding:1px 5px; border-radius:5px; white-space:nowrap;}
+  .comp .file{font-family:var(--mono); font-size:10px; color:var(--muted); margin:3px 0 0; word-break:break-all;}
+  .comp .role{font-size:12px; color:var(--ink); margin:9px 0 0; line-height:1.5;}
+  .comp .ext{margin:10px 0 0; padding-top:9px; border-top:1px dotted var(--wire);}
+  .comp .ext .lbl{font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--live); display:block; margin-bottom:6px;}
+  .comp .ext .lbl::before{content:"▸ ";}
+  .xchips{display:flex; flex-wrap:wrap; gap:5px;}
+  .xchip{font-family:var(--mono); font-size:10px; color:color-mix(in srgb,var(--live) 88%,white);
+    border:1px solid color-mix(in srgb,var(--live) 32%,transparent); background:color-mix(in srgb,var(--live) 7%,transparent);
+    padding:2px 7px; border-radius:6px;}
+  .comp .toolset{display:flex; flex-wrap:wrap; gap:5px; margin-top:9px;}
+  .tchip{font-family:var(--mono); font-size:10px; color:var(--ink); border:1px solid var(--wire); background:var(--ground-2); padding:2px 7px; border-radius:6px;}
+  .tchip.key{color:var(--signal); border-color:color-mix(in srgb,var(--signal) 42%,transparent);}
+  .comp .none{font-family:var(--mono); font-size:9.5px; color:var(--muted); margin-top:10px; padding-top:8px; border-top:1px dotted var(--wire-dim);}
+
+  /* ===== workspace tree under DISK ===== */
+  .disk-body{min-width:0;}
+  .disk-extra{padding:0 16px 16px;}
+  .ws-grid{display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:28px; align-items:start;
+    border:1px solid var(--wire); border-radius:12px; padding:16px; background:var(--ground-2);}
+  .callout{padding:10px 12px; border:1px solid color-mix(in srgb,var(--signal) 40%,transparent); border-radius:9px; background:color-mix(in srgb,var(--signal) 7%,transparent);}
+  .callout .lbl{font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--signal);}
+  .callout .path{font-family:var(--mono); font-size:10.5px; color:var(--ink-bright); margin-top:5px; overflow-wrap:anywhere; line-height:1.7;}
+  .callout .path b{color:var(--signal);}
+  .tree{font-family:var(--mono); font-size:11.5px; line-height:1.8; white-space:pre; overflow-x:auto; margin:0;}
+  .tree .d{color:var(--ink);} .tree .g{color:var(--wire);} .tree .id{color:var(--live);} .tree .f{color:var(--signal); font-weight:600;} .tree .c{color:var(--muted);}
+  .tree-key{margin-top:14px; display:flex; flex-wrap:wrap; gap:8px 14px; font-family:var(--mono); font-size:10px; color:var(--muted);}
+  .tree-key span{display:inline-flex; gap:7px; align-items:center;} .kd{width:9px; height:9px; border-radius:2px;}
+
+  footer{width:100%; max-width:none; margin:48px 0 0; padding:0 clamp(16px,2vw,32px); color:var(--muted); font-family:var(--mono); font-size:11px;}
+  footer .rule{height:1px; background:var(--wire); margin-bottom:14px;}
+  .legend{display:flex; flex-wrap:wrap; gap:14px 22px; margin-top:18px; font-family:var(--mono); font-size:11px; color:var(--muted);}
+  .legend span{display:inline-flex; align-items:center; gap:8px;} .lg{width:11px;height:11px;border-radius:3px;}
+  .legend .dash{width:13px;height:0;border-top:2px dashed var(--plan);}
+
+  /* ===== section headers ===== */
+  .sec{margin-top:70px; scroll-margin-top:30px;}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:14px;}
+  .sec-head[id]{scroll-margin-top:30px;}
+  .sec-num{font-family:var(--mono); font-size:12px; color:var(--signal);}
+  .sec-head h2{font-family:var(--disp); font-weight:600; font-size:22px; margin:0; color:var(--ink-bright); letter-spacing:-.01em;}
+  .sec-head .note{font-family:var(--mono); font-size:11px; color:var(--muted);}
+  .sec-head .rule{flex:1; height:1px; background:var(--wire-dim);}
+  .grammar{margin:0 0 26px; display:flex; flex-wrap:wrap; align-items:center; gap:8px; font-family:var(--mono); font-size:11.5px; color:var(--muted);}
+  .grammar b{color:var(--ink-bright); font-weight:600;} .grammar .arr{color:var(--wire);}
+  .grammar .rep{color:var(--live);} .grammar .it{color:var(--plan);}
+
+  /* ===== roadmaps (vertical timelines) ===== */
+  .journeys{display:grid; grid-template-columns:1fr 1fr; gap:30px;}
+  .rmap{position:relative;}
+  .rmap-head{display:flex; align-items:center; gap:11px; flex-wrap:wrap; margin-bottom:6px;}
+  .rmap-head h3{font-family:var(--disp); font-weight:600; font-size:20px; margin:0; color:var(--ink-bright);}
+  .rstat{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:6px;}
+  .rstat.live{color:var(--signal); border:1px solid color-mix(in srgb,var(--signal) 50%,transparent); background:color-mix(in srgb,var(--signal) 10%,transparent);}
+  .rstat.planned{color:var(--plan); border:1px solid color-mix(in srgb,var(--plan) 50%,transparent); background:color-mix(in srgb,var(--plan) 10%,transparent);}
+  .rmap-sub{font-family:var(--mono); font-size:11px; color:var(--muted); margin:0 0 16px;}
+
+  .variants{margin:0 0 20px; padding:12px 14px; border:1px solid var(--wire); border-radius:11px; background:var(--ground-2);}
+  .var{display:grid; grid-template-columns:158px 1fr; gap:12px; align-items:baseline; padding:7px 0; border-bottom:1px dotted var(--wire-dim);}
+  .var:last-child{border-bottom:none;}
+  .vt{font-family:var(--mono); font-size:11px; color:var(--signal); border:1px solid color-mix(in srgb,var(--signal) 40%,transparent); padding:2px 7px; border-radius:6px; white-space:nowrap; text-align:center;}
+  .vd{font-size:12px; color:var(--ink); line-height:1.45;}
+  .vex{font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-top:3px;}
+  .vex::before{content:"e.g. "; color:var(--wire);}
+  .strat-label{font-family:var(--mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; display:flex; align-items:center; gap:9px;}
+  .strat-label::after{content:""; flex:1; height:1px; background:var(--wire-dim);}
+  .vflow{font-family:var(--mono); font-size:10px; margin-top:6px; color:var(--ink); line-height:1.7;}
+  .vflow b{color:var(--ink-bright);} .vflow .ar{color:var(--wire);}
+  .vflow .ok{color:var(--live);} .vflow .no{color:var(--signal);} .vflow .lp{color:var(--plan);}
+  .followup{margin:0 0 20px; padding:13px 15px; border:1px solid color-mix(in srgb,var(--plan) 40%,var(--wire)); border-radius:11px; background:color-mix(in srgb,var(--plan) 6%,transparent);}
+  .followup h5{font-family:var(--disp); font-weight:600; font-size:13.5px; margin:0; color:var(--plan); display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+  .followup .scope{font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--wire); padding:1px 6px; border-radius:5px;}
+  .followup p{font-size:12px; color:var(--ink); margin:8px 0 0; line-height:1.5;}
+  .followup p b{color:var(--ink-bright);}
+
+  .rmap-track{position:relative; padding-left:46px; padding-right:46px;}
+  .rmap-track::before{content:""; position:absolute; left:19px; top:14px; bottom:30px; width:2px;
+    background:linear-gradient(180deg, var(--accent), color-mix(in srgb,var(--accent) 30%,transparent));}
+  .flow-pulse{position:absolute; left:16px; width:8px; height:8px; border-radius:50%; background:var(--accent);
+    box-shadow:0 0 12px var(--accent); opacity:0; animation:drip var(--dur,6.5s) linear infinite; z-index:1;}
+  @keyframes drip{0%{top:10px;opacity:0}8%{opacity:1}90%{opacity:1}100%{top:calc(100% - 34px);opacity:0}}
+
+  .ms{position:relative; margin-bottom:15px;}
+  .ms .node{position:absolute; left:-34px; top:15px; width:13px; height:13px; border-radius:50%;
+    background:var(--ms,var(--accent)); border:2px solid var(--ground); box-shadow:0 0 0 3px color-mix(in srgb,var(--ms,var(--accent)) 22%,transparent); z-index:2;}
+  .ms-card{background:linear-gradient(180deg,var(--panel),var(--panel-hi)); border:1px solid var(--wire);
+    border-radius:11px; padding:12px 15px 13px; box-shadow:0 12px 32px -24px rgba(0,0,0,.9);}
+  .rmap.planned .ms-card{border-style:dashed; border-color:color-mix(in srgb,var(--inbound) 30%,var(--wire));}
+  .ms.special .ms-card{border-color:color-mix(in srgb,var(--ms) 55%,transparent); background:linear-gradient(180deg, color-mix(in srgb,var(--ms) 10%,var(--panel)), var(--panel-hi));}
+  .ms-ey{font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ms,var(--accent)); margin-bottom:4px;}
+  .ms-card h4{font-family:var(--disp); font-weight:600; font-size:15px; margin:0; color:var(--ink-bright);}
+  .ms-card p{font-size:12px; color:var(--muted); margin:5px 0 0; line-height:1.5;}
+  .ms-card p b{color:var(--ink);}
+  .tagline{display:inline-flex; align-items:center; gap:5px; margin-top:7px; font-family:var(--mono); font-size:10px; color:var(--live);}
+  .tagline.plan{color:var(--plan);}
+  .loop-svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:0;}
+  .loop-lbl{position:absolute; z-index:3; font-family:var(--mono); font-size:9.5px; white-space:nowrap;
+    padding:3px 8px; border-radius:999px; transform:translate(-50%,-50%) rotate(90deg); background:var(--ground);}
+
+  .atools{margin-top:11px; padding-top:11px; border-top:1px dotted var(--wire); display:grid; gap:7px;}
+  .atrow{display:grid; grid-template-columns:74px 1fr; gap:10px; align-items:start;}
+  .atk{font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding-top:4px;}
+  .achips{display:flex; flex-wrap:wrap; gap:5px;}
+  .tchip.cap{color:var(--muted); border-color:var(--wire-dim); background:transparent;}
+  .tchip.sk{color:var(--live); border-color:color-mix(in srgb,var(--live) 38%,transparent); background:color-mix(in srgb,var(--live) 7%,transparent);}
+  .tri{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px;}
+  .notes2{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:26px;}
+  .ms.opt .ms-card{border-style:dashed; border-color:color-mix(in srgb,var(--plan) 50%,var(--wire));}
+  .ms.opt .ms-ey{color:var(--plan);}
+  .sc{font-family:var(--mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--plan); border:1px solid color-mix(in srgb,var(--plan) 45%,transparent); padding:2px 7px; border-radius:5px;}
+  .sidecard{border:1px solid var(--wire); border-radius:13px; padding:18px 20px; background:linear-gradient(180deg,var(--panel),var(--panel-hi));}
+  .sidecard h4{font-family:var(--disp); font-weight:600; font-size:15px; margin:0 0 9px; color:var(--ink-bright);}
+  .sidecard p{font-size:13px; color:var(--muted); margin:0 0 10px; line-height:1.55;}
+  .sidecard p b{color:var(--ink);} .sidecard .km{color:#D98AC0;}
+  @media (max-width:1180px){ .tri{grid-template-columns:1fr; gap:46px;} }
+  @media (max-width:980px){ .journeys{grid-template-columns:1fr; gap:50px;} .notes2{grid-template-columns:1fr;} }
+  @media (max-width:840px){
+    .topbar{grid-template-columns:1fr auto; grid-template-areas:"eyebrow lang" "nav nav";}
+    .eyebrow{grid-area:eyebrow;}
+    .langtoggle{grid-area:lang;}
+    .site-nav{grid-area:nav; justify-content:flex-start; border-radius:10px; overflow-x:auto;}
+    .layer{grid-template-columns:1fr;}
+    .rail{flex-direction:row; align-items:baseline; gap:10px; border-right:none; border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,var(--wire));}
+    .rail::before{width:100%; height:3px; bottom:auto;}
+    .ws-grid{grid-template-columns:1fr;}
+  }
+  /* ===== sequence diagram ===== */
+  .seqcap{font-family:var(--mono); font-size:11.5px; color:var(--muted); margin:0 0 16px; line-height:1.75; max-width:1040px;}
+  .seqcap b{color:var(--ink);} .seqcap .k{color:var(--signal);}
+  .seqwrap{border:1px solid var(--wire); border-radius:16px; overflow-x:auto;
+    background:radial-gradient(900px 420px at 28% -12%, color-mix(in srgb,var(--signal) 6%,transparent), transparent 60%), linear-gradient(180deg,var(--panel),var(--ground-2));
+    padding:8px 10px;}
+  .seqwrap svg{display:block; height:auto;}
+  .seq-legend{display:flex; flex-wrap:wrap; gap:11px 20px; margin-top:16px; font-family:var(--mono); font-size:10.5px; color:var(--muted);}
+  .seq-legend span{display:inline-flex; align-items:center; gap:7px;}
+  .seq-legend i{width:20px; height:0; display:inline-block;}
+  .seq-legend .s-sync{border-top:2px solid #8aa0b2;}
+  .seq-legend .s-async{border-top:2px dashed #5BD0E0;}
+  .seq-legend .s-key{border-top:2px solid var(--signal);}
+  .seq-legend .s-rep{border-top:2px solid var(--live);}
+
+  @media (prefers-reduced-motion:reduce){ * {scroll-behavior:auto;} }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="eyebrow">services/seleven-mcp · src/calle/agentic</div>
+    <nav class="site-nav" aria-label="section navigation">
+      <a class="navlink" href="#architecture">01 Architecture</a>
+      <a class="navlink" href="#roadmaps">02 Roadmaps</a>
+      <a class="navlink" href="#sequence">03 Sequence</a>
+    </nav>
+    <div class="langtoggle" role="group" aria-label="language / 语言">
+      <button class="langbtn" type="button" data-l="en">EN</button>
+      <button class="langbtn" type="button" data-l="zh">中文</button>
+    </div>
+  </div>
+  <h1>CALL-E agentic<br><em>component architecture</em>.</h1>
+  <p class="thesis">
+    The runtime is a stack of composable layers. Each layer owns a few components; each component lists what it
+    <b>does today</b> and the <b>extension points</b> you build new capabilities on — a new tool, a new
+    <code>goal_type</code>, a new call provider, a new skill. The request flow is kept below only as a reference.
+  </p>
+
+  <!-- ===== slim flow reference strip ===== -->
+  <div class="flowstrip">
+    <div class="fs-label">request flow · reference</div>
+    <div class="fs-track">
+      <span class="fs-node">User</span><span class="fs-arr">→</span>
+      <span class="fs-node">MainAgent</span><span class="fs-arr"><b>commit_goal</b>→</span>
+      <span class="fs-node">Dispatcher</span><span class="fs-arr">→</span>
+      <span class="fs-node">Goal Agent</span><span class="fs-arr"><b>create_voice_run</b>→</span>
+      <span class="fs-node">VoiceRunExecutor</span><span class="fs-arr">→</span>
+      <span class="fs-node plan">Wake Scheduler</span>
+    </div>
+    <div class="fs-loop">
+      <span class="rp lp">report: projection + summary → MainAgent → user</span>
+      <span class="live lp">terminal call event → re-dispatch</span>
+      <span class="pl lp">next_wakeup_at due → re-dispatch · daily/weekly follow-up · planned</span>
+    </div>
+  </div>
+
+  <!-- ===== LAYER STACK ===== -->
+  <div id="architecture" class="sec-head" style="margin-top:46px;"><span class="sec-num">01</span><h2>Component architecture</h2>
+    <span class="note">7 layers · responsibilities + extension points</span><span class="rule"></span></div>
+  <div class="stack">
+
+    <!-- ENTRY -->
+    <div class="layer" style="--accent:var(--l-entry)">
+      <div class="rail"><span class="lnum">L0</span><span class="lname">ENTRY</span><span class="lsub">host &amp; I/O</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>CallEAgent</h3></div>
+          <div class="file">agents/calle.py</div>
+          <div class="role">Host runtime for one chat session: builds the orchestrator, owns memory, runs the active agent, and schedules goal dispatch + voice executors as background tasks.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">model config</span><span class="xchip">memory backend</span><span class="xchip">multi-agent switch</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>TUI / REPL</h3></div>
+          <div class="file">seleven-agent-tui · tui/repl.py · tui_adapter.py</div>
+          <div class="role">User surface: streaming output, slash commands, auth session, model switching, scheduler task view.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">new slash commands</span><span class="xchip">web / api surface</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>CALL-E Chat</h3><span class="planpill">planned</span></div>
+          <div class="file">web UI · not started</div>
+          <div class="role">Planned web surface for the same CALL-E runtime: user chat, goal status, run progress, evidence/report review, and scheduler visibility.</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">chat UI</span><span class="xchip">goal timeline</span><span class="xchip">run/evidence panels</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AGENTS -->
+    <div class="layer" style="--accent:var(--l-agents)">
+      <div class="rail"><span class="lnum">L1</span><span class="lname">AGENTS</span><span class="lsub">SandboxAgent<br>instances</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>MainAgent</h3></div>
+          <div class="file">agents/orchestrator.py · contracts/calle + root_orchestrator</div>
+          <div class="role">Conversational planner — talks with the user, plans, commits goals.</div>
+          <div class="atools">
+            <div class="atrow"><span class="atk">capability</span><div class="achips">
+              <span class="tchip cap">view_image</span><span class="tchip cap">apply_patch</span><span class="tchip cap">exec_command</span><span class="tchip cap">write_stdin</span><span class="tchip cap">load_skill</span></div></div>
+            <div class="atrow"><span class="atk">skill · lazy</span><div class="achips">
+              <span class="tchip sk">outbound-planner</span></div></div>
+            <div class="atrow"><span class="atk">business</span><div class="achips">
+              <span class="tchip">request_user_input</span><span class="tchip">update_plan</span><span class="tchip key">commit_goal</span><span class="tchip">list_goals</span><span class="tchip">get_goal</span><span class="tchip">notify_goal</span></div></div>
+          </div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>OutboundGoalAgent</h3></div>
+          <div class="file">agents/goal.py · + goal/base + domain/outbound</div>
+          <div class="role">Runs one outbound goal iteration · routed for one_shot / batch / progressive_outbound.</div>
+          <div class="atools">
+            <div class="atrow"><span class="atk">capability</span><div class="achips">
+              <span class="tchip cap">view_image</span><span class="tchip cap">apply_patch</span><span class="tchip cap">exec_command</span><span class="tchip cap">write_stdin</span><span class="tchip cap">load_skill</span></div></div>
+            <div class="atrow"><span class="atk">skill · lazy</span><div class="achips">
+              <span class="tchip sk">voice-agent-run-strategy</span></div></div>
+            <div class="atrow"><span class="atk">business</span><div class="achips">
+              <span class="tchip">create_run_spec</span><span class="tchip key">create_voice_run</span><span class="tchip">refresh_voice_run_result</span><span class="tchip key">complete_goal_iteration</span></div></div>
+          </div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>InboundGoalAgent</h3><span class="planpill">planned</span></div>
+          <div class="file">reserved goal_type</div>
+          <div class="role">Inbound counterpart, sharing the same dispatcher, goal-event log, and iteration contract.</div>
+          <div class="atools">
+            <div class="atrow"><span class="atk">capability</span><div class="achips">
+              <span class="tchip cap">view_image</span><span class="tchip cap">apply_patch</span><span class="tchip cap">exec_command</span><span class="tchip cap">write_stdin</span><span class="tchip cap">load_skill</span></div></div>
+            <div class="atrow"><span class="atk">skill · lazy</span><div class="achips">
+              <span class="tchip cap">inbound-* (tbd)</span></div></div>
+            <div class="atrow"><span class="atk">business</span><div class="achips">
+              <span class="tchip cap">tbd</span><span class="tchip key">complete_goal_iteration</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPOSE -->
+    <div class="layer" style="--accent:var(--l-compose)">
+      <div class="rail"><span class="lnum">L2</span><span class="lname">COMPOSE</span><span class="lsub">what an agent<br>is built from</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>Tools</h3></div>
+          <div class="file">tools/builtins · tools/goals</div>
+          <div class="toolset">
+            <span class="tchip">request_user_input</span><span class="tchip">update_plan</span>
+            <span class="tchip key">commit_goal</span><span class="tchip">list_goals</span><span class="tchip">get_goal</span><span class="tchip">notify_goal</span>
+            <span class="tchip">create_run_spec</span><span class="tchip key">create_voice_run</span>
+            <span class="tchip">refresh_voice_run_result</span><span class="tchip">complete_goal_iteration</span></div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">register new FunctionTool</span><span class="xchip">builtin_tools() / agent list</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Skills</h3></div>
+          <div class="file">skills/ · lazy-loaded</div>
+          <div class="toolset">
+            <span class="tchip">outbound-planner</span><span class="tchip">voice-agent-run-strategy</span><span class="tchip">run-strategy</span></div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">add SKILL.md pack</span><span class="xchip">+ *_SKILL_NAMES</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Instructions</h3></div>
+          <div class="file">instructions/ · InstructionKit</div>
+          <div class="toolset">
+            <span class="tchip">contracts/calle</span><span class="tchip">root_orchestrator</span><span class="tchip">goal/base</span><span class="tchip">domain/outbound</span></div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">.with_instruction() per domain</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Capabilities / Manifest</h3></div>
+          <div class="file">agents.sandbox</div>
+          <div class="role">Skills capability + default Capabilities; Manifest(root=workspace) grants the agent its workspace.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">sandbox capability</span><span class="xchip">path grant</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KNOWLEDGE (planned · spec §2) -->
+    <div class="layer" style="--accent:#D98AC0">
+      <div class="rail"><span class="lnum">L3</span><span class="lname">KNOWLEDGE</span><span class="lsub">spec §2 · planned<br>context source</span></div>
+      <div class="comps">
+        <div class="comp planned">
+          <div class="chead"><h3>User Upload KB</h3><span class="planpill">planned</span></div>
+          <div class="file">spec §2.1 · workspace uploads/ + knowledge/</div>
+          <div class="role">Per org / tenant / chat, the user uploads a knowledge base — company intro, product docs, FAQ, SOP, policies, 客户名单, 话术要求, 历史 report — built into keyword + embedding indexes.</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">new upload types</span><span class="xchip">dual index</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>Knowledge Recall</h3><span class="planpill">planned</span></div>
+          <div class="file">spec §2.1 · hybrid search</div>
+          <div class="role">Embedding + keyword <b>hybrid search</b> over the KB to inform planning &amp; execution. A Context Compiler then picks which candidates actually enter the prompt.</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">rerank / filters</span><span class="xchip">context compiler</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>Historical Cases</h3><span class="planpill">planned</span></div>
+          <div class="file">spec §2.2</div>
+          <div class="role"><b>Similar-case recall</b> over raw historical cases (good/bad case · task type), plus Case-Derived Playbooks (required inputs, call strategy, failure patterns, retry/fallback) distilled offline.</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">raw case retrieval</span><span class="xchip">playbook distillation</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>External Retrieval</h3><span class="planpill">planned</span></div>
+          <div class="file">spec §2.3 · saved as evidence</div>
+          <div class="role">Fill gaps the KB and cases don't cover: <code>web_search</code> · <code>official_site_retrieval</code> · <code>local_search / maps</code> · <code>status_api</code>. Results stored as evidence (source, fetched_at, confidence, ttl).</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">new retrieval module</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>Retrieval Tools</h3><span class="planpill">planned</span></div>
+          <div class="file">spec §5.2</div>
+          <div class="toolset"><span class="tchip">retrieve_tool</span><span class="tchip">index_tool</span></div>
+          <div class="role"><code>retrieve_tool</code> wraps the retrieval modules; <code>index_tool</code> builds indexes — event-driven (on upload / after a call), not necessarily agent-called.</div>
+          <div class="ext"><span class="lbl">build</span><div class="xchips">
+            <span class="xchip">register module</span><span class="xchip">offline index jobs</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUNTIME -->
+    <div class="layer" style="--accent:var(--l-runtime)">
+      <div class="rail"><span class="lnum">L4</span><span class="lname">RUNTIME</span><span class="lsub">goal engine</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>GoalRuntimeDispatcher</h3></div>
+          <div class="file">runtime/dispatcher.py</div>
+          <div class="role">Claims a lease, reads the event backlog after the cursor, routes by <code>goal_type</code>, runs one iteration, applies the patch + emits events, advances the cursor, releases with <code>next_wakeup_at</code>, and streams goal-agent events back to the session.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">new goal_type → agent route</span><span class="xchip">lease TTL / batch</span><span class="xchip">resume policy</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>VoiceRunExecutor</h3></div>
+          <div class="file">voice_execution/executor.py</div>
+          <div class="role">Executes a voice run: places the real call, writes transcripts / recordings / raw payloads, emits the terminal goal event, and triggers re-dispatch.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">call provider (Calling / AIRUDDER)</span><span class="xchip">artifact kinds</span></div></div>
+        </div>
+        <div class="comp planned">
+          <div class="chead"><h3>Wake Scheduler</h3><span class="planpill">planned</span></div>
+          <div class="file">polls next_wakeup_at</div>
+          <div class="role">Sweeps goals whose <code>next_wakeup_at</code> is due and re-dispatches them on a cadence (daily / weekly) for continuous follow-up until the objective is met.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">cron / worker reusing dispatch_goal</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE -->
+    <div class="layer" style="--accent:var(--l-state)">
+      <div class="rail"><span class="lnum">L5</span><span class="lname">STATE</span><span class="lsub">durable truth<br>&amp; contracts</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>CalleGoalStore</h3></div>
+          <div class="file">goals/store.py</div>
+          <div class="role">Goal record + <code>goal_events</code> log + dispatch cursor / lease / <code>next_wakeup_at</code>; claim/release iteration, update state, append events.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">new event types</span><span class="xchip">new goal payload schema</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>SessionStore</h3></div>
+          <div class="file">sessions/store.py</div>
+          <div class="role">Session record: active_agent_name, runtime state, openai_previous_response_id.</div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Memory</h3></div>
+          <div class="file">sessions/memory.py</div>
+          <div class="role">Chat history — SQLAlchemy session or OpenAI Responses context.</div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Run Registry / Spec Store</h3></div>
+          <div class="file">runs/registry.py · runs/spec_store.py</div>
+          <div class="role">CalleRunRegistry (runs) + CalleRunSpecStore (run specs) and their records.</div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Contracts</h3></div>
+          <div class="file">schemas/agentic/</div>
+          <div class="toolset">
+            <span class="tchip">GoalIterationResult</span><span class="tchip">GoalProjection</span>
+            <span class="tchip">GoalStatePatch</span><span class="tchip">GoalEvent</span><span class="tchip">GoalBrief / Payload</span></div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">new patch fields</span><span class="xchip">new schema</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>Structured Data</h3></div>
+          <div class="file">goals · run_specs · runs · events · reports</div>
+          <div class="role">Agent work is kept as structured records first: goal brief/payload, frozen RunSpec, run status, event timeline, evidence refs, projection, and report fields. Free-form chat becomes queryable state and auditable artifacts.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">report schema</span><span class="xchip">analytics fields</span><span class="xchip">web projections</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="layer" style="--accent:var(--l-events)">
+      <div class="rail"><span class="lnum">L6</span><span class="lname">EVENTS</span><span class="lsub">streaming &amp;<br>run context</span></div>
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>SessionEventBus</h3></div>
+          <div class="file">agentic/events.py</div>
+          <div class="role">In-process pub/sub: typed EventEnvelope plus the internal SessionStreamEvent SDK wrapper. Streams detached background goal runs back to the TUI.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">new consumer (webhook / web UI)</span><span class="xchip">new event names</span></div></div>
+        </div>
+        <div class="comp">
+          <div class="chead"><h3>AgentCTX</h3></div>
+          <div class="file">schemas/agents/ctx.py</div>
+          <div class="role">Per-turn context handed to tools: session / tenant / user + current_user, goal_store, db_session, memory_engine, session_event_bus, pending_dispatch_goal_ids, pending_voice_run_ids, janus queue.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">add handle for new tool</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DISK -->
+    <div class="layer" style="--accent:var(--l-disk)">
+      <div class="rail"><span class="lnum">L7</span><span class="lname">DISK</span><span class="lsub">workspace<br>filesystem</span></div>
+      <div class="disk-body">
+      <div class="comps">
+        <div class="comp">
+          <div class="chead"><h3>WorkspaceLayout</h3></div>
+          <div class="file">workspace/layout.py</div>
+          <div class="role">tenant → session → goal → run directory tree; the manifest root each agent is granted; <code>workspace://</code> artifact refs; ensure_* creators.</div>
+          <div class="ext"><span class="lbl">extend</span><div class="xchips">
+            <span class="xchip">NAS / PVC mount</span><span class="xchip">new subdir sets</span></div></div>
+        </div>
+      </div>
+      <div class="disk-extra">
+        <div class="ws-grid">
+          <div>
+<pre class="tree"><span class="c">root = .calle/workspaces  ·  tenant = local</span>
+<span class="d">.calle/workspaces/</span>
+<span class="g">└─</span> <span class="d">tenants/local/</span>                <span class="c"># default_tenant_id</span>
+<span class="g">   ├─</span> <span class="d">shared/</span> <span class="c">uploads · knowledge · reports</span>
+<span class="g">   └─</span> <span class="d">sessions/</span>
+<span class="g">      └─</span> <span class="id">0e21fa2d-698c-…-426fc14f56c1/</span>
+<span class="g">         ├─</span> <span class="d">context/</span> <span class="c">compactions · traces</span>
+<span class="g">         └─</span> <span class="d">goals/</span>
+<span class="g">            └─</span> <span class="id">&lt;goal_id&gt;/</span>          <span class="c"># 1 session ↔ 1 v1 goal</span>
+<span class="g">               ├─</span> <span class="d">run_specs/</span>
+<span class="g">               │  └─</span> <span class="id">ask_work_end_time/</span>
+<span class="g">               │     └─</span> <span class="f">voice_instruction.md</span>
+<span class="g">               ├─</span> <span class="d">runs/</span><span class="id">&lt;run_id&gt;/</span> <span class="c">transcripts · recordings · raw_provider_payloads</span>
+<span class="g">               ├─</span> <span class="d">evidence/ proposals/ reports/</span>
+<span class="g">               └─</span> <span class="d">input/ scratch/ exports/</span></pre>
+          </div>
+          <div>
+            <div class="callout"><div class="lbl">Example artifact</div>
+              <div class="path">…/goals/&lt;goal_id&gt;/run_specs/<b>ask_work_end_time</b>/<b>voice_instruction.md</b></div></div>
+            <div class="tree-key">
+              <span><i class="kd" style="background:var(--ink)"></i>directory</span>
+              <span><i class="kd" style="background:var(--live)"></i>runtime id</span>
+              <span><i class="kd" style="background:var(--signal)"></i>example file</span></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <span><i class="lg" style="background:var(--live)"></i>▸ extension point (build here)</span>
+    <span><i class="dash"></i>planned (not in code yet)</span>
+    <span><i class="lg" style="background:var(--signal)"></i>active / outbound</span>
+    <span><i class="lg" style="background:var(--inbound)"></i>inbound</span>
+  </div>
+
+  <!-- ===== 02 · AGENT ROADMAPS ===== -->
+  <section id="roadmaps" class="sec">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Agent roadmaps</h2>
+      <span class="note">3 journeys · dispatcher routes by goal_type</span><span class="rule"></span></div>
+    <div class="grammar"><b>Shared loop</b><span class="arr">·</span>
+      Plan <span class="arr">→</span> Act <span class="arr">→</span> Observe <span class="arr">→</span>
+      <span class="rep">Report</span> <span class="arr">→</span> Confirm <span class="arr">→</span> <span class="it">Iterate&nbsp;↺</span>
+      <span class="arr">&nbsp;·&nbsp; Plan steps recall the</span> <span class="km" style="color:#D98AC0">Knowledge layer</span>
+      <span class="arr">(KB + similar cases)</span></div>
+
+    <div class="tri">
+
+      <!-- ONE-SHOT -->
+      <div class="rmap" id="rm-oneshot" style="--accent:var(--signal)">
+        <div class="rmap-head"><h3>One-shot</h3><span class="rstat live">live</span></div>
+        <p class="rmap-sub">goal_type one_shot_outbound · solve once · e.g. clinic earliest slot</p>
+        <svg class="loop-svg" aria-hidden="true"></svg>
+        <div class="rmap-track"><i class="flow-pulse" style="--dur:6s"></i>
+          <div class="ms" id="os1"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">plan · 01</div><h4>Commit goal</h4>
+            <p>Pin the objective for <b>one callee</b> · <code>commit_goal</code>.</p></div></div>
+          <div class="ms" id="os2"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">plan · 02</div><h4>Plan the run</h4>
+            <p>Draft a RunSpec → <code>voice_instruction.md</code>.</p>
+            <span class="tagline" style="color:#D98AC0">▸ recall KB + similar cases</span></div></div>
+          <div class="ms" id="os3"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">run · 03</div><h4>Place the call</h4>
+            <p><code>create_voice_run</code> → VoiceRunExecutor dials.</p></div></div>
+          <div class="ms" id="os4"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">run · 04</div><h4>Collect outcome</h4>
+            <p>Transcript · recording · status.</p></div></div>
+          <div class="ms special" id="os5" style="--ms:var(--live)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">report · 05</div><h4>Report to user</h4>
+            <p><code>complete_goal_iteration</code> → projection via EventBus.</p>
+            <span class="tagline">▸ projection → user</span></div></div>
+          <div class="ms special" id="os6" style="--ms:var(--l-disk)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">done · 06</div><h4>Resolved</h4>
+            <p>Objective met (one retry if no-answer).</p>
+            <span class="tagline" style="color:var(--l-disk)">✓ goal complete</span></div></div>
+        </div>
+      </div>
+
+      <!-- BATCH (optional Progressive) -->
+      <div class="rmap" id="rm-batch" style="--accent:var(--signal)"
+           data-loop-from="bt7" data-loop-to="bt3" data-loop-color="#FF6A3D" data-loop-label="next batch ↺">
+        <div class="rmap-head"><h3>Batch</h3><span class="rstat live">live</span><span class="sc">+ optional Progressive</span></div>
+        <p class="rmap-sub">goal_type batch_outbound (+ progressive) · whole list · e.g. 银行催收</p>
+        <svg class="loop-svg" aria-hidden="true"></svg>
+        <div class="rmap-track"><i class="flow-pulse" style="--dur:6s"></i>
+          <div class="ms" id="bt1"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">plan · 01</div><h4>Commit goal</h4>
+            <p>A <b>fixed list</b> of N callees · <code>commit_goal</code>.</p></div></div>
+          <div class="ms" id="bt2"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">plan · 02</div><h4>Plan the run</h4>
+            <p>One shared RunSpec for the list.</p>
+            <span class="tagline" style="color:#D98AC0">▸ recall KB + similar cases</span></div></div>
+          <div class="ms" id="bt3"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">run · 03</div><h4>Call the batch</h4>
+            <p>Dial the next callee(s) · <code>create_voice_run</code>.</p></div></div>
+          <div class="ms" id="bt4"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">run · 04</div><h4>Collect outcome</h4>
+            <p>Per-callee transcript · status.</p></div></div>
+          <div class="ms opt" id="bt5" style="--ms:var(--plan)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">optional · progressive</div><h4>Ramp gate</h4>
+            <p>Canary a slice (<b>10/100</b>), evaluate the bot: <span style="color:var(--live)">✓ scale up</span> · <span style="color:var(--signal)">✗ tune &amp; re-ramp</span>.</p>
+            <span class="tagline plan">⌥ optional · else run the whole list</span></div></div>
+          <div class="ms special" id="bt6" style="--ms:var(--live)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">report · 05</div><h4>Report progress</h4>
+            <p>Running tally → MainAgent → user.</p>
+            <span class="tagline">▸ progress → user</span></div></div>
+          <div class="ms special" id="bt7" style="--ms:var(--plan)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">iterate · 06</div><h4>Next batch</h4>
+            <p>Walk the list to completion; unreached retried on cadence.</p>
+            <span class="tagline plan">↻ next batch · follow-up</span></div></div>
+        </div>
+      </div>
+
+      <!-- INBOUND -->
+      <div class="rmap planned" id="rm-in" style="--accent:var(--inbound)"
+           data-loop-from="i10" data-loop-to="i3" data-loop-color="#7FA6FF" data-loop-label="version upgrade ↺">
+        <div class="rmap-head"><h3>Inbound</h3><span class="rstat planned">planned</span></div>
+        <p class="rmap-sub">InboundGoalAgent (reserved goal_type) · build → launch → operate</p>
+        <svg class="loop-svg" aria-hidden="true"></svg>
+        <div class="rmap-track">
+          <i class="flow-pulse" style="--dur:8s"></i>
+          <i class="flow-pulse" style="--dur:8s; animation-delay:4s"></i>
+
+          <div class="ms" id="i1"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">build · 01</div><h4>Build the inbound bot</h4>
+            <p>Define the hotline persona, intents &amp; FAQs; <code>commit_goal</code> (goal_type=inbound).</p></div></div>
+          <div class="ms" id="i2"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">build · 02</div><h4>Assemble version&nbsp;1</h4>
+            <p>Compile the bot config — the inbound analog of a RunSpec.</p></div></div>
+          <div class="ms" id="i3"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">build · 03</div><h4>Simulate &amp; test</h4>
+            <p>Run simulated inbound calls to validate flows before any real caller reaches it.</p>
+            <span class="tagline" style="color:#D98AC0">▸ recall SOP / FAQ + cases</span></div></div>
+          <div class="ms" id="i4"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">launch · 04</div><h4>Release v1</h4>
+            <p>User confirms the test; publish bot <code>version 1</code>.</p></div></div>
+          <div class="ms" id="i5"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">launch · 05</div><h4>Bind the hotline</h4>
+            <p>Attach the hotline number to the released version.</p></div></div>
+          <div class="ms" id="i6"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">launch · 06</div><h4>Go online</h4>
+            <p>Activate — real inbound calls now land on v1.</p></div></div>
+          <div class="ms special" id="i7" style="--ms:var(--plan)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">operate · 07</div><h4>Scheduled check</h4>
+            <p>The Wake Scheduler sweeps live inbound calls at <code>next_wakeup_at</code>.</p>
+            <span class="tagline plan">↻ recurring follow-up</span></div></div>
+          <div class="ms special" id="i8" style="--ms:var(--live)"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">report · 08</div><h4>Report + suggest</h4>
+            <p>Analyze transcripts → report + optimization suggestions → user.</p>
+            <span class="tagline">▸ report → MainAgent → user</span></div></div>
+          <div class="ms" id="i9"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">confirm · 09</div><h4>User confirms</h4>
+            <p><code>notify_goal</code> confirm — approve the improvements.</p></div></div>
+          <div class="ms" id="i10"><span class="node"></span><div class="ms-card">
+            <div class="ms-ey">iterate · 10</div><h4>Upgrade to version&nbsp;2</h4>
+            <p>Publish the improved version; loop back to re-test &amp; re-release.</p></div></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="notes2">
+      <div class="followup">
+        <h5>持续跟进 · continuous follow-up <span class="scope">batch · progressive</span></h5>
+        <p>The goal is done only when the user's <b>real-world objective</b> is met — e.g. a 银行催收 debtor actually repays — not when a call ends. So the agent re-dispatches on a cadence via the <b>Wake Scheduler</b> until then.</p>
+        <div class="vflow">call <span class="ar">→</span> objective met? <span class="ar">→</span> <span class="no">✗ wait · daily / weekly</span> <span class="lp">↺ via Wake Scheduler</span> <span class="ar">|</span> <span class="ok">✓ goal done</span></div>
+      </div>
+      <div class="sidecard">
+        <h4>Inbound · one pipeline, a new branch</h4>
+        <p>Reuses the same <b>dispatcher</b>, <b>goal-event log</b> &amp; <b>report contract</b> as outbound — it's a new <code>goal_type</code>, not a new pipeline. <b>Simulate (03)</b> &amp; <b>Report (08)</b> draw on the <span class="km">Knowledge layer</span>; the operate loop (07–10) is the same Scheduler cadence.</p>
+        <p style="color:var(--plan); margin-bottom:0;"><b>Planned</b> — no inbound goal_type in code yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 · ONE-SHOT RUNTIME SEQUENCE ===== -->
+  <section id="sequence" class="sec">
+    <div class="sec-head"><span class="sec-num">03</span><h2>One-shot call · runtime sequence</h2>
+      <span class="note">live · the only path built today</span><span class="rule"></span></div>
+    <p class="seqcap">
+      The concrete trace of a single <b>one_shot_outbound</b> goal — from the user's request to a resolved objective.
+      <b>Two dispatch iterations bracket one real call</b>: iteration&nbsp;① plans the RunSpec and <span class="k">queues</span> the call;
+      the call runs <b>detached</b>; its terminal event <b>re-dispatches</b> iteration&nbsp;② to evaluate the outcome and report back to the user.
+      Each dispatch is one <code>OutboundGoalAgent</code> turn that must end in <code>complete_goal_iteration</code>.
+    </p>
+    <div class="seqwrap"><svg id="seq-os" aria-label="one-shot outbound call runtime sequence diagram"></svg></div>
+    <div class="seq-legend">
+      <span><i class="s-sync"></i>sync call / return</span>
+      <span><i class="s-async"></i>async · event</span>
+      <span><i class="s-key"></i>key business tool</span>
+      <span><i class="s-rep"></i>report → user</span>
+      <span>⟳&nbsp;self-action</span>
+      <span style="color:var(--plan)">▭ dispatch iteration</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function mkPath(svg,d,stroke,w,dash,id){
+    const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.setAttribute('fill','none');
+    p.setAttribute('stroke',stroke);p.setAttribute('stroke-width',w);p.setAttribute('stroke-linecap','round');
+    if(dash)p.setAttribute('stroke-dasharray',dash);if(id)p.id=id;svg.appendChild(p);return p;}
+  function mkPulse(svg,pathId,color,dur){
+    if(reduce)return;const c=document.createElementNS(NS,'circle');
+    c.setAttribute('r','3');c.setAttribute('fill',color);
+    const m=document.createElementNS(NS,'animateMotion');m.setAttribute('dur',dur);m.setAttribute('repeatCount','indefinite');
+    const mp=document.createElementNS(NS,'mpath');mp.setAttributeNS('http://www.w3.org/1999/xlink','href','#'+pathId);
+    m.appendChild(mp);c.appendChild(m);svg.appendChild(c);}
+  function drawRoadmap(rmap){
+    const svg=rmap.querySelector('.loop-svg');if(!svg)return;
+    [...svg.querySelectorAll('path,circle')].forEach(n=>n.remove());
+    rmap.querySelectorAll('.loop-lbl').forEach(n=>n.remove());
+    const base=rmap.getBoundingClientRect();
+    svg.setAttribute('viewBox',`0 0 ${base.width} ${base.height}`);
+    const from=document.getElementById(rmap.dataset.loopFrom), to=document.getElementById(rmap.dataset.loopTo);
+    if(!from||!to)return;
+    const fr=from.getBoundingClientRect(), tr=to.getBoundingClientRect();
+    const fy=fr.top-base.top+fr.height/2, ty=tr.top-base.top+tr.height/2;
+    const cardRight=fr.right-base.left, bow=base.width-12;
+    const color=rmap.dataset.loopColor||'#FF6A3D';
+    const id='loop-'+rmap.id;
+    mkPath(svg,`M ${cardRight} ${fy} C ${bow} ${fy}, ${bow} ${ty}, ${cardRight} ${ty}`,color,1.8,'4 6',id);
+    const ah=document.createElementNS(NS,'path');
+    ah.setAttribute('d',`M ${cardRight+7} ${ty-4} L ${cardRight} ${ty} L ${cardRight+7} ${ty+4} Z`);
+    ah.setAttribute('fill',color);svg.appendChild(ah);
+    mkPulse(svg,id,color,'3.2s');
+    const lbl=document.createElement('div');lbl.className='loop-lbl';lbl.textContent=rmap.dataset.loopLabel||'↺';
+    lbl.style.color=color;lbl.style.border='1px solid '+color;lbl.style.left=bow+'px';lbl.style.top=((fy+ty)/2)+'px';
+    rmap.appendChild(lbl);
+  }
+  function drawAll(){document.querySelectorAll('.rmap').forEach(drawRoadmap);}
+  document.querySelectorAll('.rmap').forEach(r=>new ResizeObserver(()=>drawRoadmap(r)).observe(r));
+  window.addEventListener('load',drawAll);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawAll);
+  drawAll();
+})();
+</script>
+
+<script>
+/* ===== one-shot runtime sequence diagram ===== */
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.getElementById('seq-os');
+  if(!svg)return;
+
+  const P=[
+    {k:'user', t:'User',              s:'TUI / REPL',   c:'#B8C4D0'},
+    {k:'main', t:'MainAgent',         s:'orchestrator', c:'#7FA6FF'},
+    {k:'store',t:'GoalStore',         s:'goal_events',  c:'#C58BF0'},
+    {k:'disp', t:'Dispatcher',        s:'runtime',      c:'#F2B14C'},
+    {k:'agent',t:'OutboundGoalAgent', s:'goal.py',      c:'#FF6A3D'},
+    {k:'voice',t:'VoiceRunExecutor',  s:'executor.py',  c:'#FFA060'},
+    {k:'bus',  t:'EventBus',          s:'pub / sub',    c:'#5BD0E0'},
+  ];
+  const COL={key:'#FF6A3D', evt:'#5BD0E0', rep:'#46D8AC', plan:'#F2B14C', skill:'#46D8AC', def:'#8aa0b2'};
+
+  const M=[
+    {f:'user', to:'main',  l:'describe the objective', z:'描述目标',                k:'sync'},
+    {self:'main',          l:'request_user_input · update_plan',             c:'plan'},
+    {f:'main', to:'store', l:'commit_goal · append goal_created', z:'commit_goal · 追加 goal_created', k:'sync', c:'key'},
+    {f:'store',to:'main',  l:'goal_id · needs_dispatch',                     k:'ret'},
+
+    {g:'s', id:'A', l:'dispatch · iteration ①  ·  plan & queue the call', lz:'派发 · 迭代 ①  ·  规划并入队通话', c:'plan', from:'user', to:'bus'},
+    {f:'main', to:'disp',  l:'background dispatch_goal(goal_id)', z:'后台 dispatch_goal(goal_id)',  k:'async', c:'evt'},
+    {f:'disp', to:'store', l:'claim lease · read backlog after cursor', z:'认领 lease · 读取 cursor 后的积压', k:'sync'},
+    {f:'disp', to:'agent', l:'run one iteration · goal bootstrap', z:'运行一轮迭代 · goal bootstrap',  k:'sync'},
+    {self:'agent',         l:'load_skill · voice-agent-run-strategy',        c:'skill'},
+    {self:'agent',         l:'create_run_spec → voice_instruction.md'},
+    {f:'agent',to:'voice', l:'create_voice_run · queue run', z:'create_voice_run · 入队 run',          k:'async', c:'key'},
+    {f:'agent',to:'disp',  l:'complete_goal_iteration · waiting_event',      k:'ret',   c:'key'},
+    {f:'disp', to:'store', l:'apply patch · emit events · release(next_wakeup_at)', z:'应用 patch · 发出事件 · release(next_wakeup_at)', k:'sync'},
+    {f:'disp', to:'bus',   l:'GOAL_DISPATCH_COMPLETED + projection',         k:'async', c:'evt'},
+    {f:'bus',  to:'main',  l:'stream projection', z:'流式 projection',                k:'async', c:'rep'},
+    {f:'main', to:'user',  l:'call queued · live status', z:'通话已入队 · 实时状态',          k:'ret',   c:'rep'},
+    {g:'e', id:'A'},
+
+    {g:'s', id:'B', l:'real-world call · detached / async', lz:'真实通话 · 脱离 / 异步', c:'key', from:'store', to:'voice'},
+    {self:'voice',          l:'☎ place real call · write transcript · recording', z:'☎ 发起真实通话 · 写入 transcript · recording', c:'key'},
+    {f:'voice',to:'store',  l:'append terminal event · needs_dispatch', z:'追加终态事件 · needs_dispatch',  k:'sync', c:'key'},
+    {g:'e', id:'B'},
+
+    {g:'s', id:'C', l:'re-dispatch · iteration ②  ·  evaluate & report', lz:'重新派发 · 迭代 ②  ·  评估并汇报', c:'plan', from:'user', to:'voice'},
+    {f:'voice',to:'disp',  l:'terminal event → re-dispatch', z:'终态事件 → 重新派发',                k:'async', c:'evt'},
+    {f:'disp', to:'agent', l:'run iteration · terminal event', z:'运行迭代 · 终态事件',              k:'sync'},
+    {self:'agent',         l:'refresh_voice_run_result · evaluate outcome', z:'refresh_voice_run_result · 评估结果'},
+    {note:'agent',         l:'✓ objective met → complete   ·   ✗ no-answer → one retry ↺', lz:'✓ 目标达成 → 完成   ·   ✗ 无应答 → 重试一次 ↺'},
+    {f:'agent',to:'disp',  l:'complete_goal_iteration · completed',          k:'ret', c:'key'},
+    {f:'disp', to:'bus',   l:'projection · needs_user_attention',            k:'async', c:'evt'},
+    {f:'bus',  to:'main',  l:'stream final projection', z:'流式最终 projection',            k:'async', c:'rep'},
+    {f:'main', to:'user',  l:'✓ resolved · transcript + outcome', z:'✓ 已解决 · transcript + 结果',     k:'ret', c:'rep'},
+    {g:'e', id:'C'},
+  ];
+
+  const x0=130, dx=188, headTop=14, headH=42, rh=44, selfH=54;
+  const px={}; P.forEach((p,i)=>px[p.k]=x0+i*dx);
+  const lineTop=headTop+headH;
+
+  const SG="'Space Grotesk',system-ui,sans-serif", JB="'JetBrains Mono',ui-monospace,monospace";
+  function el(n,a){const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;}
+  function lab(m,lang){ return lang==='zh' ? (m.lz||m.z||m.l) : m.l; }
+  function tw(s){ let w=0; for(const ch of s){ w+= ch.charCodeAt(0)>255 ? 11 : 6.1; } return w; }
+
+  function render(lang){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    function add(n,a){const e=el(n,a);svg.appendChild(e);return e;}
+    function text(x,yy,s,o){const t=el('text',{x,y:yy,'font-family':JB});t.textContent=s;for(const k in (o||{}))t.setAttribute(k,o[k]);svg.appendChild(t);return t;}
+
+    let y=lineTop+38; const groups={};
+    M.forEach(m=>{
+      if(m.g==='s'){ y+=12; groups[m.id]={m,y0:y-6}; y+=24; return; }
+      if(m.g==='e'){ groups[m.id].y1=y+4; y+=14; return; }
+      if(m.self){ m._y=y+4; y+=selfH; return; }
+      if(m.note){ m._y=y+2; y+=46; return; }
+      m._y=y; y+=rh;
+    });
+    const H=y+22, W=x0+(P.length-1)*dx+210;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    svg.style.width='100%'; svg.style.minWidth=W+'px';
+
+    // dispatch-iteration boxes (behind everything)
+    Object.values(groups).forEach(gp=>{
+      const m=gp.m, col=COL[m.c]||COL.def, s=lab(m,lang);
+      const left=Math.min(px[m.from],px[m.to])-50, right=Math.max(px[m.from],px[m.to])+50;
+      add('rect',{x:left,y:gp.y0,width:right-left,height:gp.y1-gp.y0,rx:12,
+        fill:'rgba(255,255,255,.012)',stroke:col,'stroke-width':1,'stroke-dasharray':'3 6',opacity:.7});
+      add('rect',{x:left,y:gp.y0-10,width:tw(s)+20,height:19,rx:6,fill:'#0E1216',stroke:col,'stroke-width':1});
+      text(left+10,gp.y0+3,s,{fill:col,'font-size':10,'letter-spacing':'.03em'});
+    });
+
+    // lifelines + headers
+    P.forEach(p=>{
+      const x=px[p.k], bw=152;
+      add('line',{x1:x,y1:lineTop,x2:x,y2:H-14,stroke:'#2a3540','stroke-width':1.4,'stroke-dasharray':'2 6'});
+      add('rect',{x:x-bw/2,y:headTop,width:bw,height:headH,rx:9,fill:'#161D24',stroke:p.c,'stroke-width':1.3});
+      add('rect',{x:x-bw/2,y:headTop,width:4,height:headH,rx:2,fill:p.c});
+      text(x,headTop+19,p.t,{fill:'#EAF1F7','font-size':12.5,'text-anchor':'middle','font-family':SG,'font-weight':600});
+      text(x,headTop+33,p.s,{fill:'#6C7A88','font-size':9,'text-anchor':'middle'});
+    });
+
+    function head(x,yy,dir,col,open){
+      if(open) add('path',{d:`M ${x-dir*9} ${yy-5} L ${x} ${yy} L ${x-dir*9} ${yy+5}`,
+        fill:'none',stroke:col,'stroke-width':1.7,'stroke-linecap':'round','stroke-linejoin':'round'});
+      else add('path',{d:`M ${x} ${yy} L ${x-dir*9} ${yy-4.6} L ${x-dir*9} ${yy+4.6} Z`,fill:col,stroke:col});
+    }
+
+    M.forEach(m=>{
+      if(m.g)return;
+      const col=COL[m.c]||COL.def, s=lab(m,lang);
+      if(m.self){
+        const x=px[m.self], yy=m._y, r=15;
+        add('path',{d:`M ${x} ${yy} h ${r} a 9 9 0 0 1 9 9 v 7 a 9 9 0 0 1 -9 9 h ${-r}`,fill:'none',stroke:col,'stroke-width':1.7});
+        head(x+1,yy+25,1,col,!(m.c==='key'||m.c==='skill'));
+        text(x+r+20,yy+10,s,{fill:m.c?col:'#CBD6E0','font-size':10.5});
+        return;
+      }
+      if(m.note){
+        const x=px[m.note], yy=m._y, w=tw(s)+24;
+        add('rect',{x:x-w/2,y:yy,width:w,height:30,rx:8,fill:'#1a1813',stroke:'#F2B14C','stroke-width':1});
+        text(x,yy+19,s,{fill:'#F2D08A','font-size':10.5,'text-anchor':'middle'});
+        return;
+      }
+      const xa=px[m.f], xb=px[m.to], yy=m._y, dir=xb>xa?1:-1, open=(m.k==='async'||m.k==='ret');
+      const ln=add('line',{x1:xa+dir*2,y1:yy,x2:xb-dir*8,y2:yy,stroke:col,'stroke-width':1.7,'stroke-linecap':'round'});
+      if(open) ln.setAttribute('stroke-dasharray','5 5');
+      head(xb,yy,dir,col,open);
+      text((xa+xb)/2,yy-7,s,{fill:m.c?col:'#9fb0c0','font-size':10.5,'text-anchor':'middle'});
+    });
+  }
+
+  window.__seqRender=render;
+  render((document.documentElement.getAttribute('data-lang'))||'en');
+})();
+</script>
+
+<script>
+/* ===== EN / 中文 i18n ===== */
+(function(){
+  const ZH={
+    // hero
+    "CALL-E agenticcomponent architecture.":"CALL-E agentic<br><em>组件架构</em>。",
+    "The runtime is a stack of composable layers. Each layer owns a few components; each component lists what it does today and the extension points you build new capabilities on — a new tool, a new goal_type, a new call provider, a new skill. The request flow is kept below only as a reference.":
+      "运行时是一组可组合的分层。每一层拥有若干组件；每个组件都列出它<b>今天做什么</b>，以及你在其上构建新能力的<b>扩展点</b> —— 一个新 tool、一个新 <code>goal_type</code>、一个新通话 provider、一个新 skill。下方的请求流转仅作参考。",
+    // nav
+    "01 Architecture":"01 架构",
+    "02 Roadmaps":"02 路线图",
+    "03 Sequence":"03 时序",
+    // flow strip
+    "request flow · reference":"请求流转 · 参考",
+    "report: projection + summary → MainAgent → user":"汇报：projection + summary → MainAgent → 用户",
+    "terminal call event → re-dispatch":"通话终态事件 → 重新派发",
+    "next_wakeup_at due → re-dispatch · daily/weekly follow-up · planned":"next_wakeup_at 到期 → 重新派发 · 每日/每周跟进 · 规划中",
+    // section heads
+    "Component architecture":"组件架构",
+    "7 layers · responsibilities + extension points":"7 层 · 职责 + 扩展点",
+    "Agent roadmaps":"Agent 路线图",
+    "3 journeys · dispatcher routes by goal_type":"3 条旅程 · dispatcher 按 goal_type 路由",
+    "One-shot call · runtime sequence":"一次性通话 · 运行时时序",
+    "live · the only path built today":"已上线 · 当前唯一落地的链路",
+    // layer subtitles
+    "host & I/O":"宿主 & I/O",
+    "SandboxAgentinstances":"SandboxAgent 实例",
+    "what an agentis built from":"一个 agent 由什么组成",
+    "spec §2 · plannedcontext source":"spec §2 · 规划中 上下文来源",
+    "goal engine":"目标引擎",
+    "durable truth& contracts":"持久事实 & 契约",
+    "streaming &run context":"流式 & 运行上下文",
+    "workspacefilesystem":"工作区文件系统",
+    // labels reused
+    "extend":"扩展", "build":"构建", "planned":"规划中",
+    "capability":"能力", "skill · lazy":"技能 · 懒加载", "business":"业务",
+    // ENTRY
+    "Host runtime for one chat session: builds the orchestrator, owns memory, runs the active agent, and schedules goal dispatch + voice executors as background tasks.":
+      "单个 chat session 的宿主运行时：构建 orchestrator、持有 memory、运行当前 active agent，并把 goal dispatch + voice executor 作为后台任务调度。",
+    "model config":"模型配置", "memory backend":"持久化后端", "multi-agent switch":"多 agent 切换",
+    "User surface: streaming output, slash commands, auth session, model switching, scheduler task view.":
+      "用户界面：流式输出、slash 命令、auth 会话、模型切换、scheduler 任务视图。",
+    "new slash commands":"新 slash 命令", "web / api surface":"web / api 接入面",
+    "Planned web surface for the same CALL-E runtime: user chat, goal status, run progress, evidence/report review, and scheduler visibility.":
+      "同一套 CALL-E runtime 的规划中 Web 界面：用户对话、goal 状态、run 进度、evidence/report 查看，以及 scheduler 可见性。",
+    "chat UI":"chat UI", "goal timeline":"goal 时间线", "run/evidence panels":"run/evidence 面板",
+    // AGENTS
+    "Conversational planner — talks with the user, plans, commits goals.":"对话式规划者 —— 与用户对话、规划、提交 goal。",
+    "Runs one outbound goal iteration · routed for one_shot / batch / progressive_outbound.":
+      "运行一轮 outbound goal 迭代 · 按 one_shot / batch / progressive_outbound 路由。",
+    "Inbound counterpart, sharing the same dispatcher, goal-event log, and iteration contract.":
+      "Inbound 对应方，复用同一 dispatcher、goal-event 日志与迭代契约。",
+    // COMPOSE
+    "register new FunctionTool":"注册新 FunctionTool", "builtin_tools() / agent list":"builtin_tools() / agent 列表",
+    "add SKILL.md pack":"新增 SKILL.md 包",
+    ".with_instruction() per domain":"按领域 .with_instruction()",
+    "Skills capability + default Capabilities; Manifest(root=workspace) grants the agent its workspace.":
+      "Skills capability + 默认 Capabilities；Manifest(root=workspace) 把工作区授权给 agent。",
+    "sandbox capability":"sandbox 能力", "path grant":"路径授权",
+    // KNOWLEDGE
+    "Per org / tenant / chat, the user uploads a knowledge base — company intro, product docs, FAQ, SOP, policies, 客户名单, 话术要求, 历史 report — built into keyword + embedding indexes.":
+      "按 组织 / 租户 / 会话，用户上传知识库 —— 公司介绍、产品文档、FAQ、SOP、政策、客户名单、话术要求、历史 report —— 构建为关键词 + embedding 索引。",
+    "new upload types":"新上传类型", "dual index":"双路索引",
+    "Embedding + keyword hybrid search over the KB to inform planning & execution. A Context Compiler then picks which candidates actually enter the prompt.":
+      "在知识库上做 embedding + 关键词<b>混合检索</b>，为规划与执行提供依据。再由 Context Compiler 决定哪些候选真正进入 prompt。",
+    "rerank / filters":"重排 / 过滤", "context compiler":"context compiler",
+    "Similar-case recall over raw historical cases (good/bad case · task type), plus Case-Derived Playbooks (required inputs, call strategy, failure patterns, retry/fallback) distilled offline.":
+      "在原始历史 case（good/bad case · 任务类型）上做<b>相似 case 召回</b>，并离线蒸馏出 Case 衍生 Playbook（必需输入、通话策略、失败模式、重试/兜底）。",
+    "raw case retrieval":"原始 case 检索", "playbook distillation":"playbook 蒸馏",
+    "Fill gaps the KB and cases don't cover: web_search · official_site_retrieval · local_search / maps · status_api. Results stored as evidence (source, fetched_at, confidence, ttl).":
+      "补齐知识库与 case 未覆盖的缺口：<code>web_search</code> · <code>official_site_retrieval</code> · <code>local_search / maps</code> · <code>status_api</code>。结果作为 evidence 存储（source、fetched_at、confidence、ttl）。",
+    "new retrieval module":"新检索模块",
+    "retrieve_tool wraps the retrieval modules; index_tool builds indexes — event-driven (on upload / after a call), not necessarily agent-called.":
+      "<code>retrieve_tool</code> 封装各检索模块；<code>index_tool</code> 构建索引 —— 事件驱动（上传时 / 通话后），不一定由 agent 调用。",
+    "register module":"注册模块", "offline index jobs":"离线索引任务",
+    // RUNTIME
+    "Claims a lease, reads the event backlog after the cursor, routes by goal_type, runs one iteration, applies the patch + emits events, advances the cursor, releases with next_wakeup_at, and streams goal-agent events back to the session.":
+      "认领 lease、读取 cursor 之后的事件积压、按 <code>goal_type</code> 路由、运行一轮迭代、应用 patch + 发出事件、推进 cursor、带 <code>next_wakeup_at</code> 释放，并把 goal-agent 事件流式回传到 session。",
+    "new goal_type → agent route":"新 goal_type → agent 路由", "lease TTL / batch":"lease TTL / 批量", "resume policy":"resume 策略",
+    "Executes a voice run: places the real call, writes transcripts / recordings / raw payloads, emits the terminal goal event, and triggers re-dispatch.":
+      "执行一次 voice run：发起真实通话，写入 transcripts / recordings / 原始 payload，发出终态 goal 事件，并触发重新派发。",
+    "call provider (Calling / AIRUDDER)":"通话 provider（Calling / AIRUDDER）", "artifact kinds":"artifact 类型",
+    "Sweeps goals whose next_wakeup_at is due and re-dispatches them on a cadence (daily / weekly) for continuous follow-up until the objective is met.":
+      "扫描 <code>next_wakeup_at</code> 到期的 goal，按节奏（每日 / 每周）重新派发，持续跟进直到目标达成。",
+    "cron / worker reusing dispatch_goal":"复用 dispatch_goal 的 cron / worker",
+    // STATE
+    "Goal record + goal_events log + dispatch cursor / lease / next_wakeup_at; claim/release iteration, update state, append events.":
+      "Goal 记录 + <code>goal_events</code> 日志 + dispatch cursor / lease / <code>next_wakeup_at</code>；认领/释放迭代、更新状态、追加事件。",
+    "new event types":"新事件类型", "new goal payload schema":"新 goal payload schema",
+    "Session record: active_agent_name, runtime state, openai_previous_response_id.":
+      "Session 记录：active_agent_name、运行时状态、openai_previous_response_id。",
+    "Chat history — SQLAlchemy session or OpenAI Responses context.":"对话历史 —— SQLAlchemy session 或 OpenAI Responses 上下文。",
+    "CalleRunRegistry (runs) + CalleRunSpecStore (run specs) and their records.":
+      "CalleRunRegistry（runs）+ CalleRunSpecStore（run specs）及其记录。",
+    "new patch fields":"新 patch 字段", "new schema":"新 schema",
+    "Agent work is kept as structured records first: goal brief/payload, frozen RunSpec, run status, event timeline, evidence refs, projection, and report fields. Free-form chat becomes queryable state and auditable artifacts.":
+      "Agent 工作首先被保存为结构化记录：goal brief/payload、冻结的 RunSpec、run 状态、event timeline、evidence 引用、projection 与 report 字段。自由文本对话会沉淀为可查询的状态和可审计的 artifacts。",
+    "report schema":"report schema", "analytics fields":"分析字段", "web projections":"Web projections",
+    // EVENTS
+    "In-process pub/sub: typed EventEnvelope plus the internal SessionStreamEvent SDK wrapper. Streams detached background goal runs back to the TUI.":
+      "进程内 pub/sub：使用 typed EventEnvelope，并仅以 SessionStreamEvent 包装内部 SDK 流事件。把脱离的后台 goal run 流式回传到 TUI。",
+    "new consumer (webhook / web UI)":"新消费者（webhook / web UI）", "new event names":"新事件名",
+    "Per-turn context handed to tools: session / tenant / user + current_user, goal_store, db_session, memory_engine, session_event_bus, pending_dispatch_goal_ids, pending_voice_run_ids, janus queue.":
+      "交给 tools 的单轮上下文：session / tenant / user + current_user、goal_store、db_session、memory_engine、session_event_bus、pending_dispatch_goal_ids、pending_voice_run_ids、janus queue。",
+    "add handle for new tool":"为新 tool 增加 handle",
+    // DISK
+    "tenant → session → goal → run directory tree; the manifest root each agent is granted; workspace:// artifact refs; ensure_* creators.":
+      "tenant → session → goal → run 目录树；授予每个 agent 的 manifest root；<code>workspace://</code> artifact 引用；ensure_* 创建器。",
+    "NAS / PVC mount":"NAS / PVC 挂载", "new subdir sets":"新子目录集",
+    "Example artifact":"示例产物",
+    "directory":"<i class=\"kd\" style=\"background:var(--ink)\"></i>目录",
+    "runtime id":"<i class=\"kd\" style=\"background:var(--live)\"></i>运行时 id",
+    "example file":"<i class=\"kd\" style=\"background:var(--signal)\"></i>示例文件",
+    // legend
+    "▸ extension point (build here)":"<i class=\"lg\" style=\"background:var(--live)\"></i>▸ 扩展点（在此构建）",
+    "planned (not in code yet)":"<i class=\"dash\"></i>规划中（代码尚未实现）",
+    "active / outbound":"<i class=\"lg\" style=\"background:var(--signal)\"></i>已上线 / outbound",
+    "inbound":"<i class=\"lg\" style=\"background:var(--inbound)\"></i>inbound",
+    // grammar
+    "Shared loop· Plan → Act → Observe → Report → Confirm → Iterate ↺ · Plan steps recall the Knowledge layer (KB + similar cases)":
+      "<b>共享循环</b><span class=\"arr\">·</span> 规划 <span class=\"arr\">→</span> 执行 <span class=\"arr\">→</span> 观察 <span class=\"arr\">→</span> <span class=\"rep\">汇报</span> <span class=\"arr\">→</span> 确认 <span class=\"arr\">→</span> <span class=\"it\">迭代&nbsp;↺</span> <span class=\"arr\">&nbsp;·&nbsp; 规划步骤会召回</span> <span class=\"km\" style=\"color:#D98AC0\">Knowledge 层</span> <span class=\"arr\">（KB + 相似 case）</span>",
+    // roadmaps · one-shot
+    "One-shot":"一次性", "live":"已上线",
+    "goal_type one_shot_outbound · solve once · e.g. clinic earliest slot":"goal_type one_shot_outbound · 一次解决 · 例：诊所最早号",
+    "plan · 01":"规划 · 01", "plan · 02":"规划 · 02", "run · 03":"执行 · 03", "run · 04":"执行 · 04",
+    "report · 05":"汇报 · 05", "done · 06":"完成 · 06", "iterate · 06":"迭代 · 06", "optional · progressive":"可选 · progressive",
+    "Commit goal":"提交 goal",
+    "Pin the objective for one callee · commit_goal.":"为<b>单个被叫</b>锁定目标 · <code>commit_goal</code>。",
+    "Plan the run":"规划 run",
+    "Draft a RunSpec → voice_instruction.md.":"起草 RunSpec → <code>voice_instruction.md</code>。",
+    "▸ recall KB + similar cases":"▸ 召回 KB + 相似 case",
+    "Place the call":"发起通话",
+    "create_voice_run → VoiceRunExecutor dials.":"<code>create_voice_run</code> → VoiceRunExecutor 拨号。",
+    "Collect outcome":"收集结果",
+    "Transcript · recording · status.":"transcript · recording · 状态。",
+    "Report to user":"向用户汇报",
+    "complete_goal_iteration → projection via EventBus.":"<code>complete_goal_iteration</code> → 经 EventBus 输出 projection。",
+    "▸ projection → user":"▸ projection → 用户",
+    "Resolved":"已解决",
+    "Objective met (one retry if no-answer).":"目标达成（无应答则重试一次）。",
+    "✓ goal complete":"✓ goal 完成",
+    // roadmaps · batch
+    "Batch":"批量", "+ optional Progressive":"+ 可选 Progressive",
+    "goal_type batch_outbound (+ progressive) · whole list · e.g. 银行催收":"goal_type batch_outbound（+ progressive）· 整张名单 · 例：银行催收",
+    "A fixed list of N callees · commit_goal.":"一张<b>固定名单</b>的 N 个被叫 · <code>commit_goal</code>。",
+    "One shared RunSpec for the list.":"为整张名单准备一份共享 RunSpec。",
+    "Call the batch":"呼叫批次",
+    "Dial the next callee(s) · create_voice_run.":"拨打下一批被叫 · <code>create_voice_run</code>。",
+    "Per-callee transcript · status.":"每个被叫的 transcript · 状态。",
+    "Ramp gate":"放量闸门",
+    "Canary a slice (10/100), evaluate the bot: ✓ scale up · ✗ tune & re-ramp.":
+      "灰度一小批（<b>10/100</b>），评估机器人：<span style=\"color:var(--live)\">✓ 放量</span> · <span style=\"color:var(--signal)\">✗ 调优后再放量</span>。",
+    "⌥ optional · else run the whole list":"⌥ 可选 · 否则直接跑整张名单",
+    "Report progress":"汇报进度",
+    "Running tally → MainAgent → user.":"实时统计 → MainAgent → 用户。",
+    "▸ progress → user":"▸ 进度 → 用户",
+    "Next batch":"下一批",
+    "Walk the list to completion; unreached retried on cadence.":"走完整张名单；未触达的按节奏重试。",
+    "↻ next batch · follow-up":"↻ 下一批 · 跟进",
+    // roadmaps · inbound
+    "Inbound":"呼入",
+    "InboundGoalAgent (reserved goal_type) · build → launch → operate":"InboundGoalAgent（预留 goal_type）· 构建 → 上线 → 运营",
+    "build · 01":"构建 · 01", "build · 02":"构建 · 02", "build · 03":"构建 · 03",
+    "launch · 04":"上线 · 04", "launch · 05":"上线 · 05", "launch · 06":"上线 · 06",
+    "operate · 07":"运营 · 07", "report · 08":"汇报 · 08", "confirm · 09":"确认 · 09", "iterate · 10":"迭代 · 10",
+    "Build the inbound bot":"构建呼入机器人",
+    "Define the hotline persona, intents & FAQs; commit_goal (goal_type=inbound).":"定义热线人设、意图与 FAQ；<code>commit_goal</code>（goal_type=inbound）。",
+    "Assemble version 1":"组装 version 1",
+    "Compile the bot config — the inbound analog of a RunSpec.":"编译机器人配置 —— 呼入侧相当于 RunSpec。",
+    "Simulate & test":"模拟与测试",
+    "Run simulated inbound calls to validate flows before any real caller reaches it.":"在真实来电前，用模拟呼入验证流程。",
+    "▸ recall SOP / FAQ + cases":"▸ 召回 SOP / FAQ + case",
+    "Release v1":"发布 v1",
+    "User confirms the test; publish bot version 1.":"用户确认测试；发布机器人 <code>version 1</code>。",
+    "Bind the hotline":"绑定热线",
+    "Attach the hotline number to the released version.":"将热线号码绑定到已发布版本。",
+    "Go online":"上线",
+    "Activate — real inbound calls now land on v1.":"激活 —— 真实来电现在落到 v1。",
+    "Scheduled check":"定时巡检",
+    "The Wake Scheduler sweeps live inbound calls at next_wakeup_at.":"Wake Scheduler 在 <code>next_wakeup_at</code> 扫描线上呼入通话。",
+    "↻ recurring follow-up":"↻ 周期性跟进",
+    "Report + suggest":"汇报 + 建议",
+    "Analyze transcripts → report + optimization suggestions → user.":"分析 transcript → 报告 + 优化建议 → 用户。",
+    "▸ report → MainAgent → user":"▸ 报告 → MainAgent → 用户",
+    "User confirms":"用户确认",
+    "notify_goal confirm — approve the improvements.":"<code>notify_goal</code> confirm —— 批准改进。",
+    "Upgrade to version 2":"升级到 version 2",
+    "Publish the improved version; loop back to re-test & re-release.":"发布改进版本；回到重新测试与重新发布。",
+    // notes2
+    "The goal is done only when the user's real-world objective is met — e.g. a 银行催收 debtor actually repays — not when a call ends. So the agent re-dispatches on a cadence via the Wake Scheduler until then.":
+      "只有当用户的<b>真实世界目标</b>达成时 goal 才算完成 —— 例如银行催收的债务人真正还款 —— 而不是通话结束时。因此 agent 会经 <b>Wake Scheduler</b> 按节奏重新派发，直到达成。",
+    "call → objective met? → ✗ wait · daily / weekly ↺ via Wake Scheduler | ✓ goal done":
+      "通话 <span class=\"ar\">→</span> 目标达成？ <span class=\"ar\">→</span> <span class=\"no\">✗ 等待 · 每日 / 每周</span> <span class=\"lp\">↺ 经 Wake Scheduler</span> <span class=\"ar\">|</span> <span class=\"ok\">✓ goal 完成</span>",
+    "Inbound · one pipeline, a new branch":"呼入 · 同一条管线的新分支",
+    "Reuses the same dispatcher, goal-event log & report contract as outbound — it's a new goal_type, not a new pipeline. Simulate (03) & Report (08) draw on the Knowledge layer; the operate loop (07–10) is the same Scheduler cadence.":
+      "复用与 outbound 相同的 <b>dispatcher</b>、<b>goal-event 日志</b> 与 <b>报告契约</b> —— 它是一个新 <code>goal_type</code>，而非新管线。<b>模拟（03）</b> 与 <b>报告（08）</b> 依托 <span class=\"km\">Knowledge 层</span>；运营循环（07–10）是同一套 Scheduler 节奏。",
+    "Planned — no inbound goal_type in code yet.":"<b>规划中</b> —— 代码中尚无 inbound goal_type。",
+    // sequence caption + legend
+    "The concrete trace of a single one_shot_outbound goal — from the user's request to a resolved objective. Two dispatch iterations bracket one real call: iteration ① plans the RunSpec and queues the call; the call runs detached; its terminal event re-dispatches iteration ② to evaluate the outcome and report back to the user. Each dispatch is one OutboundGoalAgent turn that must end in complete_goal_iteration.":
+      "单个 <b>one_shot_outbound</b> goal 的具体轨迹 —— 从用户请求到目标解决。<b>两轮派发迭代夹着一次真实通话</b>：迭代 ① 规划 RunSpec 并<span class=\"k\">入队</span>通话；通话<b>脱离</b>运行；其终态事件<b>重新派发</b>迭代 ②，评估结果并向用户汇报。每次派发都是一个必须以 <code>complete_goal_iteration</code> 结束的 <code>OutboundGoalAgent</code> 回合。",
+    "sync call / return":"<i class=\"s-sync\"></i>同步调用 / 返回",
+    "async · event":"<i class=\"s-async\"></i>异步 · 事件",
+    "key business tool":"<i class=\"s-key\"></i>关键业务 tool",
+    "report → user":"<i class=\"s-rep\"></i>汇报 → 用户",
+    "⟳ self-action":"⟳&nbsp;自身动作",
+    "▭ dispatch iteration":"▭ 派发迭代"
+  };
+
+  const SEL='.thesis, .navlink, .fs-label, .fs-loop .lp, .sec-head h2, .sec-head .note, .lsub, .role, .ext .lbl, .xchip, .comp .none, .callout .lbl, .tree-key span, .legend span, .rmap-head h3, .rstat, .rmap-sub, .sc, .ms-ey, .ms-card h4, .ms-card p, .tagline, .grammar, .atk, .planpill, .followup p, .followup .vflow, .sidecard h4, .sidecard p, .seqcap, .seq-legend span, h1';
+  const norm=s=>s.replace(/\s+/g,' ').trim();
+  const items=[...document.querySelectorAll(SEL)].map(el=>({el, en:el.innerHTML, key:norm(el.textContent)}));
+
+  function apply(lang){
+    document.documentElement.setAttribute('data-lang',lang);
+    document.documentElement.setAttribute('lang', lang==='zh'?'zh':'en');
+    items.forEach(o=>{
+      if(lang==='zh'){ const v=ZH[o.key]; o.el.innerHTML = v!==undefined ? v : o.en; }
+      else o.el.innerHTML=o.en;
+    });
+    document.querySelectorAll('.langbtn').forEach(b=>b.classList.toggle('on', b.dataset.l===lang));
+    try{localStorage.setItem('calle-arch-lang',lang);}catch(e){}
+    if(window.__seqRender) window.__seqRender(lang);
+  }
+  document.querySelectorAll('.langbtn').forEach(b=>b.addEventListener('click',()=>apply(b.dataset.l)));
+  let init='en'; try{init=localStorage.getItem('calle-arch-lang')||'en';}catch(e){}
+  apply(init);
+})();
+</script>
+
+<footer>
+  <div class="rule"></div>
+  source · agents/{calle,orchestrator,goal}.py · runtime/dispatcher.py · voice_execution/executor.py · tools/* · skills/* · goals/store.py · sessions/* · runs/* · events.py · schemas/agents/ctx.py · schemas/agentic/* · workspace/layout.py
+  &nbsp;·&nbsp; branch feat/one-shot-agentic-unified-agent &nbsp;·&nbsp; 2026-06-18
+</footer>
+
+</body>
+</html>

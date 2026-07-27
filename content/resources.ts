@@ -35,6 +35,16 @@ export type ResourceCollection = {
 };
 
 export const resources = [
+  {
+    title: "CALL-E Agentic Framework",
+    description: "交互式展示 CALL-E Agentic Framework 的入口、Agent、Skills、Runtime、State、Events 与语音执行链路。",
+    type: "demo",
+    href: "/calle-agentic-architecture/index.html",
+    tags: ["agentic", "architecture", "call-e", "visualization"],
+    date: "2026-07-27",
+    status: "public",
+    featured: true
+  },
   // Snapshot source:
   // https://gist.githubusercontent.com/Derekwang2002/8ea85042f886b464aa3562eb493c3c16/raw/8d2e2bcbcb237586bc1fea065aa277c574685d47/session.html
   {
