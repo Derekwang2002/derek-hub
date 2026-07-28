@@ -3,10 +3,6 @@ import { getResourcesBySection, type ResourceSection } from "./resources";
 import type { Resource } from "../content/resources";
 
 const ENGLISH_COPY: Record<string, Pick<Resource, "title" | "description">> = {
-  "/calle-agentic-architecture/index.html": {
-    title: "CALL-E Agentic Framework",
-    description: "An interactive architecture map of CALL-E entry points, agents, skills, runtime, state, events, and voice execution."
-  },
   "/dev-test-uat-prod/index.html": {
     title: "dev -> test -> uat -> prod",
     description: "A shared session explaining Dev, Test, UAT, and Prod environments and their release flow."

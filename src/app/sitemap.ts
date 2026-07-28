@@ -1,9 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "../../lib/posts";
-import {
-  getAllPostSeriesDocuments,
-  getPostSeriesDefinition
-} from "../../lib/post-series";
+import { getAllProjects } from "../../lib/projects";
 import {
   RESOURCE_SECTIONS,
   getPublicResources,
@@ -29,7 +26,7 @@ function toDate(date: string): Date {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
   const posts = await getAllPosts();
-  const postSeriesDocuments = await getAllPostSeriesDocuments("zh");
+  const projects = await getAllProjects("en");
   const publicResources = await getPublicResources();
 
   const latestPostDate = posts.length > 0 ? toDate(posts[0].date) : undefined;
@@ -72,23 +69,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7
   }));
 
-  const postSeriesEntries: MetadataRoute.Sitemap = postSeriesDocuments.map((document) => {
-    const definition = getPostSeriesDefinition(document.seriesSlug);
-    const parentPost = definition
-      ? posts.find((post) => post.slug === definition.parentPostSlug)
-      : undefined;
-
-    if (!definition || !parentPost) {
-      throw new Error(`Post-series document "${document.fileName}" has no parent post.`);
-    }
-
-    return {
-      url: toAbsoluteUrl(siteUrl, `/blog/${document.seriesSlug}/${document.slug}`),
-      lastModified: toDate(parentPost.date),
-      changeFrequency: "monthly",
-      priority: 0.65
-    };
-  });
+  const projectEntries: MetadataRoute.Sitemap = [
+    {
+      url: toAbsoluteUrl(siteUrl, "/projects"),
+      lastModified: projects[0] ? toDate(projects[0].lastUpdated) : latestPostDate,
+      changeFrequency: "weekly",
+      priority: 0.85
+    },
+    ...projects.flatMap((project) => [
+      {
+        url: toAbsoluteUrl(siteUrl, project.href),
+        lastModified: toDate(project.lastUpdated),
+        changeFrequency: "weekly" as const,
+        priority: 0.85
+      },
+      ...project.sections.flatMap((section) =>
+        section.items.map((item) => ({
+          url: toAbsoluteUrl(siteUrl, item.href),
+          lastModified: toDate(item.updated),
+          changeFrequency: "monthly" as const,
+          priority: 0.7
+        }))
+      ),
+      {
+        url: toAbsoluteUrl(siteUrl, `${project.href}/updates`),
+        lastModified: toDate(project.lastUpdated),
+        changeFrequency: "weekly" as const,
+        priority: 0.65
+      }
+    ])
+  ];
 
   const resourceEntries: MetadataRoute.Sitemap = publicResources
     .filter((resource) => !isExternalResourceHref(resource.href))
@@ -104,7 +114,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...resourceSectionEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
     ...resourceEntries.filter((entry) => entry.url.includes("/hub/skills/")).map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
     ...postEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/blog`, `${siteUrl}/zh/blog`) })),
-    ...postSeriesEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/blog`, `${siteUrl}/zh/blog`) }))
+    ...projectEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/projects`, `${siteUrl}/zh/projects`) }))
   ];
 
   return [
@@ -112,7 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...resourceSectionEntries,
     ...resourceEntries,
     ...postEntries,
-    ...postSeriesEntries,
+    ...projectEntries,
     ...chineseEntries
   ];
 }

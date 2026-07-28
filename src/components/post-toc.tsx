@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
-import type { PostSeriesLocale } from "../../lib/post-series";
+import type { ContentLocale } from "../../lib/locale";
 import styles from "../app/blog/[slug]/page.module.css";
 
 export type TocItem = {
@@ -15,7 +15,7 @@ type PostTocProps = {
   activeId: string;
   articleTitle: string;
   items: TocItem[];
-  locale?: PostSeriesLocale;
+  locale?: ContentLocale;
   onOpenChange: (open: boolean) => void;
   open: boolean;
   overlay: boolean;

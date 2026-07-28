@@ -30,50 +30,13 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "no-referrer" },
           { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }
         ]
-      }
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: "/blog/prod-dive-in-agentic-architecture",
-        destination: "/blog/call-e-overview",
-        permanent: true
       },
       {
-        source: "/zh/blog/prod-dive-in-agentic-architecture",
-        destination: "/zh/blog/call-e-overview",
-        permanent: true
-      },
-      {
-        source: "/blog/call-e-agentic-tech-doc",
-        destination: "/blog/call-e-overview",
-        permanent: true
-      },
-      {
-        source: "/zh/blog/call-e-agentic-tech-doc",
-        destination: "/zh/blog/call-e-overview",
-        permanent: true
-      },
-      {
-        source: "/blog/calle-agentic-goal-architecture-guide",
-        destination: "/blog/calle-agentic-goal-architecture",
-        permanent: true
-      },
-      {
-        source: "/zh/blog/calle-agentic-goal-architecture-guide",
-        destination: "/zh/blog/calle-agentic-goal-architecture",
-        permanent: true
-      },
-      {
-        source: "/blog/calle-agentic-goal-full-chain",
-        destination: "/blog/calle-agentic-goal-architecture",
-        permanent: true
-      },
-      {
-        source: "/zh/blog/calle-agentic-goal-full-chain",
-        destination: "/zh/blog/calle-agentic-goal-architecture",
-        permanent: true
+        source: "/projects/:project/source-atlas/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "X-Content-Type-Options", value: "nosniff" }
+        ]
       }
     ];
   },

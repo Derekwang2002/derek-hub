@@ -7,10 +7,13 @@ This repository contains Derek Hub, a Next.js App Router site for writing, resou
 - Home page with profile links and pinned resources.
 - Blog index, post detail pages, tag index, and tag detail pages.
 - Hub sections for all resources, skills, and demos.
+- Bilingual Project workspaces with an overview, ordered document tree, update stream, and interactive assets.
+- Complete overview-to-document paging in English and Chinese.
 - Skill articles rendered as internal hub pages instead of direct repository links.
 - Static HTML demos served from `public/leetcode-cookbook/`.
 - RSS feed at `/rss.xml`.
 - Static sitemap at `/sitemap.xml` with blog posts and internal hub resources.
+- Project-aware sitemap entries; raw interactive assets remain non-canonical and are marked `noindex`.
 - Markdown rendering with headings, table of contents, code highlighting, links, lists, tables, and blockquotes.
 - Shared Markdown source layer for local files, GitHub files, and GitHub folders.
 - Duplicate slug/source validation so one article is resolved from exactly one source.
@@ -47,6 +50,21 @@ selected: true
 ```
 
 Remote blog folders are expanded into individual Markdown file sources. The generated slug comes from the filename, or from the `YYYY-MM-DD-slug.md` filename pattern when present.
+
+Blog frontmatter may include `projects`, an array of Project slugs. This associates an independently owned post with a Project update stream without moving ownership.
+
+### Projects
+
+Project structure and ordering are configured in `content/projects.ts`. Localized Markdown lives under:
+
+```text
+content/projects/[project]/                    # Chinese
+content/translations/en/projects/[project]/    # English
+```
+
+Each Project has `index.md`, an `items/` directory, and an `updates/` directory. English and Chinese filenames must match exactly. The overview is position zero in the same pager as the ordered items, so its next link opens the first published document.
+
+Interactive Project assets live under `public/projects/[project]/`. Blog posts use the `projects` frontmatter field and demos use `projectSlugs` in `content/resources.ts` for optional association. Associated content appears in Updates but does not change the Project's canonical `lastUpdated` date.
 
 ### Hub
 
@@ -100,6 +118,10 @@ The article loader validates duplicates by both public slug/href and source id. 
 - `/` - Home page.
 - `/blog` - Blog index.
 - `/blog/[slug]` - Blog post page.
+- `/projects` - Project index.
+- `/projects/[project]` - Project overview and document directory.
+- `/projects/[project]/[item]` - Ordered Project document or interactive item.
+- `/projects/[project]/updates` - Project-owned updates plus associated Blog/Demo entries.
 - `/tags` - Tag index.
 - `/tags/[tag]` - Tag detail page.
 - `/hub` - Hub redirect/entry.
@@ -168,7 +190,7 @@ npm run start -- -p 3000
 - `npm run dev:host` - start a standard Next.js dev server.
 - `npm run lint` - run ESLint checks.
 - `npm run test:board` - test Share Board authentication, permissions, uploads, sandboxing, and navigation.
-- `npm run test:series` - test localized post-series loading and navigation boundaries.
+- `npm run test:projects` - test localized Project loading, asset parity, and every rendered pager boundary.
 - `npm run typecheck` - run TypeScript checks with `tsc --noEmit`.
 - `npm run build` - create a production build.
 - `npm run start` - run the production server after a build.
@@ -182,7 +204,7 @@ Checks:
 - `npm ci`
 - `npm run lint`
 - `npm run test:board`
-- `npm run test:series`
+- `npm run test:projects`
 - `npm run typecheck`
 - `npm run build`
 
@@ -218,6 +240,8 @@ If `NEXT_PUBLIC_SITE_URL` is unset, sitemap generation falls back to `http://loc
 |- content/
 |  |- blog.ts
 |  |- posts/
+|  |- projects/
+|  |- projects.ts
 |  `- resources.ts
 |- data/
 |  `- nextjs/
@@ -225,14 +249,18 @@ If `NEXT_PUBLIC_SITE_URL` is unset, sitemap generation falls back to `http://loc
 |  |- ARCHITECTURE.md
 |  |- PERFORMANCE_BASELINE.md
 |  |- PRD.md
+|  |- adr/
+|  |- projects/
 |  `- TASKS.md
 |- lib/
 |  |- markdown-sources.ts
 |  |- posts.ts
+|  |- projects.ts
 |  |- resource-display.ts
 |  |- resources.ts
 |  `- skill-docs.ts
 |- public/
+|  |- projects/
 |  |- leetcode-cookbook/
 |  |- avatar.png
 |  `- og-default.svg

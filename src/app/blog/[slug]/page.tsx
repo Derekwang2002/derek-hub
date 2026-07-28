@@ -3,13 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
-import { PostSeriesPager } from "@/components/post-series-pager";
 import { getAllPosts, normalizeTagSlug } from "../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../lib/localized-posts";
-import {
-  getPostSeriesDefinitionByParentPostSlug,
-  getPostSeriesDocuments
-} from "../../../../lib/post-series";
 import styles from "./page.module.css";
 
 const DEFAULT_OG_IMAGE = "/og-default.svg";
@@ -80,16 +75,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const tocItems = getMarkdownHeadings(post.content);
   const renderedContent = await renderMarkdown(post.content, tocItems);
-  const seriesDefinition = getPostSeriesDefinitionByParentPostSlug(post.slug);
-  const firstSeriesDocument = seriesDefinition
-    ? (await getPostSeriesDocuments(seriesDefinition.slug, "en"))[0]
-    : null;
-  const nextSeriesLink = firstSeriesDocument && seriesDefinition
-    ? {
-        href: `/blog/${seriesDefinition.slug}/${firstSeriesDocument.slug}`,
-        label: `Part ${firstSeriesDocument.order}: ${firstSeriesDocument.title}`
-      }
-    : null;
 
   return (
     <main className={styles.postPage}>
@@ -100,13 +85,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </p>
 
       <header className={styles.header}>
-        {seriesDefinition ? (
-          <p className={styles.seriesContext}>
-            <span>CALL-E Agentic Goal</span>
-            <span aria-hidden="true">/</span>
-            <span>Part 0</span>
-          </p>
-        ) : null}
         <h1 className={styles.title}>{post.title}</h1>
         <time className={styles.date} dateTime={post.date}>
           {formatPostDate(post.date)}
@@ -125,9 +103,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <PostBodyLayout articleTitle={post.title} tocItems={tocItems}>
         {renderedContent}
       </PostBodyLayout>
-      {nextSeriesLink ? (
-        <PostSeriesPager locale="en" next={nextSeriesLink} previous={null} />
-      ) : null}
     </main>
   );
 }

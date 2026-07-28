@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
 import { useActiveHeading } from "./use-active-heading";
-import type { PostSeriesLocale } from "../../lib/post-series";
+import type { ContentLocale } from "../../lib/locale";
 import styles from "../app/blog/[slug]/page.module.css";
 
 const TOC_PREFERENCE_KEY = "derek-hub:toc-open";
@@ -15,7 +15,7 @@ type ViewportMode = "pending" | "wide" | "medium" | "mobile";
 type PostBodyLayoutProps = {
   articleTitle: string;
   children: ReactNode;
-  locale?: PostSeriesLocale;
+  locale?: ContentLocale;
   tocItems: TocItem[];
 };
 

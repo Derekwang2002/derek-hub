@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:board": "node --import tsx --test lib/share-board/*.test.ts*",
-    "test:series": "node --import tsx --test lib/post-series.test.ts",
+    "test:projects": "node --import tsx --test lib/projects.test.tsx",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

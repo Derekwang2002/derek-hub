@@ -31,8 +31,8 @@ jobs:
       - name: Share Board tests
         run: npm run test:board
 
-      - name: Post series tests
-        run: npm run test:series
+      - name: Project tests
+        run: npm run test:projects
 
       - name: Build
         run: npm run build

@@ -16,6 +16,7 @@ export function PrimaryNavigation() {
       <Link href={localizePath("/", chinese)}>Home</Link>
       <Link href={localizePath("/blog", chinese)}>Blog</Link>
       <Link href={localizePath("/hub/all", chinese)}>Hub</Link>
+      <Link href={localizePath("/projects", chinese)}>Projects</Link>
     </div>
   );
 }

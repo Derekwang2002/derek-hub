@@ -3,14 +3,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
-import { PostSeriesPager } from "@/components/post-series-pager";
 import { formatContentDate } from "../../../../../lib/locale";
 import { getAllPosts, normalizeTagSlug } from "../../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../../lib/localized-posts";
-import {
-  getPostSeriesDefinitionByParentPostSlug,
-  getPostSeriesDocuments
-} from "../../../../../lib/post-series";
 import styles from "../../../blog/[slug]/page.module.css";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -33,28 +28,11 @@ export default async function ChineseBlogPostPage({ params }: Props) {
   if (!post) notFound();
   const tocItems = getMarkdownHeadings(post.content);
   const renderedContent = await renderMarkdown(post.content, tocItems);
-  const seriesDefinition = getPostSeriesDefinitionByParentPostSlug(post.slug);
-  const firstSeriesDocument = seriesDefinition
-    ? (await getPostSeriesDocuments(seriesDefinition.slug, "zh"))[0]
-    : null;
-  const nextSeriesLink = firstSeriesDocument && seriesDefinition
-    ? {
-        href: `/zh/blog/${seriesDefinition.slug}/${firstSeriesDocument.slug}`,
-        label: `第 ${firstSeriesDocument.order} 篇：${firstSeriesDocument.title}`
-      }
-    : null;
 
   return (
     <main className={styles.postPage} lang="zh-CN">
       <p className={styles.backWrap}><Link className={styles.backLink} href="/zh/blog">返回 Blog</Link></p>
       <header className={styles.header}>
-        {seriesDefinition ? (
-          <p className={styles.seriesContext}>
-            <span>CALL-E Agentic Goal</span>
-            <span aria-hidden="true">/</span>
-            <span>第 0 篇</span>
-          </p>
-        ) : null}
         <h1 className={styles.title}>{post.title}</h1>
         <time className={styles.date} dateTime={post.date}>{formatContentDate(post.date, "zh")}</time>
         <ul className={styles.tags}>{post.tags.map((tag) => <li key={tag}><Link className={styles.tagLink} href={`/zh/blog?tag=${normalizeTagSlug(tag)}`}>{tag}</Link></li>)}</ul>
@@ -66,9 +44,6 @@ export default async function ChineseBlogPostPage({ params }: Props) {
       >
         {renderedContent}
       </PostBodyLayout>
-      {nextSeriesLink ? (
-        <PostSeriesPager locale="zh" next={nextSeriesLink} previous={null} />
-      ) : null}
     </main>
   );
 }

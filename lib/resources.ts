@@ -180,6 +180,7 @@ async function createResourceFromCollectionSource(
   const status = override?.status ?? collection.status;
   const date = override?.date ?? collection.date;
   const featured = override?.featured ?? collection.featured;
+  const projectSlugs = override?.projectSlugs;
 
   const resource: Resource = {
     title,
@@ -197,6 +198,9 @@ async function createResourceFromCollectionSource(
 
   if (featured !== undefined) {
     resource.featured = featured;
+  }
+  if (projectSlugs !== undefined) {
+    resource.projectSlugs = projectSlugs;
   }
 
   return resource;

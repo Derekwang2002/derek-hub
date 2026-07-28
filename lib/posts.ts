@@ -28,6 +28,7 @@ export type Post = {
   tags: string[];
   draft: boolean;
   selected?: boolean;
+  projects: string[];
   content: string;
   fileName: string;
   sourceId: string;
@@ -290,6 +291,7 @@ async function readPostSource(postSource: ResolvedPostSource): Promise<Post> {
   const tags = readRequiredTags(frontmatter, postSource.label);
   const draft = readOptionalBoolean(frontmatter, "draft", false, postSource.label) ?? false;
   const selected = readOptionalBoolean(frontmatter, "selected", undefined, postSource.label);
+  const projects = readOptionalStringArray(frontmatter, "projects", postSource.label);
 
   validateDate(date, postSource.label);
 
@@ -302,7 +304,8 @@ async function readPostSource(postSource: ResolvedPostSource): Promise<Post> {
     draft,
     content,
     fileName: postSource.label,
-    sourceId: source.sourceId
+    sourceId: source.sourceId,
+    projects
   };
 
   if (source.sourceUrl) {
@@ -433,6 +436,23 @@ function readRequiredTags(frontmatter: Frontmatter, fileName: string): string[] 
   }
 
   return tags;
+}
+
+function readOptionalStringArray(
+  frontmatter: Frontmatter,
+  key: string,
+  fileName: string
+): string[] {
+  const value = frontmatter[key];
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`Invalid "${key}" in "${fileName}". Expected string[].`);
+  }
+  const items = value.map((item) => item.trim()).filter(Boolean);
+  if (items.length !== value.length || new Set(items).size !== items.length) {
+    throw new Error(`Invalid "${key}" in "${fileName}". Values must be unique non-empty strings.`);
+  }
+  return items;
 }
 
 function readOptionalBoolean(
