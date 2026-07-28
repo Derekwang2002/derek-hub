@@ -1,16 +1,33 @@
 .indexPage {
-  max-width: 880px;
-  padding-bottom: 5rem;
+  margin: 0 auto;
+  max-width: 720px;
+  padding: 2.8rem 1rem 3.5rem;
+  text-align: center;
 }
 
-.indexHero,
+.indexHero {
+  margin: 0 0 1.1rem;
+}
+
+.indexHero h1 {
+  font-size: clamp(1.9rem, 6vw, 2.8rem);
+  line-height: 1.1;
+  margin: 0 0 0.5rem;
+}
+
+.indexHero > p {
+  color: var(--color-text-muted);
+  line-height: 1.65;
+  margin: 0 auto;
+  max-width: 56ch;
+}
+
 .projectHero,
 .updatesHero {
   border-bottom: 1px solid var(--color-border);
   padding: 2rem 0 2.25rem;
 }
 
-.indexHero h1,
 .projectHero h1,
 .updatesHero h1 {
   font-size: clamp(2.35rem, 7vw, 4.5rem);
@@ -19,7 +36,6 @@
   text-wrap: balance;
 }
 
-.indexHero > p:last-child,
 .projectHero > p,
 .updatesHero > p:last-child {
   color: var(--color-text-muted);
@@ -40,12 +56,14 @@
 
 .projectList {
   list-style: none;
-  margin: 2rem 0 0;
+  margin: 1.15rem auto 0;
+  max-width: 620px;
   padding: 0;
+  text-align: left;
 }
 
 .projectList li {
-  border-bottom: 1px solid var(--color-border-soft);
+  border-top: 1px solid var(--color-border-soft);
 }
 
 .projectList a {
@@ -53,7 +71,7 @@
   display: flex;
   gap: 2rem;
   justify-content: space-between;
-  padding: 1.4rem 0;
+  padding: 0.9rem 0 1.08rem;
   text-decoration: none;
 }
 
@@ -68,13 +86,16 @@
 }
 
 .projectList strong {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
 }
 
 .projectList small {
   color: var(--color-text-muted);
-  font-size: 0.94rem;
-  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.58;
+  margin-top: 0.28rem;
   max-width: 560px;
 }
 
@@ -486,4 +507,3 @@
     margin-top: 0.75rem;
   }
 }
-

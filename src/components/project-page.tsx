@@ -23,7 +23,6 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
   return (
     <main className={styles.indexPage} lang={locale === "zh" ? "zh-CN" : "en"}>
       <header className={styles.indexHero}>
-        <p className={styles.eyebrow}>{locale === "zh" ? "长期项目" : "Long-running work"}</p>
         <h1>Projects</h1>
         <p>
           {locale === "zh"
