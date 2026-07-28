@@ -95,6 +95,9 @@ export const resourceCollections = [
         title: "Agent Eval Skill",
         description: "用于 reviewer/fixer 循环的 Codex skill。",
         tags: ["codex", "skill", "automation"]
+      },
+      "sync-post-localizations": {
+        description: "同步多语言 Markdown 文章，并校验相关发布入口。"
       }
     }
   }

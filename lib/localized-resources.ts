@@ -22,6 +22,10 @@ const ENGLISH_COPY: Record<string, Pick<Resource, "title" | "description">> = {
   "/hub/skills/agent-eval": {
     title: "Agent Eval Skill",
     description: "A Codex skill for reviewing changes and running bounded reviewer/fixer loops."
+  },
+  "/hub/skills/sync-post-localizations": {
+    title: "Sync Post Localizations Skill",
+    description: "Sync localized Markdown posts and validate their publishing surfaces."
   }
 };
 
