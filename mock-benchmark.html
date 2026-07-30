@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Benchmark Mock</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #050506;
+      --text: #f3f3f7;
+      --muted: #9a9ba5;
+      --line: #485162;
+      --accent: #9299ff;
+      --secondary: #555f73;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: #050506;
+      color: var(--text);
+      font-family: "Avenir Next", Avenir, "Helvetica Neue", sans-serif;
+    }
+
+    .page {
+      display: grid;
+      gap: 68px;
+      width: min(100% - 28px, 1320px);
+      margin: 0 auto;
+      padding: 14px 0 100px;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 735px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 72px clamp(20px, 9vw, 140px);
+      background-color: #7776df;
+      background-image: var(--stage-gradient);
+      transition: background-color .6s ease;
+    }
+
+    .stage[data-theme="edx"] {
+      --stage-gradient:
+        radial-gradient(80% 95% at 7% 94%, #8966f1 0%, transparent 58%),
+        radial-gradient(75% 105% at 96% 50%, #65d7ed 0%, transparent 62%),
+        radial-gradient(70% 85% at 50% 0%, #cce2ff 0%, transparent 65%),
+        linear-gradient(120deg, #287cd0, #8fc5ff 54%, #55c9e7);
+      background-color: #5aa9e7;
+    }
+
+    .stage[data-theme="posthog"] {
+      --stage-gradient:
+        radial-gradient(55% 70% at 0% 25%, #ffae60 0%, transparent 65%),
+        radial-gradient(65% 75% at 8% 100%, #43b8e4 0%, transparent 67%),
+        radial-gradient(75% 100% at 100% 45%, #5b05bd 0%, transparent 64%),
+        linear-gradient(120deg, #e6aec0 0%, #bd5dd7 48%, #5510bc 100%);
+      background-color: #8a38cd;
+    }
+
+    .stage[data-theme="k8s"] {
+      --stage-gradient:
+        radial-gradient(75% 100% at 100% 100%, #e689d3 0%, transparent 62%),
+        radial-gradient(80% 100% at 0% 0%, #0d3ba5 0%, transparent 61%),
+        linear-gradient(135deg, #3b52c5 0%, #8273dc 56%, #c884db 100%);
+      background-color: #7776df;
+    }
+
+    .stage[data-theme="supabase"] {
+      --stage-gradient:
+        radial-gradient(75% 100% at 0% 100%, #35b8ca 0%, transparent 63%),
+        radial-gradient(70% 95% at 100% 12%, #d7ffd3 0%, transparent 64%),
+        linear-gradient(125deg, #54a7ae 0%, #8fcfc0 48%, #b7e7ba 100%);
+      background-color: #80c7b8;
+    }
+
+    .stage::after {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      opacity: .22;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      mix-blend-mode: soft-light;
+    }
+
+    .panel {
+      z-index: 1;
+      width: min(100%, 1026px);
+      overflow: hidden;
+      padding: 42px 34px 58px;
+      border: 1px solid rgb(255 255 255 / 4%);
+      border-radius: 31px;
+      background: var(--ink);
+      box-shadow: 0 28px 34px rgb(12 5 42 / 32%), 0 5px 12px rgb(0 0 0 / 22%);
+      animation: enter .8s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tab {
+      position: relative;
+      appearance: none;
+      border: 0;
+      padding: 15px 6px 19px;
+      background: transparent;
+      color: #c9cad2;
+      font: inherit;
+      cursor: pointer;
+      transition: color .25s ease;
+    }
+
+    .tab strong, .tab span { display: block; }
+    .tab strong { font-size: clamp(16px, 2.15vw, 27px); line-height: 1.2; white-space: nowrap; }
+    .tab span { margin-top: 5px; font-size: clamp(12px, 1.45vw, 17px); }
+    .tab:hover, .tab.active { color: #abb2ff; }
+
+    .tab.active::after {
+      position: absolute;
+      right: 0;
+      bottom: -2px;
+      left: 0;
+      height: 3px;
+      content: "";
+      background: var(--accent);
+      box-shadow: 0 0 14px rgb(146 153 255 / 45%);
+    }
+
+    .chart { padding: 30px 30px 0; }
+    .caption { margin: 0 0 31px; color: var(--muted); font-size: clamp(17px, 2vw, 24px); }
+    .metric + .metric { margin-top: 27px; }
+    .label { display: flex; align-items: baseline; gap: 24px; font-size: clamp(16px, 1.8vw, 22px); }
+    .label strong { color: #f7f7fa; font-weight: 600; }
+    .metric:first-of-type .label strong { color: #aeb5ff; }
+    .value { color: #b7bac5; }
+
+    .track { width: 100%; height: 24px; margin-top: 14px; }
+    .bar {
+      width: var(--width);
+      height: 100%;
+      border-radius: 999px;
+      background: var(--secondary);
+      transform-origin: left;
+      animation: grow .75s .25s cubic-bezier(.2,.8,.2,1) both;
+      transition: width .55s cubic-bezier(.2,.8,.2,1);
+    }
+    .metric:first-of-type .bar { background: linear-gradient(90deg, #858df1, #9097ff); }
+
+    .note { margin: 0; font-size: clamp(24px, 3vw, 34px); color: #d0d2dc; }
+
+    @keyframes enter { from { opacity: 0; transform: translateY(18px) scale(.985); } }
+    @keyframes grow { from { transform: scaleX(0); } }
+
+    @media (max-width: 700px) {
+      .stage { min-height: 560px; padding: 42px 14px; }
+      .panel { padding: 24px 15px 38px; border-radius: 23px; }
+      .tabs { overflow-x: auto; grid-template-columns: repeat(4, minmax(135px, 1fr)); }
+      .chart { padding: 25px 10px 0; }
+      .tab strong { font-size: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="stage" data-theme="k8s" aria-label="性能测试图表">
+      <article class="panel">
+        <div class="tabs" role="tablist" aria-label="Benchmark scenarios">
+          <button class="tab" role="tab" data-key="edx"><strong>Speed</strong><span>Open edX</span></button>
+          <button class="tab" role="tab" data-key="posthog"><strong>Build</strong><span>PostHog</span></button>
+          <button class="tab active" role="tab" aria-selected="true" data-key="k8s"><strong>CPU &amp; Battery</strong><span>Kubernetes</span></button>
+          <button class="tab" role="tab" data-key="supabase"><strong>CPU &amp; Battery</strong><span>Supabase</span></button>
+        </div>
+
+        <div class="chart" role="tabpanel">
+          <p class="caption">Background power usage (lower is better)</p>
+          <div class="metric">
+            <div class="label"><strong>OrbStack</strong><span class="value" id="orb-value">27 mW</span></div>
+            <div class="track"><div class="bar" id="orb-bar" style="--width: 22%"></div></div>
+          </div>
+          <div class="metric">
+            <div class="label"><strong>Docker Desktop</strong><span class="value" id="docker-value">123 mW</span></div>
+            <div class="track"><div class="bar" id="docker-bar" style="--width: 100%"></div></div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <p class="note">And 2x less power to run a local Supabase stack for development:</p>
+  </main>
+
+  <script>
+    const values = {
+      edx:     { orb: 38, docker: 126, unit: "sec" },
+      posthog: { orb: 46, docker: 118, unit: "sec" },
+      k8s:     { orb: 27, docker: 123, unit: "mW" },
+      supabase:{ orb: 82, docker: 137, unit: "mW" }
+    };
+
+    const tabs = document.querySelectorAll(".tab");
+    const stage = document.querySelector(".stage");
+    const orbBar = document.querySelector("#orb-bar");
+    const dockerBar = document.querySelector("#docker-bar");
+    const orbValue = document.querySelector("#orb-value");
+    const dockerValue = document.querySelector("#docker-value");
+
+    tabs.forEach(tab => tab.addEventListener("click", () => {
+      tabs.forEach(item => {
+        item.classList.toggle("active", item === tab);
+        item.setAttribute("aria-selected", String(item === tab));
+      });
+
+      const data = values[tab.dataset.key];
+      stage.dataset.theme = tab.dataset.key;
+      const max = Math.max(data.orb, data.docker);
+      orbValue.textContent = `${data.orb} ${data.unit}`;
+      dockerValue.textContent = `${data.docker} ${data.unit}`;
+      orbBar.style.setProperty("--width", `${data.orb / max * 100}%`);
+      dockerBar.style.setProperty("--width", `${data.docker / max * 100}%`);
+    }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+.stage {
+  --stage-background: linear-gradient(135deg, #3b52c5, #c884db);
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: clamp(2.5rem, 7vw, 6.5rem) clamp(1rem, 7vw, 7rem);
+  border-radius: 0.25rem;
+  background-color: #7776df;
+  background-image: var(--stage-background);
+  isolation: isolate;
+}
+
+.stage::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.content { width: 100%; }
+
+.ocean {
+  --stage-background:
+    radial-gradient(80% 95% at 7% 94%, #8966f1 0%, transparent 58%),
+    radial-gradient(75% 105% at 96% 50%, #65d7ed 0%, transparent 62%),
+    radial-gradient(70% 85% at 50% 0%, #cce2ff 0%, transparent 65%),
+    linear-gradient(120deg, #287cd0, #8fc5ff 54%, #55c9e7);
+  background-color: #5aa9e7;
+}
+
+.sunset {
+  --stage-background:
+    radial-gradient(55% 70% at 0% 25%, #ffae60 0%, transparent 65%),
+    radial-gradient(65% 75% at 8% 100%, #43b8e4 0%, transparent 67%),
+    radial-gradient(75% 100% at 100% 45%, #5b05bd 0%, transparent 64%),
+    linear-gradient(120deg, #e6aec0 0%, #bd5dd7 48%, #5510bc 100%);
+  background-color: #8a38cd;
+}
+
+.aurora {
+  --stage-background:
+    radial-gradient(75% 100% at 0% 100%, #35b8ca 0%, transparent 63%),
+    radial-gradient(70% 95% at 100% 12%, #d7ffd3 0%, transparent 64%),
+    linear-gradient(125deg, #54a7ae 0%, #8fcfc0 48%, #b7e7ba 100%);
+  background-color: #80c7b8;
+}
+
+.violet {
+  --stage-background:
+    radial-gradient(75% 100% at 100% 100%, #e689d3 0%, transparent 62%),
+    radial-gradient(80% 100% at 0% 0%, #0d3ba5 0%, transparent 61%),
+    linear-gradient(135deg, #3b52c5 0%, #8273dc 56%, #c884db 100%);
+  background-color: #7776df;
+}
+
+@media (max-width: 640px) {
+  .stage { padding-inline: 0.75rem; }
+}

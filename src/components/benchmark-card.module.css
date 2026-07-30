@@ -1,0 +1,71 @@
+.panel {
+  width: 100%;
+  overflow: hidden;
+  padding: clamp(1.4rem, 3vw, 2.7rem) clamp(1rem, 3vw, 2.2rem) clamp(2rem, 4vw, 3.7rem);
+  border: 1px solid rgb(255 255 255 / 5%);
+  border-radius: clamp(1.3rem, 3vw, 2rem);
+  color: #f4f4f8;
+  background: #050506;
+  box-shadow: 0 1.75rem 2.5rem rgb(12 5 42 / 32%), 0 0.3rem 0.75rem rgb(0 0 0 / 22%);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  overflow-x: auto;
+  border-bottom: 1px solid #485162;
+}
+
+.tab {
+  position: relative;
+  appearance: none;
+  min-width: 8rem;
+  border: 0;
+  padding: 0.9rem 0.4rem 1.15rem;
+  color: #c9cad2;
+  background: transparent;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.tab strong,
+.tab span { display: block; }
+.tab strong { font-size: clamp(1rem, 2vw, 1.55rem); line-height: 1.2; }
+.tab span { margin-top: 0.3rem; font-size: clamp(0.75rem, 1.4vw, 1rem); }
+.tab:hover,
+.tab:focus-visible,
+.active { color: #abb2ff; }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+
+.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  content: "";
+  background: var(--accent);
+  box-shadow: 0 0 0.8rem rgb(146 153 255 / 45%);
+}
+
+.chart { padding: clamp(1.5rem, 3vw, 2rem) clamp(0.25rem, 2vw, 1.8rem) 0; }
+.description { margin: 0 0 1.9rem; color: #9a9ba5; font-size: clamp(1rem, 1.8vw, 1.35rem); }
+.metrics { display: grid; gap: 1.7rem; }
+.metricLabel { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.5rem 1.5rem; color: #b7bac5; font-size: clamp(0.95rem, 1.6vw, 1.2rem); }
+.metricLabel strong { color: #f7f7fa; font-weight: 600; }
+.metricLabel .emphasis { color: #aeb5ff; }
+.track { width: 100%; height: clamp(0.9rem, 2vw, 1.35rem); margin-top: 0.75rem; }
+.bar { display: block; height: 100%; border-radius: 999px; background: #555f73; transition: width 550ms cubic-bezier(.2,.8,.2,1); }
+.emphasisBar { background: linear-gradient(90deg, #858df1, #9097ff); }
+
+@media (max-width: 640px) {
+  .tabs { display: flex; }
+  .tab { flex: 1 0 8rem; }
+  .panel { padding-inline: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { transition: none; }
+}

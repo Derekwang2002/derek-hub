@@ -1,0 +1,49 @@
+.browser {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: clamp(1rem, 2.5vw, 1.6rem);
+  color: #eef0f5;
+  background: #08090b;
+  box-shadow: 0 1.75rem 2.5rem rgb(12 5 42 / 30%), 0 0.3rem 0.75rem rgb(0 0 0 / 20%);
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) 4rem;
+  align-items: center;
+  min-height: 3.1rem;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid #252830;
+  background: #121419;
+}
+
+.controls { display: flex; gap: 0.4rem; }
+.controls i { width: 0.65rem; height: 0.65rem; border-radius: 50%; background: #565b67; }
+.controls i:first-child { background: #ff6b65; }
+.controls i:nth-child(2) { background: #e8b84f; }
+.controls i:nth-child(3) { background: #4fc477; }
+
+.address {
+  overflow: hidden;
+  padding: 0.42rem 0.8rem;
+  border: 1px solid #292d36;
+  border-radius: 999px;
+  color: #aeb2bc;
+  background: #0b0d11;
+  font-size: 0.75rem;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viewport { position: relative; min-height: clamp(15rem, 48vw, 35rem); background: #fff; }
+.frame { display: block; width: 100%; height: clamp(15rem, 48vw, 35rem); border: 0; background: #fff; }
+.image { display: block; width: 100%; height: auto; max-height: 44rem; object-fit: cover; object-position: top; }
+.slice { min-height: inherit; overflow: auto; color: initial; background: #fff; }
+.toolbarSpacer { display: block; }
+
+@media (max-width: 520px) {
+  .toolbar { grid-template-columns: 3.5rem minmax(0, 1fr); }
+  .toolbarSpacer { display: none; }
+}
