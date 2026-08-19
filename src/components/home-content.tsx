@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 
+import { AvatarTilt } from "@/components/avatar-tilt";
+
 import styles from "../app/page.module.css";
 
 const SOCIAL_LINKS = [
@@ -14,8 +16,11 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
   return (
     <main className={styles.home} lang={locale === "zh" ? "zh-CN" : "en"}>
       <section className={styles.profile} aria-labelledby="home-title">
-        <Image alt="Derek Wang" className={styles.avatar} height={112} priority sizes="112px" src="/avatar.png" width={112} />
-        <h1 className={styles.name} id="home-title">Derek Wang</h1>
+        <AvatarTilt className={styles.avatarFrame}>
+          <Image alt="Derek Wang" className={`${styles.avatar} ${styles.avatarLight}`} height={144} priority sizes="(max-width: 480px) 120px, 144px" src="/avatar.png" width={144} />
+          <Image alt="" aria-hidden className={`${styles.avatar} ${styles.avatarDark}`} height={144} sizes="(max-width: 480px) 120px, 144px" src="/avatar-dark.png" width={144} />
+        </AvatarTilt>
+        <h1 className={styles.name} id="home-title">{"Derek Wang".split("").map((char, index) => char === " " ? " " : <span className={styles.nameLetter} key={index}>{char}</span>)}</h1>
         <p className={styles.tagline}>USC CS37 / Programmer</p>
         <ul className={styles.socialList}>{SOCIAL_LINKS.map((link) => (
           <li key={link.label}><a href={link.href} rel={link.href.startsWith("mailto:") ? undefined : "noreferrer"} target={link.href.startsWith("mailto:") ? undefined : "_blank"}><SocialIcon icon={link.icon} />{link.label}</a></li>

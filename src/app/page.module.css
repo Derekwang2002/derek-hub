@@ -12,15 +12,61 @@
   text-align: center;
 }
 
+.avatarFrame {
+  border-radius: 999px;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.16);
+  line-height: 0;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 650ms cubic-bezier(0.18, 1.5, 0.32, 1);
+  will-change: transform;
+}
+
+.avatarFrame::after {
+  border-radius: 999px;
+  box-shadow:
+    inset 0 4px 10px rgb(0 0 0 / 0.35),
+    inset 0 -3px 6px rgb(255 255 255 / 0.22);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+:global(html[data-theme="dark"]) .avatarFrame {
+  box-shadow:
+    0 4px 10px rgb(0 0 0 / 0.5),
+    0 16px 36px rgb(0 0 0 / 0.55);
+}
+
+:global(html[data-theme="dark"]) .avatarFrame::after {
+  box-shadow:
+    inset 0 2px 4px rgb(255 255 255 / 0.16),
+    inset 0 -4px 10px rgb(0 0 0 / 0.45);
+}
+
 .avatar {
   background: var(--color-surface-muted);
   border-radius: 999px;
-  height: 112px;
-  mask-image: radial-gradient(circle, #000 62%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle, #000 62%, transparent 72%);
+  display: block;
+  height: 144px;
   object-fit: cover;
   object-position: center;
-  width: 112px;
+  width: 144px;
+}
+
+:global(html[data-theme="light"]) .avatarLight {
+  filter: brightness(1.06);
+}
+
+.avatarDark {
+  display: none;
+}
+
+:global(html[data-theme="dark"]) .avatarDark {
+  display: block;
+  inset: 0;
+  position: absolute;
 }
 
 .name {
@@ -30,6 +76,21 @@
   letter-spacing: 0.01em;
   color: var(--color-text);
 }
+
+.nameLetter {
+  color: inherit;
+  transition: color 260ms ease-out;
+}
+
+.nameLetter:nth-of-type(1):hover { color: #e5484d; }
+.nameLetter:nth-of-type(2):hover { color: #f76b15; }
+.nameLetter:nth-of-type(3):hover { color: #d9930d; }
+.nameLetter:nth-of-type(4):hover { color: #30a46c; }
+.nameLetter:nth-of-type(5):hover { color: #12a594; }
+.nameLetter:nth-of-type(6):hover { color: #0091ff; }
+.nameLetter:nth-of-type(7):hover { color: #3e63dd; }
+.nameLetter:nth-of-type(8):hover { color: #8e4ec6; }
+.nameLetter:nth-of-type(9):hover { color: #d6409f; }
 
 .tagline {
   margin: 0;
@@ -150,7 +211,41 @@
 }
 
 .resumeSection {
-  margin-top: 2.4rem;
+  border-radius: 14px;
+  margin: calc(2.4rem - 1rem) -1rem 0;
+  padding: 1rem;
+  transition:
+    background-color 320ms ease-out,
+    box-shadow 420ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 420ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.resumeSection:hover {
+  background: var(--color-surface-muted);
+  box-shadow:
+    0 12px 28px rgb(0 0 0 / 0.1),
+    inset 0 1px 0 rgb(255 255 255 / 0.5);
+  transform: translateY(-2px);
+  transition:
+    background-color 180ms ease-out,
+    box-shadow 360ms cubic-bezier(0.34, 1.45, 0.64, 1),
+    transform 360ms cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+:global(html[data-theme="dark"]) .resumeSection:hover {
+  box-shadow:
+    0 14px 32px rgb(0 0 0 / 0.5),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resumeSection {
+    transition: background-color 220ms ease, box-shadow 220ms ease;
+  }
+
+  .resumeSection:hover {
+    transform: none;
+  }
 }
 
 .resumeSection h2 {
@@ -344,8 +439,8 @@
   }
 
   .avatar {
-    width: 96px;
-    height: 96px;
+    width: 120px;
+    height: 120px;
   }
 
   .tagline {
