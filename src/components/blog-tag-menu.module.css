@@ -40,6 +40,7 @@
   border: 1px solid var(--color-border-soft);
   left: calc(100% + 0.75rem);
   margin: -0.5rem 0 0;
+  max-width: calc(100vw - 2rem);
   width: 14.5rem;
   padding: 0.75rem;
   position: absolute;
@@ -146,7 +147,7 @@
   margin: 0.5rem 0 0;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 720px) {
   .panel {
     left: 50%;
     margin-top: 0.55rem;
