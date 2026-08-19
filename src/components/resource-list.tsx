@@ -76,7 +76,7 @@ function ResourceLink({ locale, resource }: { locale: "en" | "zh"; resource: Res
 function ResourceMeta({ locale, resource }: { locale: "en" | "zh"; resource: Resource }) {
   return (
     <div className={styles.meta}>
-      <span className={styles.typeBadge}>{locale === "zh" && resource.type === "demo" ? "演示" : getResourceTypeLabel(resource.type)}</span>
+      <span className="meta-badge">{locale === "zh" && resource.type === "demo" ? "演示" : getResourceTypeLabel(resource.type)}</span>
 
       {resource.tags.length > 0 ? (
         <span aria-hidden="true" className={styles.metaSeparator}>
@@ -87,7 +87,7 @@ function ResourceMeta({ locale, resource }: { locale: "en" | "zh"; resource: Res
       {resource.tags.length > 0 ? (
         <span aria-label="Tags" className={styles.tagList} role="group">
           {resource.tags.map((tag) => (
-            <span className={styles.tag} key={tag}>
+            <span className="tag-chip" key={tag}>
               {tag}
             </span>
           ))}

@@ -146,7 +146,7 @@ function PostMeta({
     <div className={styles.postMeta}>
       {post.selected ? (
         <>
-          <span className={`${styles.metaBadge} ${styles.selectedBadge}`}>{locale === "zh" ? "精选" : "Selected"}</span>
+          <span className={`meta-badge ${styles.selectedBadge}`}>{locale === "zh" ? "精选" : "Selected"}</span>
           {post.tags.length > 0 ? (
             <span aria-hidden="true" className={styles.metaSeparator}>
               |
@@ -163,7 +163,7 @@ function PostMeta({
 
             return (
               <Link
-                className={styles.postTag}
+                className={`tag-chip ${styles.postTag}`}
                 href={href}
                 key={slug}
                 onClick={(event) => {

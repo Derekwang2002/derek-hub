@@ -58,11 +58,7 @@
 
 .postRow {
   border-top: 1px solid var(--color-border-soft);
-  padding: 1rem 0;
-}
-
-.postRow:first-child {
-  padding-top: 0.9rem;
+  padding: 0.9rem 0 1.08rem;
 }
 
 .postHeader {
@@ -111,20 +107,6 @@
   margin: 0.42rem 0 0;
 }
 
-.metaBadge {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 2px;
-  color: var(--color-text-muted);
-  font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  line-height: 1.45;
-  padding: 0.08rem 0.34rem;
-  text-transform: uppercase;
-}
-
 .selectedBadge {
   background: var(--color-surface-muted);
   color: var(--color-focus);
@@ -145,19 +127,8 @@
 }
 
 .postTag {
-  background: var(--color-surface-muted);
-  border: 1px solid var(--color-border-soft);
-  border-radius: 2px;
-  color: var(--color-text-muted);
-  line-height: 1.4;
-  padding: 0.06rem 0.34rem;
   text-decoration: none;
-}
-
-.postTag::before {
-  color: var(--color-focus);
-  content: "#";
-  margin-right: 0.06rem;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
 .postTag:hover,
