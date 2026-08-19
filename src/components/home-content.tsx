@@ -21,7 +21,7 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
           <Image alt="" aria-hidden className={`${styles.avatar} ${styles.avatarDark}`} height={144} sizes="(max-width: 480px) 120px, 144px" src="/avatar-dark.png" width={144} />
         </AvatarTilt>
         <h1 className={styles.name} id="home-title">{"Derek Wang".split("").map((char, index) => char === " " ? " " : <span className={styles.nameLetter} key={index}>{char}</span>)}</h1>
-        <p className={styles.tagline}>USC CS37 / Programmer</p>
+        <p className={styles.tagline}>USC CS37 / AI Engineer</p>
         <ul className={styles.socialList}>{SOCIAL_LINKS.map((link) => (
           <li key={link.label}><a href={link.href} rel={link.href.startsWith("mailto:") ? undefined : "noreferrer"} target={link.href.startsWith("mailto:") ? undefined : "_blank"}><SocialIcon icon={link.icon} />{link.label}</a></li>
         ))}</ul>
