@@ -133,7 +133,7 @@
 
 .active {
   color: var(--color-text);
-  font-weight: 600;
+  text-shadow: 0 0 0.65px currentColor;
 }
 
 .tagCount {

@@ -80,6 +80,7 @@
   color: var(--color-text-soft);
   text-decoration: none;
   border-bottom: 1px solid transparent;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .tagLink:hover,
@@ -682,6 +683,7 @@ a.tocItemActive {
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 0.18em;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
 }
 
 .readingAction:hover,

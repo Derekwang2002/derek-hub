@@ -13,6 +13,7 @@
   color: var(--color-text-muted);
   padding: 0 0 0.25rem;
   text-decoration: none;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .link:hover,
@@ -24,5 +25,5 @@
 .active {
   border-bottom-color: var(--color-text);
   color: var(--color-text);
-  font-weight: 700;
+  text-shadow: 0 0 0.65px currentColor;
 }
