@@ -166,14 +166,33 @@
   display: block;
   fill: currentColor;
   height: 0.9rem;
+  transition: fill 200ms ease;
   width: 0.9rem;
 }
 
-.socialGlyph {
-  display: inline-block;
-  font-size: 0.95em;
-  line-height: 1;
-  transform: translateY(-0.01em);
+.socialList a:hover .socialIconGithub,
+.socialList a:focus-visible .socialIconGithub {
+  fill: #8957e5;
+}
+
+.socialList a:hover .socialIconLinkedin,
+.socialList a:focus-visible .socialIconLinkedin {
+  fill: #0a66c2;
+}
+
+.socialList a:hover .socialIconGmail,
+.socialList a:focus-visible .socialIconGmail {
+  fill: #ea4335;
+}
+
+:global(html[data-theme="dark"]) .socialList a:hover .socialIconGithub,
+:global(html[data-theme="dark"]) .socialList a:focus-visible .socialIconGithub {
+  fill: #a371f7;
+}
+
+:global(html[data-theme="dark"]) .socialList a:hover .socialIconLinkedin,
+:global(html[data-theme="dark"]) .socialList a:focus-visible .socialIconLinkedin {
+  fill: #58a6ff;
 }
 
 .resume {
