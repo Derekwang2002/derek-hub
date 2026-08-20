@@ -67,11 +67,13 @@ export function AvatarTilt({ children, className }: { children: ReactNode; class
       tiltRef.current = { x: 0, y: 0 };
       velocityRef.current = { x: 0, y: 0 };
       frame.style.transform = "";
+      frame.style.removeProperty("--avatar-shadow-x");
       return;
     }
 
     tiltRef.current = { x: nextX, y: nextY };
     frame.style.transform = `perspective(380px) rotateX(${nextX.toFixed(2)}deg) rotateY(${nextY.toFixed(2)}deg)`;
+    frame.style.setProperty("--avatar-shadow-x", `${(-nextY * 0.55).toFixed(1)}px`);
     animationRef.current = requestAnimationFrame(step);
   }
 

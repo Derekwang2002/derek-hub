@@ -14,7 +14,7 @@
 
 .avatarFrame {
   border-radius: 999px;
-  box-shadow: 0 12px 28px rgb(0 0 0 / 0.16);
+  box-shadow: var(--avatar-shadow-x, 0px) 12px 28px rgb(0 0 0 / 0.16);
   line-height: 0;
   position: relative;
   transform-style: preserve-3d;
@@ -34,8 +34,8 @@
 
 :global(html[data-theme="dark"]) .avatarFrame {
   box-shadow:
-    0 4px 10px rgb(0 0 0 / 0.5),
-    0 16px 36px rgb(0 0 0 / 0.55);
+    var(--avatar-shadow-x, 0px) 4px 10px rgb(0 0 0 / 0.5),
+    var(--avatar-shadow-x, 0px) 16px 36px rgb(0 0 0 / 0.55);
 }
 
 :global(html[data-theme="dark"]) .avatarFrame::after {
@@ -90,6 +90,40 @@
 .nameLetter:nth-of-type(7):hover { color: #3e63dd; }
 .nameLetter:nth-of-type(8):hover { color: #8e4ec6; }
 .nameLetter:nth-of-type(9):hover { color: #d6409f; }
+
+@keyframes homeEnter {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .avatarFrame {
+    animation: homeEnter 560ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .name {
+    animation: homeEnter 560ms cubic-bezier(0.22, 1, 0.36, 1) 90ms backwards;
+  }
+
+  .tagline {
+    animation: homeEnter 560ms cubic-bezier(0.22, 1, 0.36, 1) 180ms backwards;
+  }
+
+  .socialList {
+    animation: homeEnter 560ms cubic-bezier(0.22, 1, 0.36, 1) 270ms backwards;
+  }
+
+  .resumeHeader {
+    animation: homeEnter 560ms cubic-bezier(0.22, 1, 0.36, 1) 360ms backwards;
+  }
+}
 
 .tagline {
   margin: 0;
@@ -337,6 +371,7 @@
 }
 
 .achievementList {
+  list-style: none;
   margin: 0.8rem 0 0;
   padding-left: 1.2rem;
 }
@@ -344,6 +379,14 @@
 .achievementList li {
   line-height: 1.65;
   margin: 0.42rem 0;
+  position: relative;
+}
+
+.achievementList li::before {
+  color: var(--color-focus);
+  content: "—";
+  left: -1.2rem;
+  position: absolute;
 }
 
 .skillList {
@@ -499,5 +542,26 @@
   .skillList div {
     gap: 0.12rem;
     grid-template-columns: 1fr;
+  }
+}
+
+:global(html[data-theme]) .reveal {
+  opacity: 0;
+  translate: 0 18px;
+  transition:
+    opacity 560ms ease,
+    translate 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:global(html[data-theme]) .reveal[data-revealed="true"] {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(html[data-theme]) .reveal {
+    opacity: 1;
+    translate: none;
+    transition: none;
   }
 }

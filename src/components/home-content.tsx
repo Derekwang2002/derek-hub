@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 
 import { AvatarTilt } from "@/components/avatar-tilt";
+import { RevealOnScroll } from "@/components/reveal-on-scroll";
 
 import styles from "../app/page.module.css";
 
@@ -32,38 +33,44 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
           <span>{locale === "zh" ? "后端 · AI 工程" : "Backend · AI Engineering"}</span>
         </div>
 
-        <ResumeSection title={resume.educationTitle}>
-          {resume.education.map((item) => (
-            <article className={styles.educationEntry} key={item.school}>
+        <RevealOnScroll className={styles.reveal}>
+          <ResumeSection title={resume.educationTitle}>
+            {resume.education.map((item) => (
+              <article className={styles.educationEntry} key={item.school}>
+                <div className={styles.entryHeading}>
+                  <h3>{item.school}</h3>
+                  <time>{item.period}</time>
+                </div>
+                <p className={styles.entrySubline}>{item.degree} <span>{item.gpa}</span></p>
+                <p className={styles.coursework}>{item.coursework}</p>
+              </article>
+            ))}
+          </ResumeSection>
+        </RevealOnScroll>
+
+        <RevealOnScroll className={styles.reveal}>
+          <ResumeSection title={resume.experienceTitle}>
+            <article className={styles.experienceEntry}>
               <div className={styles.entryHeading}>
-                <h3>{item.school}</h3>
-                <time>{item.period}</time>
+                <h3>Takin.ai <span>{resume.role}</span></h3>
+                <time>2024.8 — 2025.12</time>
               </div>
-              <p className={styles.entrySubline}>{item.degree} <span>{item.gpa}</span></p>
-              <p className={styles.coursework}>{item.coursework}</p>
+              <p className={styles.experienceIntro}>{resume.experienceIntro}</p>
+              <p className={styles.techStack}>{resume.techStack}</p>
+              <ul className={styles.achievementList}>
+                {resume.achievements.map((achievement) => <li key={achievement}>{achievement}</li>)}
+              </ul>
             </article>
-          ))}
-        </ResumeSection>
+          </ResumeSection>
+        </RevealOnScroll>
 
-        <ResumeSection title={resume.experienceTitle}>
-          <article className={styles.experienceEntry}>
-            <div className={styles.entryHeading}>
-              <h3>Takin.ai <span>{resume.role}</span></h3>
-              <time>2024.8 — 2025.12</time>
-            </div>
-            <p className={styles.experienceIntro}>{resume.experienceIntro}</p>
-            <p className={styles.techStack}>{resume.techStack}</p>
-            <ul className={styles.achievementList}>
-              {resume.achievements.map((achievement) => <li key={achievement}>{achievement}</li>)}
-            </ul>
-          </article>
-        </ResumeSection>
-
-        <ResumeSection title={resume.skillsTitle}>
-          <dl className={styles.skillList}>
-            {resume.skills.map(([label, values]) => <div key={label}><dt>{label}</dt><dd>{values}</dd></div>)}
-          </dl>
-        </ResumeSection>
+        <RevealOnScroll className={styles.reveal}>
+          <ResumeSection title={resume.skillsTitle}>
+            <dl className={styles.skillList}>
+              {resume.skills.map(([label, values]) => <div key={label}><dt>{label}</dt><dd>{values}</dd></div>)}
+            </dl>
+          </ResumeSection>
+        </RevealOnScroll>
       </section>
     </main>
   );
