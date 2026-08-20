@@ -91,17 +91,18 @@
 
 .content {
   color: var(--color-text);
-  grid-column: 2;
+  grid-column: 4;
   min-width: 0;
   padding-left: clamp(1.25rem, 2.4vw, 2.75rem);
 }
 
 .bodyLayout {
   align-items: start;
-  border-top: 1px solid var(--color-border-soft);
-  column-gap: clamp(1.75rem, 3vw, 3.25rem);
   display: grid;
-  grid-template-columns: minmax(12rem, 1fr) minmax(0, 860px) minmax(12rem, 1fr);
+  grid-template-columns:
+    minmax(0, 1.618fr) 15rem minmax(0, 1fr)
+    minmax(0, 860px)
+    minmax(0, 1fr) auto minmax(0, 1.618fr);
   padding-top: 2rem;
 }
 
@@ -297,12 +298,10 @@
 
 .tocShell {
   align-self: start;
-  grid-column: 1;
-  justify-self: start;
+  grid-column: 2;
   min-height: 2.75rem;
   position: sticky;
   top: 1.5rem;
-  width: 12rem;
 }
 
 .tocBackdrop {
@@ -324,11 +323,11 @@
 }
 
 .toc {
-  border-right: 1px solid var(--color-border-soft);
   color: var(--color-text-muted);
   display: flex;
   flex-direction: column;
   font-family: inherit;
+  margin-left: auto;
   max-height: calc(100vh - 3rem);
   max-height: calc(100dvh - 3rem);
   min-width: 0;
@@ -340,8 +339,16 @@
 
 .tocOpen {
   animation: tocPanelReveal 200ms ease-out both;
-  padding-left: 1rem;
-  width: 17rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: 0.9rem;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.05);
+  padding: 0.75rem 0.6rem;
+  width: 15rem;
+}
+
+:global(html[data-theme="dark"]) .tocOpen {
+  box-shadow: 0 14px 32px rgb(0 0 0 / 0.35);
 }
 
 @keyframes tocPanelReveal {
@@ -357,15 +364,15 @@
 }
 
 .tocCollapsed {
-  min-height: calc(100vh - 3rem);
-  min-height: calc(100dvh - 3rem);
   padding-right: 0.65rem;
   width: 5.5rem;
 }
 
 .tocOverlay {
   background: var(--color-surface);
-  border-right-color: var(--color-border);
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid var(--color-border);
   box-shadow: 0.75rem 0 2rem rgb(20 18 14 / 0.14);
   height: 100vh;
   height: 100dvh;
@@ -393,7 +400,7 @@
 .tocTitle {
   color: var(--color-text);
   display: -webkit-box;
-  font-size: 0.94rem;
+  font-size: 0.88rem;
   font-weight: 600;
   line-height: 1.4;
   margin: 0;
@@ -493,7 +500,7 @@
 
 .tocContents {
   flex: 1 1 auto;
-  margin: 0.8rem 0 0;
+  margin: 0.6rem 0 0;
   max-height: calc(100vh - 8rem);
   max-height: calc(100dvh - 8rem);
   min-height: 0;
@@ -546,21 +553,20 @@
 }
 
 .tocList a {
-  border-left: 2px solid transparent;
-  border-radius: 0 0.3rem 0.3rem 0;
+  border-radius: 0.5rem;
   color: inherit;
   display: block;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   line-height: 1.3;
-  min-height: 2.25rem;
+  min-height: 2rem;
   min-width: 0;
   overflow: hidden;
-  padding: 0.55rem 0.5rem;
+  padding: 0.45rem 0.55rem 0.45rem 0.8rem;
+  position: relative;
   text-decoration: none;
   text-overflow: ellipsis;
   transition:
     background-color 160ms ease,
-    border-color 160ms ease,
     color 160ms ease;
   white-space: nowrap;
 }
@@ -573,10 +579,22 @@
 
 .tocItemActive > a,
 a.tocItemActive {
-  background: var(--color-surface-muted);
-  border-left-color: var(--color-focus);
-  color: var(--color-text);
+  background: var(--color-surface-raised);
+  color: var(--color-focus);
   font-weight: 600;
+}
+
+.tocItemActive > a::before,
+a.tocItemActive::before {
+  background: var(--color-focus);
+  border-radius: 2px;
+  content: "";
+  height: 55%;
+  left: 0.35rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
 }
 
 .tocLevel2 {
@@ -600,111 +618,67 @@ a.tocItemActive {
 }
 
 .readingRail {
-  align-self: start;
-  color: var(--color-text-muted);
-  display: grid;
-  gap: 1rem;
-  grid-column: 3;
-  grid-template-columns: 0.18rem minmax(0, 1fr);
-  justify-self: end;
-  max-width: 9rem;
-  position: sticky;
-  top: 1.5rem;
-  width: 100%;
+  bottom: clamp(1.25rem, 4vh, 2.5rem);
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  right: clamp(1.25rem, 3vw, 2.5rem);
+  transform: translateY(0.4rem);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+  z-index: 2;
 }
 
-.readingProgress {
-  background: var(--color-border-soft);
-  grid-row: 1 / 4;
-  height: min(16rem, calc(100vh - 6rem));
-  overflow: hidden;
-  position: relative;
-  width: 1px;
+.railVisible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
 }
 
-.readingProgressFill {
-  background: var(--color-text);
-  display: block;
-  height: 100%;
-  transform: scaleY(0);
-  transform-origin: top;
-  width: 1px;
-}
-
-@supports (animation-timeline: scroll()) {
-  .readingProgressFill {
-    animation: readingProgress linear both;
-    animation-timeline: scroll(root);
+@media (prefers-reduced-motion: reduce) {
+  .readingRail {
+    transform: none;
+    transition: opacity 220ms ease;
   }
 }
 
-@keyframes readingProgress {
-  from {
-    transform: scaleY(0);
-  }
-
-  to {
-    transform: scaleY(1);
-  }
-}
-
-.readingMeta {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.readingLabel {
-  color: var(--color-text-faint);
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-}
-
-.readingCurrent {
-  color: var(--color-text-soft);
-  display: -webkit-box;
-  font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.35;
-  overflow: hidden;
-  text-decoration: none;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
-.readingCurrent:hover,
-.readingCurrent:focus-visible {
-  text-decoration: underline;
-}
-
-.readingActions {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.readingAction {
+.topButton {
+  align-items: center;
   background: transparent;
   border: 0;
+  border-radius: 0.4rem;
   color: var(--color-text-muted);
   cursor: pointer;
-  font: inherit;
-  font-size: 0.86rem;
+  display: inline-flex;
+  height: 2.5rem;
+  justify-content: center;
   padding: 0;
-  text-align: left;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.18em;
-  transition: color 160ms ease, text-decoration-color 160ms ease;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+  width: 2.5rem;
 }
 
-.readingAction:hover,
-.readingAction:focus-visible {
+.topButton:hover {
+  background: var(--color-surface-raised);
   color: var(--color-text);
-  text-decoration-color: currentColor;
 }
 
-.readingAction:active {
+.topButton:active {
   transform: translateY(1px);
+}
+
+.topButton:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.topButton svg {
+  display: block;
+  height: 1.2rem;
+  width: 1.2rem;
 }
 
 .seriesPager {
@@ -742,13 +716,17 @@ a.tocItemActive {
 }
 
 @media (min-width: 1280px) {
-  .tocShell {
-    margin-left: clamp(-7rem, -5vw, -1.25rem);
-    width: 12rem;
+  .postPage {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .content {
+    padding-left: 0;
   }
 
   .tocOpen {
-    width: 17rem;
+    width: 15rem;
   }
 
   .tocCollapsed {
@@ -775,7 +753,7 @@ a.tocItemActive {
   .tocShell {
     height: 2.75rem;
     margin-bottom: -2.75rem;
-    margin-left: clamp(-7rem, -5vw, -1.25rem);
+    margin-left: clamp(-4rem, -3vw, -1.5rem);
     position: sticky;
     top: 1.5rem;
     width: 5.5rem;

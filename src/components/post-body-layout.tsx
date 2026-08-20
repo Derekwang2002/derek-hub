@@ -105,7 +105,7 @@ export function PostBodyLayout({
         overlay={tocOverlay}
       />
       <article className={styles.content}>{children}</article>
-      <PostReadingRail activeId={activeId} items={tocItems} />
+      <PostReadingRail />
     </div>
   );
 }
