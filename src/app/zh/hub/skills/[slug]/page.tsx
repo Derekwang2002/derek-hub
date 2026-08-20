@@ -28,7 +28,7 @@ export default async function ChineseSkillPage({ params }: Props) {
   const tocItems = getMarkdownHeadings(doc.content);
   const renderedContent = await renderMarkdown(doc.content, tocItems);
   return (
-    <main className={styles.postPage} lang="zh-CN">
+    <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
       <p className={styles.backWrap}><Link className={styles.backLink} href="/zh/hub/skills">返回 Skills</Link></p>
       <header className={styles.header}>
         <h1 className={styles.title}>{resource.title}</h1>

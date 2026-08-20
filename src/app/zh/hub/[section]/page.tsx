@@ -41,7 +41,9 @@ export default async function ChineseHubSectionPage({ params }: Props) {
         <p className={styles.description}>{DESCRIPTIONS[section.slug]}</p>
       </header>
       <HubNav active={section.slug} locale="zh" />
-      <ResourceList emptyMessage={`暂无 ${section.label} 资源。`} locale="zh" resources={resources} />
+      <div className="list-swap" key={section.slug}>
+        <ResourceList emptyMessage={`暂无 ${section.label} 资源。`} locale="zh" resources={resources} />
+      </div>
     </main>
   );
 }

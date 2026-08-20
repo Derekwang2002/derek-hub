@@ -35,7 +35,7 @@ export function ResourceList({
       ) : (
         <ul className={styles.list}>
           {resources.map((resource) => (
-            <li className={styles.item} key={`${resource.type}-${resource.href}`}>
+            <li className={`row-highlight ${styles.item}`} key={`${resource.type}-${resource.href}`}>
               <ResourceLink locale={locale} resource={resource} />
               <p className={styles.description}>{resource.description}</p>
               <ResourceMeta locale={locale} resource={resource} />

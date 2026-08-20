@@ -21,7 +21,7 @@ const DEFAULT_OG_IMAGE = "/og-default.svg";
 export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
   const projects = await getAllProjects(locale);
   return (
-    <main className={styles.indexPage} lang={locale === "zh" ? "zh-CN" : "en"}>
+    <main className={`page-enter ${styles.indexPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
       <header className={styles.indexHero}>
         <h1>Projects</h1>
         <p>
@@ -32,7 +32,7 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
       </header>
       <ul className={styles.projectList}>
         {projects.map((project) => (
-          <li key={project.slug}>
+          <li className="row-highlight" key={project.slug}>
             <Link href={project.href}>
               <span>
                 <strong>{project.overview.title}</strong>
@@ -199,7 +199,7 @@ function ProjectPageShell({
   project: Project;
 }) {
   return (
-    <main className={styles.projectPage} lang={locale === "zh" ? "zh-CN" : "en"}>
+    <main className={`page-enter ${styles.projectPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
       <ProjectNavigation activeHref={activeHref} locale={locale} project={project} />
       <div className={styles.projectMain}>{children}</div>
     </main>

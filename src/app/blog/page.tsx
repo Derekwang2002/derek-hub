@@ -37,7 +37,7 @@ export default async function BlogPage() {
   const latestPost = allPosts[0];
 
   return (
-    <main className={styles.blogPage}>
+    <main className={`page-enter ${styles.blogPage}`}>
       <header className={styles.hero}>
         <h1 className={styles.title}>Blog</h1>
         <p className={styles.description}>

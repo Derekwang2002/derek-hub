@@ -24,14 +24,12 @@
 
 .projectHero,
 .updatesHero {
-  border-bottom: 1px solid var(--color-border);
   padding: 2rem 0 2.25rem;
 }
 
 .projectHero h1,
 .updatesHero h1 {
   font-size: clamp(2.2rem, 5vw, 3.75rem);
-  letter-spacing: -0.035em;
   line-height: 1.08;
   margin: 0 0 0.8rem;
   text-wrap: balance;
@@ -63,10 +61,6 @@
   text-align: left;
 }
 
-.projectList li {
-  border-top: 1px solid var(--color-border-soft);
-}
-
 .projectList a {
   align-items: flex-start;
   display: flex;
@@ -74,11 +68,6 @@
   justify-content: space-between;
   padding: 0.9rem 0 1.08rem;
   text-decoration: none;
-}
-
-.projectList a:hover strong,
-.projectList a:focus-visible strong {
-  text-decoration: underline;
 }
 
 .projectList strong,
@@ -238,6 +227,7 @@
   display: flex;
   flex-wrap: wrap;
   font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
   gap: 0.45rem;
   margin-top: 1rem;
 }
@@ -339,6 +329,12 @@
 
 .directoryGrid a {
   color: var(--color-text-soft);
+  text-decoration: none;
+}
+
+.directoryGrid a:hover,
+.directoryGrid a:focus-visible {
+  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.18rem;
 }
@@ -363,6 +359,7 @@
   color: var(--color-text-faint);
   display: flex;
   font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
   gap: 0.75rem;
   text-transform: uppercase;
 }

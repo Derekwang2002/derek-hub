@@ -77,7 +77,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const renderedContent = await renderMarkdown(post.content, tocItems);
 
   return (
-    <main className={styles.postPage}>
+    <main className={`page-enter ${styles.postPage}`}>
       <p className={styles.backWrap}>
         <Link className={styles.backLink} href="/blog">
           Back to Blog

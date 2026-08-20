@@ -30,7 +30,7 @@ export default async function ChineseBlogPostPage({ params }: Props) {
   const renderedContent = await renderMarkdown(post.content, tocItems);
 
   return (
-    <main className={styles.postPage} lang="zh-CN">
+    <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
       <p className={styles.backWrap}><Link className={styles.backLink} href="/zh/blog">返回 Blog</Link></p>
       <header className={styles.header}>
         <h1 className={styles.title}>{post.title}</h1>

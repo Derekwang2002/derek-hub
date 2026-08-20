@@ -20,7 +20,7 @@ export default async function ChineseBlogPage() {
   const latestPost = allPosts[0];
 
   return (
-    <main className={styles.blogPage} lang="zh-CN">
+    <main className={`page-enter ${styles.blogPage}`} lang="zh-CN">
       <header className={styles.hero}>
         <h1 className={styles.title}>Blog</h1>
         <p className={styles.description}>按时间整理的写作、学习笔记与实现记录。</p>

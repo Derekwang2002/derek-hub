@@ -77,10 +77,12 @@ export default async function HubSectionPage({ params }: HubSectionPageProps) {
 
       <HubNav active={section.slug} />
 
-      <ResourceList
-        emptyMessage={`No ${section.label.toLowerCase()} resources yet.`}
-        resources={resources}
-      />
+      <div className="list-swap" key={section.slug}>
+        <ResourceList
+          emptyMessage={`No ${section.label.toLowerCase()} resources yet.`}
+          resources={resources}
+        />
+      </div>
     </main>
   );
 }

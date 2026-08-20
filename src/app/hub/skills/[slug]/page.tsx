@@ -77,7 +77,7 @@ export default async function SkillPage({ params }: SkillPageProps) {
   const renderedContent = await renderMarkdown(doc.content, tocItems);
 
   return (
-    <main className={styles.postPage}>
+    <main className={`page-enter ${styles.postPage}`}>
       <p className={styles.backWrap}>
         <Link className={styles.backLink} href="/hub/skills">
           Back to Skills

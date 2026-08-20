@@ -82,7 +82,8 @@ export function BlogExplorer({ locale = "en", posts, tags }: BlogExplorerProps) 
         />
       </div>
 
-      {filteredPosts.length === 0 ? (
+      <div className="list-swap" key={`${filters.activeTab}|${filters.activeTags.join(",")}`}>
+        {filteredPosts.length === 0 ? (
         filters.activeTab === "selected" ? (
           <>
             <p className={styles.emptyState}>{locale === "zh" ? "暂无精选文章。" : "No selected posts yet."}</p>
@@ -112,7 +113,7 @@ export function BlogExplorer({ locale = "en", posts, tags }: BlogExplorerProps) 
       ) : (
         <ul className={styles.postList}>
           {filteredPosts.map((post) => (
-            <li className={styles.postRow} key={post.slug}>
+            <li className={`row-highlight ${styles.postRow}`} key={post.slug}>
               <div className={styles.postHeader}>
                 <Link className={styles.postLink} href={`${locale === "zh" ? "/zh" : ""}/blog/${post.slug}`}>
                   {post.title}
@@ -127,6 +128,7 @@ export function BlogExplorer({ locale = "en", posts, tags }: BlogExplorerProps) 
           ))}
         </ul>
       )}
+      </div>
     </>
   );
 }
