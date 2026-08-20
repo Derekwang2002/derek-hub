@@ -74,7 +74,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: LANGUAGE_INIT_SCRIPT }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <div className="site-shell">
           <SiteHeader />
 
