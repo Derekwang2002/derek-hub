@@ -33,6 +33,14 @@ export const projectDefinitions: ProjectDefinition[] = [
         reviewedRevision: "calle-agentic-knowledge-transfer@2026-08-12"
       },
       {
+        slug: "goal-lifecycle",
+        sectionSlug: "product",
+        kind: "document",
+        status: "published",
+        updated: "2026-08-21",
+        reviewedRevision: "goal-lifecycle-prd@2026-08-13"
+      },
+      {
         slug: "iteration-playbook",
         sectionSlug: "product",
         kind: "document",

@@ -13,6 +13,7 @@ import {
 const ITEM_SLUGS = [
   "goal-first-product-design",
   "product-journeys",
+  "goal-lifecycle",
   "iteration-playbook",
   "technical-architecture",
   "agentic-goal-architecture",
