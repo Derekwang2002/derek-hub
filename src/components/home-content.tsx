@@ -37,16 +37,18 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
           <ResumeSection title={resume.educationTitle}>
             {resume.education.map((item) => (
               <article className={styles.educationEntry} key={item.school}>
-                <span className={styles.schoolLogo}>
-                  <Image alt="" height={56} src={item.logo} width={56} />
-                </span>
                 <div className={styles.educationBody}>
                   <div className={styles.entryHeading}>
                     <h3>{item.school}</h3>
-                    <time>{item.period}</time>
                   </div>
                   <p className={styles.entrySubline}>{item.degree} <span>{item.gpa}</span></p>
                   <p className={styles.coursework}>{item.coursework}</p>
+                </div>
+                <div className={styles.educationAside}>
+                  <time>{item.period}</time>
+                  <span className={styles.schoolLogo}>
+                    <Image alt="" height={56} src={item.logo} width={56} />
+                  </span>
                 </div>
               </article>
             ))}

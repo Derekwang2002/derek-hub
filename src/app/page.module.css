@@ -309,31 +309,52 @@
 }
 
 .educationEntry {
-  align-items: flex-start;
+  align-items: stretch;
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .educationEntry + .educationEntry {
   margin-top: 1.15rem;
 }
 
-.schoolLogo {
-  align-items: center;
-  background: #ffffff;
-  border-radius: 999px;
+.educationAside {
+  align-items: flex-end;
   display: flex;
   flex: 0 0 auto;
-  height: 3.5rem;
+  flex-direction: column;
+}
+
+.educationAside time {
+  color: var(--color-text-muted);
+  flex: 0 0 auto;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+.educationAside .schoolLogo {
+  margin: auto 0;
+}
+
+.schoolLogo {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  height: 3rem;
   justify-content: center;
-  margin-top: 0.1rem;
-  width: 3.5rem;
+  width: 3rem;
 }
 
 .schoolLogo img {
-  height: 76%;
+  height: 100%;
   object-fit: contain;
-  width: 76%;
+  width: 100%;
+}
+
+:global(html[data-theme="dark"]) .schoolLogo img {
+  filter: grayscale(1) invert(0.9) brightness(1.15);
+  opacity: 0.72;
 }
 
 .educationBody {
