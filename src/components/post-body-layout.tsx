@@ -94,7 +94,8 @@ export function PostBodyLayout({
   );
 
   return (
-    <div className={styles.bodyLayout}>
+    <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
+      <div aria-hidden="true" className={styles.layoutRule} />
       <PostToc
         activeId={activeId}
         articleTitle={articleTitle}
