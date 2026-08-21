@@ -37,12 +37,17 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
           <ResumeSection title={resume.educationTitle}>
             {resume.education.map((item) => (
               <article className={styles.educationEntry} key={item.school}>
-                <div className={styles.entryHeading}>
-                  <h3>{item.school}</h3>
-                  <time>{item.period}</time>
+                <span className={styles.schoolLogo}>
+                  <Image alt="" height={56} src={item.logo} width={56} />
+                </span>
+                <div className={styles.educationBody}>
+                  <div className={styles.entryHeading}>
+                    <h3>{item.school}</h3>
+                    <time>{item.period}</time>
+                  </div>
+                  <p className={styles.entrySubline}>{item.degree} <span>{item.gpa}</span></p>
+                  <p className={styles.coursework}>{item.coursework}</p>
                 </div>
-                <p className={styles.entrySubline}>{item.degree} <span>{item.gpa}</span></p>
-                <p className={styles.coursework}>{item.coursework}</p>
               </article>
             ))}
           </ResumeSection>
@@ -96,8 +101,8 @@ const RESUME = {
     skillsTitle: "专业技能",
     role: "后端开发实习生",
     education: [
-      { school: "南加利福尼亚大学", degree: "计算机科学（硕士）", gpa: "GPA: 3.6 / 4.0", period: "2025.1 — 2027.5", coursework: "主修课程：算法分析、操作系统、数据库系统、信息检索" },
-      { school: "西南财经大学", degree: "信息管理与信息系统（信息系统与数据管理方向）（学士）", gpa: "GPA: 3.9 / 4.0（6 / 60）", period: "2020.9 — 2024.6", coursework: "主修课程：数据结构、计算机网络、数据库原理、面向对象程序设计（Java）" }
+      { school: "南加利福尼亚大学", logo: "/schools/usc-seal.svg", degree: "计算机科学（硕士）", gpa: "GPA: 3.6 / 4.0", period: "2025.1 — 2027.5", coursework: "主修课程：算法分析、操作系统、数据库系统、信息检索" },
+      { school: "西南财经大学", logo: "/schools/swufe-logo.svg", degree: "信息管理与信息系统（信息系统与数据管理方向）（学士）", gpa: "GPA: 3.9 / 4.0（6 / 60）", period: "2020.9 — 2024.6", coursework: "主修课程：数据结构、计算机网络、数据库原理、面向对象程序设计（Java）" }
     ],
     experienceIntro: "作为核心开发，负责内部运维 Agent 平台后端研发，将告警诊断端到端耗时从 15–30 分钟压缩至 60 秒内。",
     techStack: "技术栈：Java、Spring Boot、Spring AI、DashScope、Milvus、SSE、ReAct、Function Calling",
@@ -115,8 +120,8 @@ const RESUME = {
     skillsTitle: "Technical Skills",
     role: "Backend Engineering Intern",
     education: [
-      { school: "University of Southern California", degree: "M.S. in Computer Science", gpa: "GPA: 3.6 / 4.0", period: "Jan 2025 — May 2027", coursework: "Coursework: Analysis of Algorithms, Operating Systems, Database Systems, Information Retrieval" },
-      { school: "Southwestern University of Finance and Economics", degree: "B.S. in Information Management and Information Systems", gpa: "GPA: 3.9 / 4.0 (6 / 60)", period: "Sep 2020 — Jun 2024", coursework: "Coursework: Data Structures, Computer Networks, Database Principles, Object-Oriented Programming (Java)" }
+      { school: "University of Southern California", logo: "/schools/usc-seal.svg", degree: "M.S. in Computer Science", gpa: "GPA: 3.6 / 4.0", period: "Jan 2025 — May 2027", coursework: "Coursework: Analysis of Algorithms, Operating Systems, Database Systems, Information Retrieval" },
+      { school: "Southwestern University of Finance and Economics", logo: "/schools/swufe-logo.svg", degree: "B.S. in Information Management and Information Systems", gpa: "GPA: 3.9 / 4.0 (6 / 60)", period: "Sep 2020 — Jun 2024", coursework: "Coursework: Data Structures, Computer Networks, Database Principles, Object-Oriented Programming (Java)" }
     ],
     experienceIntro: "Core backend contributor for an internal operations Agent platform, reducing end-to-end alert diagnosis from 15–30 minutes to under 60 seconds.",
     techStack: "Stack: Java, Spring Boot, Spring AI, DashScope, Milvus, SSE, ReAct, Function Calling",
