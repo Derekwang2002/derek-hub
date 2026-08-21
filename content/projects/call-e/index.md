@@ -1,11 +1,11 @@
 ---
 title: "CALL-E"
-summary: "从系统边界和一条真实电话任务的主链路，快速理解 CALL-E 如何把模型判断变成可恢复、可审计的长期执行。"
+summary: "从一次电话工具到持续拥有用户目标的 Agentic 系统：产品边界、三条典型旅程，以及可恢复、可审计的 Goal Runtime 实现。"
 ---
 
-CALL-E 不是“会调用电话工具的聊天机器人”。它处理的是一个持续时间可能远长于单次对话的目标：理解用户要什么，确认真实世界副作用，规划一次或多次电话，保存过程证据，并把结果重新交付给用户。
+CALL-E 不是“会调用电话工具的聊天机器人”。它处理的是一个持续时间可能远长于单次对话的目标：理解用户要什么，确认真实世界副作用，规划一次或多次电话，保存过程证据，并把结果重新交付给用户。今天的 agentic CALL-E 由 OpenAI Agents SDK 驱动（代码在 `calle/agentic`），一次执行就结束的外呼和长任务 Goal 跑在同一套 Goal Runtime 上；旧的无状态 v1 流水线已被吸收为 Runtime 里的一种 RunSpec 和 Run。
 
-本文依据 `s-eleven-mcp` revision `b36ac02f` 整理，只建立阅读源码所需的系统模型。实现细节由后续文档展开。
+本文建立阅读整个 Project 所需的系统模型。产品侧内容依据知识转移文档 `docs/calle-agentic-knowledge-transfer.md`（基线 2026-08-12）；工程侧依据 `s-eleven-mcp` revision `b36ac02f` 的源码审计。实现细节由后续文档展开。
 
 ## 1. 一条主链路
 
@@ -27,15 +27,26 @@ CALL-E 不是“会调用电话工具的聊天机器人”。它处理的是一�
 
 | 对象 | 回答的问题 |
 |---|---|
-| `Session` | 用户在哪个对话中观察和继续任务？ |
-| `Goal` | 用户最终想完成什么，哪些约束已经确认？ |
-| `RunSpec` | 一次执行准备如何进行？ |
+| `Goal` | 用户最终想完成什么，哪些约束已经确认？跨会话、跨执行持续存在 |
+| `RunSpec` | 系统准备怎么做？不可变、可追溯的执行版本（话术 + 契约 + 配置） |
 | `Run` | 现实中实际发生了哪次尝试？ |
-| `Report` | 系统最终交付了什么结论和证据？ |
+| `Evidence` / `Artifact` | 为什么得到这个结论？只追加，不改写 |
+| `Delivery` | 系统现在要告诉或问用户什么？GoalAgent 声明，Runtime 投递 |
 
-`Goal` 不等于一通电话。一项长期目标可以产生多个版本化 `RunSpec` 和多个 `Run`；单次拨号失败也不必直接终结 Goal。`Report` 汇总的是目标结果，而不是简单复制某次通话的状态。
+Chat history 帮助模型推理，但 `Goal`、`RunSpec`、`Run` 和 `Evidence` 才是产品事实。`Goal` 不等于一通电话：一项长期目标可以产生多个版本化 `RunSpec` 和多个 `Run`；执行状态也不是 Goal 状态——一次通话失败不会让目标失败，成功也不会让目标完成。
 
-## 3. 四个系统边界
+## 3. 四条用户体验边界
+
+系统对用户的承诺只有四条，所有评测用例都对应其中一条：
+
+1. **系统说的状态是真的**——「已保存」「已验证」「已批准」「已执行」「已完成」不许互相顶替；
+2. **用户知道系统接下来要做什么**——真实电话和热线绑定前，批准对象是确切动作本身；
+3. **系统没有消失**——长任务里用户总能看到进度、等待原因和下次继续时间；
+4. **失败不等于重新开始**——崩溃、重启、通话失败都不丢失已确认的 Goal、方案和证据。
+
+这四条由 Goal Runtime 的持久状态、protected-tool approval、delivery 契约和 bounded recovery 兑现，代价是更长的链路、多一跳的事实读取和跨 Agent 排障成本。
+
+## 4. 四个系统边界
 
 | 边界 | 主要职责 | 当前源码位置 |
 |---|---|---|
@@ -46,7 +57,7 @@ CALL-E 不是“会调用电话工具的聊天机器人”。它处理的是一�
 
 API 层可以结束一次 HTTP 请求，但 Goal 仍可在后台推进。Agentic Runtime 保存业务事实并决定下一步；Voice Runtime 执行一通电话；Platform Adapter 隔离外部系统协议。模型负责判断，确定性代码负责身份、状态转换、幂等、事务和副作用边界。
 
-## 4. 为什么能够恢复和审计
+## 5. 为什么能够恢复和审计
 
 CALL-E 把关键进展写成持久记录：Goal 及其 Event、dispatch cursor、不可变 RunSpec、Run 状态与 Event、Report、Session Event，以及 Workspace 中的证据引用。
 
@@ -54,9 +65,8 @@ CALL-E 把关键进展写成持久记录：Goal 及其 Event、dispatch cursor�
 
 真实电话仍存在外部副作用窗口。CALL-E 能提供稳定的本地身份、状态机、幂等键和证据链，但数据库事务本身不能证明外部供应商永远不会重复执行。文档会明确区分“本地 exactly-once 记录”与“端到端副作用保证”。
 
-## 5. 怎样继续阅读
+## 6. 怎样继续阅读
 
-先阅读[技术架构与框架取舍](/zh/projects/call-e/technical-architecture)，理解为什么 CALL-E 选择显式 runtime；再进入 [Agentic Goal 架构](/zh/projects/call-e/agentic-goal-architecture)和三篇 Runtime Trace，沿真实调用链查看事务、游标与语音执行。
+先读产品层四页：[从「打一通电话」到「持续完成一个 Goal」](/zh/projects/call-e/goal-first-product-design)定义 Goal 与四条体验边界；[三条典型产品旅程](/zh/projects/call-e/product-journeys)展开 Outbound、Published Goal 与 Inbound Hotline 的生命周期；[Goal 的生命周期 PRD](/zh/projects/call-e/goal-lifecycle)给出开发者视角从创建到生产改进的逐步流程与 P0–P3 拆分；[分层定位与迭代 Playbook](/zh/projects/call-e/iteration-playbook)给出 bad case 归属和发布纪律。
 
-工程章节记录仍然成立的延迟优化方法和当前开发状态。最后的[源码地图](/zh/projects/call-e/source-atlas)用于从领域概念跳回具体模块。项目动态与独立 Blog/Demo 的关联内容集中在 [Updates](/zh/projects/call-e/updates)，不会打乱稳定文档顺序。
-
+再进入工程层：[技术架构与框架取舍](/zh/projects/call-e/technical-architecture)解释为什么选择显式 runtime，[Agentic Goal 架构](/zh/projects/call-e/agentic-goal-architecture)和三篇 Runtime Trace 沿真实调用链查看事务、游标与语音执行。工程章节记录仍然成立的延迟优化方法和当前开发状态。最后的[源码地图](/zh/projects/call-e/source-atlas)用于从领域概念跳回具体模块。项目动态与独立 Blog/Demo 的关联内容集中在 [Updates](/zh/projects/call-e/updates)，不会打乱稳定文档顺序。

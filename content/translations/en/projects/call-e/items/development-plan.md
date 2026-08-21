@@ -5,6 +5,19 @@ summary: "Reconcile the original six-week plan with revision b36ac02f and separa
 
 The original six-week plan described CALL-E's move from a phone tool to a durable Agentic Runtime. Revision `b36ac02f` has passed several milestones and changed parts of the implementation path. This page no longer presents the old schedule as a future commitment; it turns it into a current status and next-step review.
 
+## 0. 2026-08-12 product-side baseline
+
+The knowledge-transfer document `docs/calle-agentic-knowledge-transfer.md` (baseline 2026-08-12) adds several important status corrections beyond what this page covers:
+
+- **Current scale**: 3 long-running Agents (MainAgent, OutboundGoalAgent, InboundGoalAgent), 1 Subagent (CallOutcomeJudge), 7 Skills (6 production-ready; `collection-strategy` was built for a demo and its spec is still Draft), 28 Tools (2 protected: `submit_voice_run`, `bind_hotline`). On the Agentic side, Instructions span 6 files / 352 lines; the Voice Runtime has another 11 files / 603 lines. The model configuration is gpt-5.6-sol, reasoning=medium.
+- **Automatic redialing where one confirmation covers multiple dialing slots is still not production capability**. Today the flow is GoalAgent review → suggestion → one-sentence user confirmation → reusing the same Goal for another call; the `goal-call-strategy` spec is still in draft.
+- **Reusable Published Goals and the external API are Draft**. The `publish_goal_run_spec` publish contract and the `POST /v1/goals/{goal_id}/runs` trigger contract (`goal-runs-developer-api-sdk`, `outbound-goal-builder`, `goal-published-run-spec`) are all unfrozen.
+- **There is no evaluation tooling yet**. `src/calle/agentic/evals/` contains only unit-test fixtures — no runner and no golden set; "domain evaluation" and "journey testing" are currently all manual. Simulation cannot substitute for a regression gate.
+- **Domain DRIs are all unassigned**. Nobody owns the rubric, versions, or effectiveness of the 7 Skills and 1 Judge — no DRI means no release gate.
+- **The remaining draft list**: `batch-outbound` / `rungroup-execution-envelope` (batch outbound), `response-language-boundaries` (reply language after recovery), `calle-web-inbound-number-binding` (web-side Inbound binding), `inbound-onboarding-live-progress` (live onboarding progress), `call-e-agentic-memory-policy` (cross-task memory), `simulation-bounded-concurrency` (bounded rehearsal concurrency).
+- **The developer-journey PRD (2026-08-13)** gives the P0–P3 task breakdown and acceptance criteria for the Goal lifecycle from creation through Simulation, Live Test, Real Call Test, and API integration to post-production improvement — see [The Goal Lifecycle](/projects/call-e/goal-lifecycle). The Live Test loop and API delivery are marked P3, consistent with the Published Goal contract still being Draft.
+- The Goal lifecycle is draft / active / paused / retired, and visibility is hidden / listed.
+
 ## Status overview
 
 | Original phase | Current status | Meaning |
@@ -189,10 +202,12 @@ CALL-E is W5 / Phase 3 ready only after this chain is complete.
 
 ## 7. Current priorities
 
-1. **Complete segmented latency metrics.** Locate the real bottleneck across Bot preparation, Calling creation, connection, and first audio.
-2. **Reuse deployable Voice Artifacts.** Let stable RunSpecs bind ready versions instead of paying cold-start cost for every Run.
-3. **Add strategy and retrieval evaluation.** Make retrieval, simulation, and Run outcomes comparable.
-4. **Build ChangeProposal.** Put high-impact strategy changes behind explicit human governance.
-5. **Keep strengthening E2E behavior.** Cover recovery, duplicate delivery, external timeout, permissions, inbound launch, and Report delivery.
+1. **Claim Domain DRIs and build evaluation gates.** The 7 Skills and 1 Judge need owners first, then golden sets, a runner, and a release gate — `evals/` currently holds only fixtures, and regression is entirely manual.
+2. **Complete segmented latency metrics.** Locate the real bottleneck across Bot preparation, Calling creation, connection, and first audio.
+3. **Reuse deployable Voice Artifacts.** Let stable RunSpecs bind ready versions instead of paying cold-start cost for every Run.
+4. **Consolidate the Published Goal contracts.** `goal-call-strategy`, `outbound-goal-builder`, `goal-published-run-spec`, and the external Runs API are all still Draft — freeze them before scaling usage.
+5. **Add strategy and retrieval evaluation.** Make retrieval, simulation, and Run outcomes comparable.
+6. **Build ChangeProposal.** Put high-impact strategy changes behind explicit human governance.
+7. **Keep strengthening E2E behavior.** Cover recovery, duplicate delivery, external timeout, permissions, inbound launch, and Report delivery.
 
 This status should move with source audits rather than promising another fixed six-week calendar. The [Source Atlas](/projects/call-e/source-atlas) locates these capabilities in the current module tree.

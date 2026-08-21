@@ -75,7 +75,9 @@ The two Goal types expose different tools over the same durable skeleton, so cli
 
 A Report is not temporary model prose. GoalAgent first writes Markdown—and JSON when required—to the Workspace. `commit_report` validates paths, content integrity, subject, and schema before creating a versioned Report record and Goal Event.
 
-An iteration returns context delivery explicitly through `complete_goal_iteration`. Only after the outer product transaction commits does `CallEAgent` turn that delivery into a durable event visible to MainAgent and the user Session. GoalAgent's internal reasoning does not become a user fact directly.
+An iteration returns context delivery explicitly through `complete_goal_iteration`. There are only four delivery types: `status`, `result`, `user_input_required`, and `report_ready` — if the model cannot say which one to send, the contract itself has a problem. Only after the outer product transaction commits does `CallEAgent` turn that delivery into a durable event visible to MainAgent and the user Session. GoalAgent's internal reasoning does not become a user fact directly.
+
+Two auxiliary roles participate in no lifecycle: `CallOutcomeJudge` makes semantic judgments in an isolated context (no tools, no session, no state changes), and `RunResultMaterializer` structures a terminal result into a receipt in one shot.
 
 ## 7. Three boundaries to preserve
 
@@ -83,5 +85,5 @@ An iteration returns context delivery explicitly through `complete_goal_iteratio
 2. **Events are not current snapshots.** Events provide history; Goal, Run, and Report records serve current reads.
 3. **A local commit is not external exactly-once.** The database can atomically update local facts, while phone providers still require idempotent identity, state reconciliation, and compensation.
 
-Continue with three source paths: [Commit a Goal](/projects/call-e/commit-goal), [Run one Goal iteration](/projects/call-e/goal-iteration-runner), and [RunSpec to real Voice Run](/projects/call-e/voice-run-execution).
+Continue with three source paths: [Commit a Goal](/projects/call-e/commit-goal), [Run one Goal iteration](/projects/call-e/goal-iteration-runner), and [RunSpec to real Voice Run](/projects/call-e/voice-run-execution). For product-side concept alignment (the Goal definition, the four delivery types, and the Judge/Materializer boundaries), see [Three canonical product journeys](/projects/call-e/product-journeys).
 

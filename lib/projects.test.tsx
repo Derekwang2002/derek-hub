@@ -11,6 +11,9 @@ import {
 } from "./projects";
 
 const ITEM_SLUGS = [
+  "goal-first-product-design",
+  "product-journeys",
+  "iteration-playbook",
   "technical-architecture",
   "agentic-goal-architecture",
   "commit-goal",
@@ -37,8 +40,8 @@ test("loads the CALL-E tree with exact locale parity", async () => {
     chinese.sections.flatMap((section) => section.items.map((item) => item.slug)),
     ITEM_SLUGS
   );
-  assert.equal(english.lastUpdated, "2026-07-28");
-  assert.equal(chinese.lastUpdated, "2026-07-28");
+  assert.equal(english.lastUpdated, "2026-08-21");
+  assert.equal(chinese.lastUpdated, "2026-08-21");
 });
 
 test("Project index exposes only public Projects", async () => {

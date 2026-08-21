@@ -5,16 +5,41 @@ export const projectDefinitions: ProjectDefinition[] = [
     slug: "call-e",
     status: "active",
     overview: {
-      updated: "2026-07-28",
+      updated: "2026-08-21",
       reviewedRevision: "b36ac02f"
     },
     sections: [
+      { slug: "product", label: { en: "Product", zh: "产品" } },
       { slug: "architecture", label: { en: "Architecture", zh: "架构" } },
       { slug: "runtime-traces", label: { en: "Runtime Traces", zh: "运行时追踪" } },
       { slug: "engineering", label: { en: "Engineering", zh: "工程实践" } },
       { slug: "explore", label: { en: "Explore", zh: "交互探索" } }
     ],
     items: [
+      {
+        slug: "goal-first-product-design",
+        sectionSlug: "product",
+        kind: "document",
+        status: "published",
+        updated: "2026-08-21",
+        reviewedRevision: "calle-agentic-knowledge-transfer@2026-08-12"
+      },
+      {
+        slug: "product-journeys",
+        sectionSlug: "product",
+        kind: "document",
+        status: "published",
+        updated: "2026-08-21",
+        reviewedRevision: "calle-agentic-knowledge-transfer@2026-08-12"
+      },
+      {
+        slug: "iteration-playbook",
+        sectionSlug: "product",
+        kind: "document",
+        status: "published",
+        updated: "2026-08-21",
+        reviewedRevision: "calle-agentic-knowledge-transfer@2026-08-12"
+      },
       {
         slug: "technical-architecture",
         sectionSlug: "architecture",
@@ -28,7 +53,7 @@ export const projectDefinitions: ProjectDefinition[] = [
         sectionSlug: "architecture",
         kind: "document",
         status: "published",
-        updated: "2026-07-28",
+        updated: "2026-08-21",
         reviewedRevision: "b36ac02f"
       },
       {
@@ -68,7 +93,7 @@ export const projectDefinitions: ProjectDefinition[] = [
         sectionSlug: "engineering",
         kind: "document",
         status: "published",
-        updated: "2026-07-28",
+        updated: "2026-08-21",
         reviewedRevision: "b36ac02f"
       },
       {

@@ -75,7 +75,9 @@ Inbound GoalAgent 复用 Goal、RunSpec、Report 与 iteration 机制，但增�
 
 Report 不是一段临时模型文本。GoalAgent 先在 Workspace 生成 Markdown（必要时也生成 JSON），`commit_report` 再校验路径、内容完整性、subject 与 schema，并创建版本化 Report 记录和 Goal Event。
 
-一次 iteration 通过 `complete_goal_iteration` 显式返回 context delivery。外层产品事务提交后，`CallEAgent` 才把这份交付转成 MainAgent/用户 Session 可见的 durable event。GoalAgent 的内部推理不会直接泄漏成用户事实。
+一次 iteration 通过 `complete_goal_iteration` 显式返回 context delivery。Delivery 只有四种类型：`status`、`result`、`user_input_required`、`report_ready`——模型说不出该发哪种，就是这条契约出了问题。外层产品事务提交后，`CallEAgent` 才把这份交付转成 MainAgent/用户 Session 可见的 durable event。GoalAgent 的内部推理不会直接泄漏成用户事实。
+
+两个辅助角色不参与任何生命周期：`CallOutcomeJudge` 在隔离上下文里做语义判断（无工具、无 session、不改状态），`RunResultMaterializer` 把终态结果一次性结构化成 receipt。
 
 ## 7. 三条必须保持的边界
 
@@ -83,5 +85,5 @@ Report 不是一段临时模型文本。GoalAgent 先在 Workspace 生成 Markdo
 2. **Event 不等于当前快照。** Event 提供历史，Goal/Run/Report record 提供当前读取模型。
 3. **本地提交不等于外部 exactly-once。** 数据库可以原子更新本地事实，电话供应商仍需要幂等身份、状态核对和补偿。
 
-接下来沿源码走三条路径：[提交 Goal](/zh/projects/call-e/commit-goal)、[运行一次 Goal iteration](/zh/projects/call-e/goal-iteration-runner)，以及[从 RunSpec 到真实 Voice Run](/zh/projects/call-e/voice-run-execution)。
+接下来沿源码走三条路径：[提交 Goal](/zh/projects/call-e/commit-goal)、[运行一次 Goal iteration](/zh/projects/call-e/goal-iteration-runner)，以及[从 RunSpec 到真实 Voice Run](/zh/projects/call-e/voice-run-execution)。产品侧的概念对齐（Goal 定义、四种 Delivery、Judge/Materializer 边界）见[三条典型产品旅程](/zh/projects/call-e/product-journeys)。
 

@@ -5,6 +5,19 @@ summary: "把原六周计划与 revision b36ac02f 的实现对照，区分已经
 
 原六周计划记录了 CALL-E 从一次电话工具走向持久 Agentic Runtime 的方向。revision `b36ac02f` 已经越过其中多个里程碑，也改变了部分实现路径。本页不再把旧时间表当作未来承诺，而是把它转换成当前状态与下一步清单。
 
+## 0. 2026-08-12 产品侧基线
+
+知识转移文档 `docs/calle-agentic-knowledge-transfer.md`（基线 2026-08-12）给出了本页之外的几个重要状态修正：
+
+- **当前规模**：长期 Agent 3 个（MainAgent、OutboundGoalAgent、InboundGoalAgent），Subagent 1 个（CallOutcomeJudge），Skill 7 个（6 个生产可用，`collection-strategy` 为 demo 所建、spec 仍是 Draft），Tool 28 个（受保护 2 个：`submit_voice_run`、`bind_hotline`）。Agentic 侧 Instruction 6 个文件 / 352 行；Voice Runtime 另有 11 个文件 / 603 行。模型配置为 gpt-5.6-sol、reasoning=medium。
+- **一次确认覆盖多个拨打槽位的自动续拨仍不是生产能力**。今天是 GoalAgent 复盘 → 给建议 → 用户一句话确认 → 复用同一个 Goal 再打；`goal-call-strategy` spec 仍在草稿。
+- **可复用 Published Goal 与对外 API 是 Draft**。`publish_goal_run_spec` 发布契约、`POST /v1/goals/{goal_id}/runs` 触发契约（`goal-runs-developer-api-sdk`、`outbound-goal-builder`、`goal-published-run-spec`）均未冻结。
+- **评测工具还没有**。`src/calle/agentic/evals/` 只有单测 fixture，没有 runner 和 golden set；「领域评测」「Journey 测试」目前全部人工执行。Simulation 不能顶替回归门槛。
+- **Domain DRI 全部空缺**。7 个 Skill、1 个 Judge 的 rubric、版本和效果均无人认领——没有 DRI 就没有上线门槛。
+- **其余 Draft 清单**：`batch-outbound` / `rungroup-execution-envelope`（批量外呼）、`response-language-boundaries`（恢复后回复语言）、`calle-web-inbound-number-binding`（Web 端 Inbound 绑定）、`inbound-onboarding-live-progress`（onboarding 实时进度）、`call-e-agentic-memory-policy`（跨任务记忆）、`simulation-bounded-concurrency`（演练有界并发）。
+- **开发者旅程 PRD（2026-08-13）**给出了 Goal 从创建、Simulation、Live Test、真实呼叫测试到 API 集成与生产后改进的 P0–P3 任务拆分与验收标准，见 [Goal 的生命周期](/zh/projects/call-e/goal-lifecycle)。其中 Live Test 闭环与 API 交付标为 P3，与「Published Goal 契约仍是 Draft」的实现状态一致。
+- Goal 生命周期为 draft / active / paused / retired，visibility 为 hidden / listed。
+
 ## 状态总览
 
 | 原阶段 | 当前状态 | 说明 |
@@ -182,10 +195,12 @@ recommendation candidates；显式 proposal command 消费这些结构化数据�
 
 ## 7. 接下来的优先级
 
-1. **完成延迟分段指标。** 先定位 Bot prepare、Calling 创建、接通与首音频的真实瓶颈。
-2. **复用可部署 Voice Artifact。** 让稳定 RunSpec 优先绑定已上线版本，减少每 Run 冷启动。
-3. **补齐策略与检索评估。** 为 retrieval、simulation 和 Run outcome 建立可比较数据。
-4. **建立 ChangeProposal。** 把高影响策略变化放进显式人工治理。
-5. **持续强化 E2E。** 覆盖恢复、重复投递、外部超时、权限、inbound 上线和 Report 交付。
+1. **认领 Domain DRI 并建立评测门槛。** 7 个 Skill 与 1 个 Judge 先有人认领，再补 golden set、runner 与发布 gate——目前 `evals/` 下只有 fixture，回归全靠人工。
+2. **完成延迟分段指标。** 先定位 Bot prepare、Calling 创建、接通与首音频的真实瓶颈。
+3. **复用可部署 Voice Artifact。** 让稳定 RunSpec 优先绑定已上线版本，减少每 Run 冷启动。
+4. **收敛 Published Goal 契约。** `goal-call-strategy`、`outbound-goal-builder`、`goal-published-run-spec` 与对外 Runs API 都还在 Draft，先冻结再放量。
+5. **补齐策略与检索评估。** 为 retrieval、simulation 和 Run outcome 建立可比较数据。
+6. **建立 ChangeProposal。** 把高影响策略变化放进显式人工治理。
+7. **持续强化 E2E。** 覆盖恢复、重复投递、外部超时、权限、inbound 上线和 Report 交付。
 
 这份状态页应随源码审计更新，而不是重新承诺一个固定六周日期。下一篇[源码地图](/zh/projects/call-e/source-atlas)可以把这些能力定位到当前模块。
