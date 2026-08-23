@@ -57,17 +57,19 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
 
         <RevealOnScroll className={styles.reveal}>
           <ResumeSection title={resume.experienceTitle}>
-            <article className={styles.experienceEntry}>
-              <div className={styles.entryHeading}>
-                <h3>Takin.ai <span>{resume.role}</span></h3>
-                <time>2024.8 — 2025.12</time>
-              </div>
-              <p className={styles.experienceIntro}>{resume.experienceIntro}</p>
-              <p className={styles.techStack}>{resume.techStack}</p>
-              <ul className={styles.achievementList}>
-                {resume.achievements.map((achievement) => <li key={achievement}>{achievement}</li>)}
-              </ul>
-            </article>
+            {resume.experience.map((job) => (
+              <article className={styles.experienceEntry} key={job.company}>
+                <div className={styles.entryHeading}>
+                  <h3>{job.company} <span>{job.role}</span></h3>
+                  <time>{job.period}</time>
+                </div>
+                <p className={styles.experienceIntro}>{em(job.intro)}</p>
+                <p className={styles.techStack}>{job.techStack}</p>
+                <ul className={styles.achievementList}>
+                  {job.achievements.map((achievement) => <li key={achievement}>{em(achievement)}</li>)}
+                </ul>
+              </article>
+            ))}
           </ResumeSection>
         </RevealOnScroll>
 
@@ -89,6 +91,12 @@ function SocialIcon({ icon }: { icon: (typeof SOCIAL_LINKS)[number]["icon"] }) {
   return <svg aria-hidden="true" className={className} focusable="false" viewBox="0 0 16 16"><path d={icon === "github" ? GITHUB_MARK_PATH : LINKEDIN_MARK_PATH} /></svg>;
 }
 
+function em(text: string): ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
+    part.startsWith("**") && part.endsWith("**") ? <strong key={index}>{part.slice(2, -2)}</strong> : part
+  );
+}
+
 function ResumeSection({ children, title }: { children: ReactNode; title: string }) {
   return <section className={styles.resumeSection}>
     <h2>{title}</h2>
@@ -101,18 +109,35 @@ const RESUME = {
     educationTitle: "教育背景",
     experienceTitle: "实习经历",
     skillsTitle: "专业技能",
-    role: "后端开发实习生",
     education: [
       { school: "南加利福尼亚大学", logo: "/schools/usc-seal.svg", degree: "计算机科学（硕士）", gpa: "GPA: 3.6 / 4.0", period: "2025.1 — 2027.5", coursework: "主修课程：算法分析、操作系统、数据库系统、信息检索" },
       { school: "西南财经大学", logo: "/schools/swufe-logo.svg", degree: "信息管理与信息系统（信息系统与数据管理方向）（学士）", gpa: "GPA: 3.9 / 4.0（6 / 60）", period: "2020.9 — 2024.6", coursework: "主修课程：数据结构、计算机网络、数据库原理、面向对象程序设计（Java）" }
     ],
-    experienceIntro: "作为核心开发，负责内部运维 Agent 平台后端研发，将告警诊断端到端耗时从 15–30 分钟压缩至 60 秒内。",
-    techStack: "技术栈：Java、Spring Boot、Spring AI、DashScope、Milvus、SSE、ReAct、Function Calling",
-    achievements: [
-      "三级 Agent 协作架构：基于 Plan-Execute-Replan 设计 Planner → Executor → Supervisor 协作链路；Supervisor 校验结果并触发自动重试与策略切换，在 200+ 条真实告警样本下将工具调用成功率从 70% 提升至 95%。",
-      "Agentic RAG 检索优化：基于 Milvus 搭建内部知识库，融合 MQE 多路召回、小块检索与父块返回的双层索引、Reflection 结果校验与 query 改写；在 150 条内部问答评测集上，召回率提升约 25%，检索准确率从 65% 提升至 90%。",
-      "Function Calling 工具框架：采用 Spring AI @Tool 注解与 ToolCallback 构建工具注册与路由层，支持运行时按意图匹配工具组合与热插拔；集成 Prometheus 查询、日志检索等工具，新增工具无需改动诊断链路。",
-      "ReAct 推理链路：通过状态机增量解析 LLM 流式输出，实时拆解 Thought-Action-Observation 并经 SSE 推送前端；配合心跳保活与断连重试保障长连接稳定性，推理 trace 全量落库支持 Bad Case 分析。"
+    experience: [
+      {
+        company: "AI Rudder",
+        role: "Agent 开发实习生",
+        period: "2026.6 — 2026.8",
+        intro: "负责内部 CALL-E Agent 平台功能开发，覆盖外呼与内呼智能体。",
+        techStack: "技术栈：Python、FastAPI、AsyncIO、OpenAI Agents SDK、PostgreSQL、SQLAlchemy、Redis、RabbitMQ、Taskiq、Kafka、SSE、Pydantic",
+        achievements: [
+          "**异步 Agent 运行架构：**拆分 API 接入、任务编排、后台执行与第三方适配层；基于 Taskiq + RabbitMQ 将耗时任务投递至 Worker，Redis 承担结果存储、分布式锁与调度器选主，支持长任务异步运行与多实例部署。",
+          "**持久化与数据建模：**基于 PostgreSQL + Async SQLAlchemy 建模任务快照、追加式事件、调度状态与执行记录；高频查询字段关系化并建立组合索引，动态模型数据采用 Pydantic + JSONB 存储，兼顾查询性能、Schema 演进与任务恢复。",
+          "**实时事件处理链路：**使用 FastStream 消费 Kafka 事件，经结构化校验与异常 NACK 后写入 Redis Streams；通过 Cursor、TTL 与有界队列支持实时读取与短期回放，将关键结果投影至 PostgreSQL，并经 SSE 推送至客户端。",
+          "**并发一致性与 Agent 安全：**结合数据库行锁、状态版本、事件游标、Lease 与幂等键实现单任务单写者机制，事务化完成状态更新、事件追加与游标推进；通过强类型 Tool Calling 与角色级工具白名单隔离 LLM 推理与数据写入，**防止重复执行、过期回写及越权操作**。"
+        ]
+      },
+      {
+        company: "Takin.ai",
+        role: "后端开发实习生",
+        period: "2024.8 — 2025.12",
+        intro: "作为核心开发，负责内部运维 Agent 平台后端研发，将告警诊断端到端耗时从 15–30 分钟**压缩至 60 秒内**。",
+        techStack: "技术栈：Java、Spring Boot、Spring AI、DashScope、Milvus、SSE、ReAct、Function Calling",
+        achievements: [
+          "**三级 Agent 协作架构：**基于 Plan-Execute-Replan 设计 Planner → Executor → Supervisor 协作链路；Supervisor 校验结果并触发自动重试与策略切换，在 200+ 条真实告警样本下将工具调用成功率从 **70% 提升至 95%**。",
+          "**Agentic RAG 检索优化：**基于 Milvus 搭建内部知识库，融合 MQE 多路召回、小块检索与父块返回的双层索引、Reflection 结果校验与 query 改写；在 150 条内部问答评测集上，召回率提升约 25%，检索准确率从 **65% 提升至 90%**。"
+        ]
+      }
     ],
     skills: [["语言", "Java、Python、SQL"], ["后端框架", "Spring Boot、Spring AI、Spring Security、MyBatis"], ["中间件", "Redis、Kafka、Elasticsearch、MySQL、Milvus"], ["AI 工程", "RAG、Function Calling、ReAct"]]
   },
@@ -120,18 +145,35 @@ const RESUME = {
     educationTitle: "Education",
     experienceTitle: "Experience",
     skillsTitle: "Technical Skills",
-    role: "Backend Engineering Intern",
     education: [
       { school: "University of Southern California", logo: "/schools/usc-seal.svg", degree: "M.S. in Computer Science", gpa: "GPA: 3.6 / 4.0", period: "Jan 2025 — May 2027", coursework: "Coursework: Analysis of Algorithms, Operating Systems, Database Systems, Information Retrieval" },
       { school: "Southwestern University of Finance and Economics", logo: "/schools/swufe-logo.svg", degree: "B.S. in Information Management and Information Systems", gpa: "GPA: 3.9 / 4.0 (6 / 60)", period: "Sep 2020 — Jun 2024", coursework: "Coursework: Data Structures, Computer Networks, Database Principles, Object-Oriented Programming (Java)" }
     ],
-    experienceIntro: "Core backend contributor for an internal operations Agent platform, reducing end-to-end alert diagnosis from 15–30 minutes to under 60 seconds.",
-    techStack: "Stack: Java, Spring Boot, Spring AI, DashScope, Milvus, SSE, ReAct, Function Calling",
-    achievements: [
-      "Three-tier Agent collaboration: designed a Planner → Executor → Supervisor flow around Plan-Execute-Replan. Supervisor validation triggers automatic retries and strategy changes, increasing tool-call success from 70% to 95% across 200+ production alert samples.",
-      "Agentic RAG retrieval: built an internal knowledge base on Milvus with MQE multi-path recall, child-chunk retrieval with parent-chunk returns, Reflection validation, and query rewriting. On 150 internal Q&A evaluations, recall improved by about 25% and retrieval accuracy rose from 65% to 90%.",
-      "Function Calling framework: built a registration and routing layer with Spring AI @Tool and ToolCallback, enabling intent-based tool composition and hot-plugging. Integrated Prometheus queries and log search without changing the diagnostic flow for each new tool.",
-      "ReAct reasoning flow: incrementally parsed streamed LLM output with a state machine, delivered Thought-Action-Observation events through SSE, and persisted complete traces for Bad Case analysis while using heartbeats and reconnects for stable long-lived connections."
+    experience: [
+      {
+        company: "AI Rudder",
+        role: "Agent Engineering Intern",
+        period: "Jun 2026 — Aug 2026",
+        intro: "Developed features for the internal CALL-E Agent platform, covering outbound and inbound voice agents.",
+        techStack: "Stack: Python, FastAPI, AsyncIO, OpenAI Agents SDK, PostgreSQL, SQLAlchemy, Redis, RabbitMQ, Taskiq, Kafka, SSE, Pydantic",
+        achievements: [
+          "**Async Agent runtime:** split the system into API, orchestration, background execution, and third-party adapter layers. Long-running tasks are dispatched to workers via Taskiq + RabbitMQ, while Redis handles result storage, distributed locks, and scheduler leader election, enabling asynchronous long tasks and multi-instance deployment.",
+          "**Persistence and data modeling:** modeled task snapshots, append-only events, scheduling state, and execution records with PostgreSQL + async SQLAlchemy. Hot query fields are relational with composite indexes, while dynamic payloads use Pydantic-validated JSONB, balancing query performance, schema evolution, and task recovery.",
+          "**Real-time event pipeline:** consumed Kafka events with FastStream, applied schema validation with NACK on failures, and wrote them to Redis Streams. Cursors, TTL, and bounded queues support real-time reads and short-term replay; key results are projected to PostgreSQL and pushed to clients over SSE.",
+          "**Concurrency consistency and Agent safety:** combined row locks, state versions, event cursors, leases, and idempotency keys into a single-writer-per-task mechanism, committing status updates, event appends, and cursor advances in one transaction. Strongly-typed tool calling and role-based tool whitelists isolate LLM reasoning from data writes, **preventing duplicate execution, stale writes, and unauthorized operations**."
+        ]
+      },
+      {
+        company: "Takin.ai",
+        role: "Backend Engineering Intern",
+        period: "Aug 2024 — Dec 2025",
+        intro: "Core backend contributor for an internal operations Agent platform, reducing end-to-end alert diagnosis **from 15–30 minutes to under 60 seconds**.",
+        techStack: "Stack: Java, Spring Boot, Spring AI, DashScope, Milvus, SSE, ReAct, Function Calling",
+        achievements: [
+          "**Three-tier Agent collaboration:** designed a Planner → Executor → Supervisor flow around Plan-Execute-Replan. Supervisor validation triggers automatic retries and strategy changes, increasing tool-call success **from 70% to 95%** across 200+ production alert samples.",
+          "**Agentic RAG retrieval:** built an internal knowledge base on Milvus with MQE multi-path recall, child-chunk retrieval with parent-chunk returns, Reflection validation, and query rewriting. On 150 internal Q&A evaluations, recall improved by about 25% and retrieval accuracy rose **from 65% to 90%**."
+        ]
+      }
     ],
     skills: [["Languages", "Java, Python, SQL"], ["Backend", "Spring Boot, Spring AI, Spring Security, MyBatis"], ["Infrastructure", "Redis, Kafka, Elasticsearch, MySQL, Milvus"], ["AI Engineering", "RAG, Function Calling, ReAct"]]
   }
