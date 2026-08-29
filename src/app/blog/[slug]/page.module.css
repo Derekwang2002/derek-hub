@@ -373,8 +373,9 @@
 }
 
 .tocCollapsed {
-  padding-left: 0.6rem;
+  padding-left: calc(0.6rem + 1px);
   padding-right: 0.65rem;
+  padding-top: calc(0.75rem + 1px);
   width: 5.5rem;
 }
 
