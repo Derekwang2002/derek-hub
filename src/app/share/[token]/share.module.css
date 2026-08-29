@@ -38,6 +38,7 @@
 .downloadLink {
   align-items: center;
   border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
   color: var(--color-text-muted);
   display: inline-flex;
   flex: 0 0 auto;
@@ -45,6 +46,7 @@
   line-height: 1;
   padding: 0.38rem 0.58rem;
   text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease;
 }
 
 .downloadLink:hover,

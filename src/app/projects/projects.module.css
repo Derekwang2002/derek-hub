@@ -125,6 +125,7 @@
   font-weight: 700;
   padding: 0.35rem 0;
   text-decoration: none;
+  transition: color 160ms ease;
 }
 
 .updatesLink {
@@ -177,6 +178,7 @@
   padding: 0.34rem 0.5rem;
   text-decoration: none;
   text-wrap: pretty;
+  transition: color 160ms ease;
 }
 
 .desktopNav a:hover,
@@ -184,8 +186,6 @@
 .mobileNav a:hover,
 .mobileNav a:focus-visible {
   color: var(--color-text);
-  text-decoration: underline;
-  text-underline-offset: 0.2rem;
 }
 
 .desktopNav a[aria-current="page"],
@@ -213,13 +213,15 @@
 }
 
 .breadcrumbs a {
+  border-bottom: 1px solid transparent;
   text-decoration: none;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .breadcrumbs a:hover,
 .breadcrumbs a:focus-visible {
+  border-bottom-color: var(--color-text-faint);
   color: var(--color-text);
-  text-decoration: underline;
 }
 
 .heroMeta {
@@ -274,14 +276,16 @@
 }
 
 .onThisPage a {
+  border-bottom: 1px solid transparent;
   color: var(--color-text-muted);
   text-decoration: none;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .onThisPage a:hover,
 .onThisPage a:focus-visible {
+  border-bottom-color: var(--color-text-faint);
   color: var(--color-text);
-  text-decoration: underline;
 }
 
 .tocNested {
@@ -310,6 +314,7 @@
 .directoryGrid section {
   background: var(--color-surface-muted);
   border: 1px solid var(--color-border-soft);
+  border-radius: 10px;
   padding: 1.1rem 1.2rem;
 }
 
@@ -328,15 +333,16 @@
 }
 
 .directoryGrid a {
+  border-bottom: 1px solid transparent;
   color: var(--color-text-soft);
   text-decoration: none;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .directoryGrid a:hover,
 .directoryGrid a:focus-visible {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18rem;
+  border-bottom-color: var(--color-text-faint);
+  color: var(--color-text);
 }
 
 .updateList {
@@ -398,16 +404,19 @@
 
 .pager a {
   align-items: center;
+  color: var(--color-text-soft);
   display: flex;
   gap: 0.55rem;
   line-height: 1.4;
   padding: 0.45rem 0;
   text-decoration: none;
+  transition: color 160ms ease, text-shadow 160ms ease;
 }
 
 .pager a:hover,
 .pager a:focus-visible {
-  text-decoration: underline;
+  color: var(--color-text);
+  text-shadow: 0 0 0.65px currentColor;
 }
 
 .pagerNext {
@@ -444,6 +453,7 @@
 .interactiveFrame {
   background: #0c1016;
   border: 1px solid var(--color-border);
+  border-radius: 0.45rem;
   height: min(76vh, 820px);
   min-height: 560px;
   width: 100%;
@@ -465,6 +475,7 @@
 
   .mobileNav {
     border: 1px solid var(--color-border);
+    border-radius: 0.55rem;
     display: block;
     margin-bottom: 1.25rem;
     padding: 0.75rem 1rem;

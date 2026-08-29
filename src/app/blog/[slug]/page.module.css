@@ -10,13 +10,15 @@
 }
 
 .backLink {
+  border-bottom: 1px solid transparent;
   color: var(--color-text-soft);
   text-decoration: none;
+  transition: color 160ms ease, border-bottom-color 160ms ease;
 }
 
 .backLink:hover,
 .backLink:focus-visible {
-  text-decoration: underline;
+  border-bottom-color: var(--color-text);
 }
 
 .seriesContext {
