@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
@@ -29,6 +29,8 @@ export function PostBodyLayout({
   const [wideOpen, setWideOpen] = useState(true);
   const [overlayOpen, setOverlayOpen] = useState(false);
   const activeId = useActiveHeading(tocItems);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const flipRef = useRef<{ asideX: number; articleX: number } | null>(null);
 
   useEffect(() => {
     const wideQuery = window.matchMedia("(min-width: 1280px)");
@@ -77,6 +79,19 @@ export function PostBodyLayout({
   const setTocOpen = useCallback(
     (nextOpen: boolean) => {
       if (viewportMode === "wide") {
+        const layout = layoutRef.current;
+        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (layout && !reduceMotion) {
+          const aside = layout.querySelector("aside");
+          const article = layout.querySelector("article");
+          if (aside && article) {
+            flipRef.current = {
+              asideX: aside.getBoundingClientRect().x,
+              articleX: article.getBoundingClientRect().x
+            };
+          }
+        }
+
         setWideOpen(nextOpen);
 
         try {
@@ -93,8 +108,26 @@ export function PostBodyLayout({
     [viewportMode]
   );
 
+  useLayoutEffect(() => {
+    const first = flipRef.current;
+    flipRef.current = null;
+    const layout = layoutRef.current;
+    if (!first || !layout) return;
+
+    for (const [selector, fromX] of [["aside", first.asideX], ["article", first.articleX]] as const) {
+      const el = layout.querySelector(selector);
+      if (!el) continue;
+      const dx = fromX - el.getBoundingClientRect().x;
+      if (Math.abs(dx) < 1) continue;
+      el.animate(
+        [{ transform: `translateX(${dx}px)` }, { transform: "none" }],
+        { duration: 300, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
+      );
+    }
+  }, [tocOpen]);
+
   return (
-    <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
+    <div ref={layoutRef} className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
       <div aria-hidden="true" className={styles.layoutRule} />
       <PostToc
         activeId={activeId}
