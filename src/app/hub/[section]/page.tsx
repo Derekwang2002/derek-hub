@@ -69,7 +69,7 @@ export default async function HubSectionPage({ params }: HubSectionPageProps) {
   const resources = await getLocalizedResourcesBySection(section.slug, "en");
 
   return (
-    <main className={styles.hubPage}>
+    <main className={`page-enter ${styles.hubPage}`}>
       <header className={styles.hero}>
         <h1 className={styles.title}>Hub</h1>
         <p className={styles.description}>{section.description}</p>
