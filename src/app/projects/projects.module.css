@@ -213,14 +213,12 @@
 }
 
 .breadcrumbs a {
-  border-bottom: 1px solid transparent;
   text-decoration: none;
-  transition: color 160ms ease, border-bottom-color 160ms ease;
+  transition: color 160ms ease;
 }
 
 .breadcrumbs a:hover,
 .breadcrumbs a:focus-visible {
-  border-bottom-color: var(--color-text-faint);
   color: var(--color-text);
 }
 
@@ -276,15 +274,13 @@
 }
 
 .onThisPage a {
-  border-bottom: 1px solid transparent;
   color: var(--color-text-muted);
   text-decoration: none;
-  transition: color 160ms ease, border-bottom-color 160ms ease;
+  transition: color 160ms ease;
 }
 
 .onThisPage a:hover,
 .onThisPage a:focus-visible {
-  border-bottom-color: var(--color-text-faint);
   color: var(--color-text);
 }
 
@@ -333,16 +329,15 @@
 }
 
 .directoryGrid a {
-  border-bottom: 1px solid transparent;
   color: var(--color-text-soft);
   text-decoration: none;
-  transition: color 160ms ease, border-bottom-color 160ms ease;
+  transition: color 160ms ease, text-shadow 160ms ease;
 }
 
 .directoryGrid a:hover,
 .directoryGrid a:focus-visible {
-  border-bottom-color: var(--color-text-faint);
   color: var(--color-text);
+  text-shadow: 0 0 0.65px currentColor;
 }
 
 .updateList {
