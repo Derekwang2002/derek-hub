@@ -27,12 +27,7 @@ export async function HomeContent({ locale }: { locale: "en" | "zh" }) {
           <li key={link.label}><a href={link.href} rel={link.href.startsWith("mailto:") ? undefined : "noreferrer"} target={link.href.startsWith("mailto:") ? undefined : "_blank"}><SocialIcon icon={link.icon} />{link.label}</a></li>
         ))}</ul>
       </section>
-      <section className={styles.resume} aria-labelledby="resume-title">
-        <div className={styles.resumeHeader}>
-          <p>{locale === "zh" ? "个人简历" : "Resume"}</p>
-          <span>{locale === "zh" ? "后端 · AI 工程" : "Backend · AI Engineering"}</span>
-        </div>
-
+      <section className={styles.resume} aria-label={locale === "zh" ? "个人简历" : "Resume"}>
         <RevealOnScroll className={styles.reveal}>
           <ResumeSection title={resume.educationTitle}>
             {resume.education.map((item) => (
