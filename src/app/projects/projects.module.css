@@ -329,15 +329,14 @@
 }
 
 .directoryGrid a {
-  color: var(--color-text-soft);
+  color: var(--color-text-muted);
   text-decoration: none;
-  transition: color 160ms ease, text-shadow 160ms ease;
+  transition: color 160ms ease;
 }
 
 .directoryGrid a:hover,
 .directoryGrid a:focus-visible {
   color: var(--color-text);
-  text-shadow: 0 0 0.65px currentColor;
 }
 
 .updateList {
@@ -399,19 +398,18 @@
 
 .pager a {
   align-items: center;
-  color: var(--color-text-soft);
+  color: var(--color-text-muted);
   display: flex;
   gap: 0.55rem;
   line-height: 1.4;
   padding: 0.45rem 0;
   text-decoration: none;
-  transition: color 160ms ease, text-shadow 160ms ease;
+  transition: color 160ms ease;
 }
 
 .pager a:hover,
 .pager a:focus-visible {
   color: var(--color-text);
-  text-shadow: 0 0 0.65px currentColor;
 }
 
 .pagerNext {
