@@ -112,14 +112,13 @@ const RESUME = {
       {
         company: "AI Rudder",
         role: "Agent 开发实习生",
-        period: "2026.6 — 2026.8",
-        intro: "负责内部 CALL-E Agent 平台功能开发，覆盖外呼与内呼智能体。",
-        techStack: "技术栈：Python、FastAPI、AsyncIO、OpenAI Agents SDK、PostgreSQL、SQLAlchemy、Redis、RabbitMQ、Taskiq、Kafka、SSE、Pydantic",
+        period: "2026.6 — 2026.9",
+        intro: "参与 CALL-E goal-oriented 语音外呼 Agent 运行时的核心链路设计与开发（核心代码 120+ Python 模块、35 份版本化 spec、33 个数据库 migration），系统服务 1w+ 线上用户。",
+        techStack: "技术栈：Python、FastAPI、SSE、OpenAI Agents SDK、PostgreSQL（SQLAlchemy AsyncIO / asyncpg / Alembic）、Redis、RabbitMQ、Taskiq、Pydantic",
         achievements: [
-          "**异步 Agent 运行架构：**拆分 API 接入、任务编排、后台执行与第三方适配层；基于 Taskiq + RabbitMQ 将耗时任务投递至 Worker，Redis 承担结果存储、分布式锁与调度器选主，支持长任务异步运行与多实例部署。",
-          "**持久化与数据建模：**基于 PostgreSQL + Async SQLAlchemy 建模任务快照、追加式事件、调度状态与执行记录；高频查询字段关系化并建立组合索引，动态模型数据采用 Pydantic + JSONB 存储，兼顾查询性能、Schema 演进与任务恢复。",
-          "**实时事件处理链路：**使用 FastStream 消费 Kafka 事件，经结构化校验与异常 NACK 后写入 Redis Streams；通过 Cursor、TTL 与有界队列支持实时读取与短期回放，将关键结果投影至 PostgreSQL，并经 SSE 推送至客户端。",
-          "**并发一致性与 Agent 安全：**结合数据库行锁、状态版本、事件游标、Lease 与幂等键实现单任务单写者机制，事务化完成状态更新、事件追加与游标推进；通过强类型 Tool Calling 与角色级工具白名单隔离 LLM 推理与数据写入，**防止重复执行、过期回写及越权操作**。"
+          "**多角色 Agent 边界与副作用确认门：**MainAgent 持有用户会话（单 Foreground Turn 串行化），GoalAgent 经独立 goal-scoped session 持有长任务生命周期，两者仅通过 Runtime 的 typed event 通信，禁用 SDK handoff / agent-as-tool；外呼等真实副作用 100% 经结构化 Goal Confirmation 确认门（spec 级不变量），授权主体由服务端持有并重新校验，杜绝模型伪造授权。",
+          "**Goal → RunSpec → Run 持久化执行模型：**Goal 持有不可变、版本单调递增的 RunSpec，Run 钉死精确版本与输入快照；终态 Goal Status 与 Goal Result（summary + evidence_refs）在同一 PostgreSQL 事务（Durable Boundary）原子提交，commit 后才经 Redis Streams 做 SSE 实时投递，支撑 1w+ 用户的会话与结果投递，丢失或重复不影响正确性。",
+          "**Execution Lease fencing 与 Provider Reconciliation：**Taskiq worker 以带单调递增 fencing epoch 的 Execution Lease 认领任务，durable write 前精确比对 lease 身份，隔离僵尸 worker；外呼提交结果不确定时按稳定 provider task name 做 Provider Reconciliation 而非盲目重拨，worker 故障恢复路径的重复外呼降为 0（机制保证）。"
         ]
       },
       {
@@ -148,14 +147,13 @@ const RESUME = {
       {
         company: "AI Rudder",
         role: "Agent Engineering Intern",
-        period: "Jun 2026 — Aug 2026",
-        intro: "Developed features for the internal CALL-E Agent platform, covering outbound and inbound voice agents.",
-        techStack: "Stack: Python, FastAPI, AsyncIO, OpenAI Agents SDK, PostgreSQL, SQLAlchemy, Redis, RabbitMQ, Taskiq, Kafka, SSE, Pydantic",
+        period: "Jun 2026 — Sep 2026",
+        intro: "Contributed to the core execution paths of the CALL-E goal-oriented outbound voice Agent runtime (120+ Python modules, 35 versioned specs, 33 database migrations), serving 10k+ online users.",
+        techStack: "Stack: Python, FastAPI, SSE, OpenAI Agents SDK, PostgreSQL (SQLAlchemy AsyncIO / asyncpg / Alembic), Redis, RabbitMQ, Taskiq, Pydantic",
         achievements: [
-          "**Async Agent runtime:** split the system into API, orchestration, background execution, and third-party adapter layers. Long-running tasks are dispatched to workers via Taskiq + RabbitMQ, while Redis handles result storage, distributed locks, and scheduler leader election, enabling asynchronous long tasks and multi-instance deployment.",
-          "**Persistence and data modeling:** modeled task snapshots, append-only events, scheduling state, and execution records with PostgreSQL + async SQLAlchemy. Hot query fields are relational with composite indexes, while dynamic payloads use Pydantic-validated JSONB, balancing query performance, schema evolution, and task recovery.",
-          "**Real-time event pipeline:** consumed Kafka events with FastStream, applied schema validation with NACK on failures, and wrote them to Redis Streams. Cursors, TTL, and bounded queues support real-time reads and short-term replay; key results are projected to PostgreSQL and pushed to clients over SSE.",
-          "**Concurrency consistency and Agent safety:** combined row locks, state versions, event cursors, leases, and idempotency keys into a single-writer-per-task mechanism, committing status updates, event appends, and cursor advances in one transaction. Strongly-typed tool calling and role-based tool whitelists isolate LLM reasoning from data writes, **preventing duplicate execution, stale writes, and unauthorized operations**."
+          "**Multi-role Agent boundaries and side-effect gates:** MainAgent owns the user chat session (serialized to a single Foreground Turn), while GoalAgent owns long-task lifecycles through an independent goal-scoped session; the two communicate only through Runtime typed events — no SDK handoff or agent-as-tool calls. 100% of real side effects such as outbound calls pass a structured Goal Confirmation gate (a spec-level invariant), with the authorization subject held and re-validated server-side, preventing model-forged authorization.",
+          "**Goal → RunSpec → Run durable execution model:** Goals own immutable, monotonically versioned RunSpecs, and each Run is pinned to an exact version and input snapshot. The terminal Goal Status and Goal Result (summary + evidence_refs) commit atomically in one PostgreSQL transaction (the Durable Boundary); SSE live delivery over Redis Streams happens only after commit, so lost or duplicated delivery never affects correctness for 10k+ users.",
+          "**Execution Lease fencing and Provider Reconciliation:** Taskiq workers claim work with leases carrying monotonically increasing fencing epochs, verified exactly on every durable write to fence off zombie workers. Uncertain call submissions are resolved through Provider Reconciliation against a stable provider task name instead of blind redial, driving duplicate calls on the worker-failure recovery path to zero (guaranteed by design)."
         ]
       },
       {
