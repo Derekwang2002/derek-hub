@@ -62,7 +62,9 @@ function ResourceLink({ locale, resource }: { locale: "en" | "zh"; resource: Res
     return (
       <a className={styles.resourceLink} href={resource.href}>
         {resource.title}
-        <span aria-hidden="true" className={styles.demoMark}>↗</span>
+        <svg aria-hidden="true" className={styles.demoMark} fill="none" viewBox="0 0 24 24">
+          <path d="M7 17 17 7M8 7h9v9" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+        </svg>
       </a>
     );
   }
