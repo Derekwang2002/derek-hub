@@ -62,6 +62,7 @@ function ResourceLink({ locale, resource }: { locale: "en" | "zh"; resource: Res
     return (
       <a className={styles.resourceLink} href={resource.href}>
         {resource.title}
+        <span aria-hidden="true" className={styles.demoMark}>↗</span>
       </a>
     );
   }

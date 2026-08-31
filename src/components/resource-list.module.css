@@ -51,6 +51,15 @@
   position: absolute;
 }
 
+.demoMark {
+  color: var(--color-text-faint);
+  font-size: 0.68em;
+  font-weight: 400;
+  margin-left: 0.22rem;
+  position: relative;
+  top: -0.12em;
+}
+
 .description {
   color: var(--color-text-muted);
   font-size: 0.9rem;
