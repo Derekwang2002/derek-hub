@@ -192,11 +192,24 @@
 .mobileNav a[aria-current="page"] {
   background: var(--color-surface-muted);
   border-radius: 0.35rem;
-  box-shadow: inset 2px 0 0 var(--color-focus);
   color: var(--color-text);
   font-weight: 700;
-  padding-left: 0.65rem;
+  padding-left: 0.75rem;
+  position: relative;
   text-decoration: none;
+}
+
+.desktopNav a[aria-current="page"]::before,
+.mobileNav a[aria-current="page"]::before {
+  background: var(--color-focus);
+  border-radius: 2px;
+  content: "";
+  height: 55%;
+  left: 0.35rem;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
 }
 
 .mobileNav {
