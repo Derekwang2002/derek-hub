@@ -191,6 +191,7 @@
 .desktopNav a[aria-current="page"],
 .mobileNav a[aria-current="page"] {
   background: var(--color-surface-muted);
+  border-radius: 0.35rem;
   box-shadow: inset 2px 0 0 var(--color-focus);
   color: var(--color-text);
   font-weight: 700;
