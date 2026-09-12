@@ -6,6 +6,7 @@ import { ProjectPagerMarkup } from "../src/components/project-pager-markup";
 import {
   getAllProjects,
   getProject,
+  getProjectDefinitions,
   getProjectItem,
   getProjectPager
 } from "./projects";
@@ -46,7 +47,58 @@ test("loads the CALL-E tree with exact locale parity", async () => {
 });
 
 test("Project index exposes only public Projects", async () => {
-  assert.deepEqual((await getAllProjects("en")).map((project) => project.slug), ["call-e"]);
+  assert.deepEqual((await getAllProjects("en")).map((project) => project.slug), [
+    "csci678",
+    "ai-intelligence",
+    "derek-hub",
+    "call-e"
+  ]);
+});
+
+test("renders the complete pager loop for every Project in both locales", async () => {
+  for (const definition of getProjectDefinitions()) {
+    if (definition.status === "draft") continue;
+    for (const locale of ["en", "zh"] as const) {
+      const project = await getProject(definition.slug, locale);
+      assert.ok(project);
+      const prefix = locale === "zh" ? "/zh" : "";
+      const itemSlugs = project.sections.flatMap((section) =>
+        section.items.map((item) => item.slug)
+      );
+      const hrefs = [
+        `${prefix}/projects/${definition.slug}`,
+        ...itemSlugs.map((slug) => `${prefix}/projects/${definition.slug}/${slug}`)
+      ];
+      const slugs: Array<string | null> = [null, ...itemSlugs];
+
+      for (let index = 0; index < slugs.length; index += 1) {
+        const pager = await getProjectPager(definition.slug, slugs[index], locale);
+        const html = renderToStaticMarkup(
+          <ProjectPagerMarkup
+            classes={{ pager: "pager", next: "next", previous: "previous" }}
+            locale={locale}
+            pager={pager}
+          />
+        );
+        const previousHref = index > 0 ? hrefs[index - 1] : null;
+        const nextHref = index < hrefs.length - 1 ? hrefs[index + 1] : null;
+
+        if (previousHref) {
+          assert.match(html, new RegExp(`href="${escapeRegExp(previousHref)}"`));
+          assert.match(html, /rel="prev"/);
+        } else {
+          assert.doesNotMatch(html, /rel="prev"/);
+        }
+
+        if (nextHref) {
+          assert.match(html, new RegExp(`href="${escapeRegExp(nextHref)}"`));
+          assert.match(html, /rel="next"/);
+        } else {
+          assert.doesNotMatch(html, /rel="next"/);
+        }
+      }
+    }
+  }
 });
 
 test("renders the complete English and Chinese pager loop with actual href values", async () => {

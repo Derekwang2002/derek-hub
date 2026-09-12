@@ -117,5 +117,76 @@ export const projectDefinitions: ProjectDefinition[] = [
         }
       }
     ]
+  },
+  {
+    slug: "ai-intelligence",
+    status: "active",
+    overview: {
+      updated: "2026-09-01",
+      reviewedRevision: "00abc421"
+    },
+    sections: [
+      { slug: "methodology", label: { en: "Methodology", zh: "方法论" } }
+    ],
+    items: [
+      {
+        slug: "incremental-radar",
+        sectionSlug: "methodology",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-01",
+        reviewedRevision: "00abc421"
+      }
+    ]
+  },
+  {
+    slug: "csci678",
+    status: "active",
+    overview: {
+      updated: "2026-09-11",
+      reviewedRevision: "lecture3-preview-report@2026-09-11"
+    },
+    sections: [
+      { slug: "lecture-notes", label: { en: "Lecture Notes", zh: "课程笔记" } }
+    ],
+    items: [
+      {
+        slug: "lecture-3-preview",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-11",
+        reviewedRevision: "lecture3-preview-report@2026-09-11"
+      },
+      {
+        slug: "lecture-3-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-11",
+        reviewedRevision: "lecture3-full-translation@2026-09-11"
+      }
+    ]
+  },
+  {
+    slug: "derek-hub",
+    status: "active",
+    overview: {
+      updated: "2026-09-01",
+      reviewedRevision: "2fdf7d7c"
+    },
+    sections: [
+      { slug: "architecture", label: { en: "Architecture", zh: "架构" } }
+    ],
+    items: [
+      {
+        slug: "content-pipeline",
+        sectionSlug: "architecture",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-01",
+        reviewedRevision: "2fdf7d7c"
+      }
+    ]
   }
 ];
