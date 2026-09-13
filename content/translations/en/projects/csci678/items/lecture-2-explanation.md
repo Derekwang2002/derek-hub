@@ -30,6 +30,7 @@ What ultimately "closes the loop" in this lecture is the learnability condition 
 ### 1.1 Risk and the value of the game
 
 Let $S=(z_1,\ldots,z_n)\overset{\rm iid}{\sim}P^n$, and define
+
 \[
 L_P(f)=\mathbb E_{z\sim P}\ell(f,z),\qquad
 \widehat L_S(f)=\frac1n\sum_{t=1}^n\ell(f,z_t).
@@ -37,6 +38,7 @@ L_P(f)=\mathbb E_{z\sim P}\ell(f,z),\qquad
 \]
 
 The value of the learning game is
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 =\inf_A\sup_P\left[
@@ -46,12 +48,14 @@ The value of the learning game is
 where the algorithm may have internal randomness, and the expectation includes it by default.
 
 ERM chooses
+
 \[
 \widehat f_{\rm ERM}\in\arg\min_{f\in\mathcal F}\widehat L_S(f).
 \tag{3}
 \]
 
 Because the infimum over all algorithms is no larger than the worst-case error of any specific algorithm,
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sup_P\left[
@@ -64,6 +68,7 @@ This is only an upper bound; it does not claim that ERM is already known to be o
 ### 1.2 What if the minimum is not attained
 
 Even when the argmin does not exist, one can choose an approximate ERM:
+
 \[
 \widehat L_S(\widetilde f)
 \le\inf_f\widehat L_S(f)+\xi_n.
@@ -74,12 +79,14 @@ The risk bounds below then only need an additional $\mathbb E\xi_n$. When the op
 ### 1.3 Regularization and constrained classes: completing the argument and stating its limits
 
 Suppose $f_\lambda$ minimizes
+
 \[
 \widehat L_S(f)+\lambda\Psi(f),\qquad\lambda>0.
 \tag{6}
 \]
 Let $c=\Psi(f_\lambda)$. If there is a $g$ with $\Psi(g)\le c$ and
 $\widehat L_S(g)<\widehat L_S(f_\lambda)$, then
+
 \[
 \widehat L_S(g)+\lambda\Psi(g)
 <\widehat L_S(f_\lambda)+\lambda\Psi(f_\lambda),
@@ -93,6 +100,7 @@ This proves "given a penalized optimum, one can find a constraint radius that ex
 ### 2.1 The full derivation from ERM to a one-sided uniform deviation
 
 First assume $f^*\in\arg\min_fL_P(f)$. It may depend on $P$, but not on the current sample. Then
+
 \[
 \begin{aligned}
 \mathbb EL_P(\widehat f_{\rm ERM})-L_P(f^*)
@@ -106,6 +114,7 @@ First assume $f^*\in\arg\min_fL_P(f)$. It may depend on $P$, but not on the curr
 The first equality uses unbiasedness, $\mathbb E\widehat L_S(f^*)=L_P(f^*)$; the second step uses the empirical optimality of ERM, since subtracting a smaller empirical loss makes the difference larger; the third step relaxes the single data-selected function to the whole class.
 
 Therefore
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sup_P\mathbb E\sup_f[L_P(f)-\widehat L_S(f)].
@@ -119,6 +128,7 @@ comes from a different derivation, and its constant cannot be mixed arbitrarily 
 ### 2.2 The empirical process is a whole family of random variables
 
 For each fixed $f$, let
+
 \[
 X_f(S)=L_P(f)-\widehat L_S(f).
 \tag{9}
@@ -127,6 +137,7 @@ It has mean zero. Assuming the loss is integrable, the law of large numbers says
 $X_f(S)\to0$. But the algorithm selects the function based on the sample, so one must control the maximal deviation of the whole family simultaneously.
 
 The expected one-sided uniform convergence condition used in the slides is
+
 \[
 \limsup_{n\to\infty}\sup_P\mathbb E_S\sup_{f\in\mathcal F}X_f(S)=0.
 \tag{10}
@@ -141,6 +152,7 @@ Let the input be uniform on $[0,1]$, and let the true label be constantly $+1$. 
 Any fixed function is correct on only finitely many inputs; those points have probability zero, so the population 0-1 risk is 1. For any fixed function, the empirical risk also tends to 1 almost surely.
 
 But given the current training inputs, the class contains a function that predicts $+1$ at every training point, so the training loss is zero while the population risk is still 1:
+
 \[
 \sup_{f\in\mathcal F}[L_P(f)-\widehat L_S(f)]=1.
 \tag{11}
@@ -151,6 +163,7 @@ This example shows specifically that pointwise convergence does not imply unifor
 ## 3. Rademacher complexity: measuring only how well the class aligns with random signs
 
 For a function class $\mathcal H\subseteq\mathbb R^{\mathcal Z}$, with the sample locations fixed, define
+
 \[
 \widehat{\mathcal R}_S(\mathcal H)
 =\frac1n\mathbb E_{\epsilon_{1:n}}
@@ -160,6 +173,7 @@ For a function class $\mathcal H\subseteq\mathbb R^{\mathcal Z}$, with the sampl
 \tag{12}
 \]
 where the signs are mutually independent. The unconditional version is
+
 \[
 \mathcal R_{P,n}(\mathcal H)
 =\mathbb E_{S\sim P^n}\widehat{\mathcal R}_S(\mathcal H).
@@ -182,12 +196,14 @@ $\mathbb E\sup_h|\sum_t\epsilon_th(z_t)|/n$, a singleton class would generally n
 ### 4.1 Defining the loss class
 
 Turn predictors into functions on the sample space:
+
 \[
 \ell(\mathcal F)=\{h_f:h_f(z)=\ell(f,z),\ f\in\mathcal F\}.
 \tag{14}
 \]
 
 We want to prove
+
 \[
 \boxed{\mathbb E_S\sup_f[L_P(f)-\widehat L_S(f)]
 \le2\mathcal R_{P,n}(\ell(\mathcal F)).}
@@ -198,6 +214,7 @@ We want to prove
 
 Let $S'=(z'_1,\ldots,z'_n)$ be an independent $P^n$ sample. Since
 $L_P(f)=\mathbb E_{S'}n^{-1}\sum_t\ell(f,z'_t)$,
+
 \[
 \begin{aligned}
 \mathbb E_S\sup_f[L_P(f)-\widehat L_S(f)]
@@ -215,6 +232,7 @@ $\sup_f\mathbb E X_f\le\mathbb E\sup_fX_f$.
 ### 4.3 Why random signs can appear out of nowhere
 
 Fix any sign sequence. When $\epsilon_t=-1$, swap $(z_t,z'_t)$; when it is $+1$, do not swap. Each pair of samples has joint distribution $P\times P$, and swapping does not change it; the pairs remain independent of one another. Therefore
+
 \[
 \mathbb E_{S,S'}\sup_f\sum_t[\ell(f,z'_t)-\ell(f,z_t)]
 =\mathbb E_{S,S',\epsilon}\sup_f
@@ -243,12 +261,14 @@ The resulting complexity depends only on the values of the functions on the samp
 ## 5. Lemma 1: why binary 0-1 loss contributes exactly a factor of $1/2$
 
 When $y,f(x)\in\{-1,+1\}$, we have the identity
+
 \[
 \mathbf1\{f(x)\ne y\}=\frac{1-yf(x)}2.
 \tag{19}
 \]
 
 Indeed, $yf(x)=1$ when the signs agree and $-1$ when they differ, giving losses 0 and 1 respectively. After fixing the labeled sample,
+
 \[
 \begin{aligned}
 \widehat{\mathcal R}_S(\ell(\mathcal F))
@@ -263,6 +283,7 @@ Indeed, $yf(x)=1$ when the signs agree and $-1$ when they differ, giving losses 
 
 The first term is zero. Since $y_t$ is fixed and equals $\pm1$, the signs
 $-\epsilon_ty_t$ are still independent and equally likely to be $\pm1$. Taking the expectation over the sample again,
+
 \[
 \mathcal R_{P,n}(\ell(\mathcal F))
 =\tfrac12\mathcal R_{P_X,n}(\mathcal F).
@@ -276,12 +297,14 @@ The right-hand side actually depends only on the input marginal $P_X$. The slide
 ### 6.1 Conditions and goal
 
 Suppose $\ell(f,(x,y))=\widetilde\ell(f(x),y)$, and for all admissible predictions and labels,
+
 \[
 |\widetilde\ell(u,y)-\widetilde\ell(v,y)|\le G|u-v|.
 \tag{22}
 \]
 
 We want to prove
+
 \[
 \widehat{\mathcal R}_S(\ell(\mathcal F))
 \le G\widehat{\mathcal R}_{x_{1:n}}(\mathcal F).
@@ -291,6 +314,7 @@ We want to prove
 ### 6.2 Replace only the last coordinate first
 
 Fix $\epsilon_1,\ldots,\epsilon_{n-1}$, and write
+
 \[
 A_f=\sum_{t=1}^{n-1}\epsilon_t\widetilde\ell(f(x_t),y_t),
 \qquad \phi(u)=\widetilde\ell(u,y_n).
@@ -298,6 +322,7 @@ A_f=\sum_{t=1}^{n-1}\epsilon_t\widetilde\ell(f(x_t),y_t),
 \]
 
 Average over the two possible values of the last sign:
+
 \[
 \begin{aligned}
 \mathbb E_{\epsilon_n}\sup_f[A_f+\epsilon_n\phi(f(x_n))]
@@ -315,6 +340,7 @@ The second step uses that the sum of two suprema with independently chosen funct
 
 $A_f+A_g$ is unchanged when $f,g$ are swapped, while
 $f(x_n)-g(x_n)$ changes sign. So every difference with positive absolute value can be turned into a positive difference without the absolute value by swapping the order:
+
 \[
 \sup_{f,g}[A_f+A_g+G|f(x_n)-g(x_n)|]
 =\sup_{f,g}[A_f+A_g+G(f(x_n)-g(x_n))].
@@ -322,6 +348,7 @@ $f(x_n)-g(x_n)$ changes sign. So every difference with positive absolute value c
 \]
 
 Split the supremum back apart:
+
 \[
 \begin{aligned}
 \frac12\sup_{f,g}[A_f+A_g+Gf(x_n)-Gg(x_n)]
@@ -333,6 +360,7 @@ Split the supremum back apart:
 \]
 
 Thus the nonlinear loss at the last coordinate is replaced by $Gf(x_n)$ without making the complexity smaller. Taking expectations over the earlier signs and replacing coordinates $n-1,\ldots,1$ one by one gives
+
 \[
 \mathbb E\sup_f\sum_t\epsilon_t\widetilde\ell(f(x_t),y_t)
 \le\mathbb E\sup_f\sum_t\epsilon_tGf(x_t).
@@ -347,6 +375,7 @@ $\sum_{t<n}\epsilon_t[\widetilde\ell(f(x_t),y_t)+\widetilde\ell(g(x_t),y_t)]$; t
 
 The slides use the half-square loss
 $\widetilde\ell(u,y)=\tfrac12(u-y)^2$. For $u,v,y\in[-1,1]$:
+
 \[
 \begin{aligned}
 |\widetilde\ell(u,y)-\widetilde\ell(v,y)|
@@ -360,6 +389,7 @@ $\widetilde\ell(u,y)=\tfrac12(u-y)^2$. For $u,v,y\in[-1,1]$:
 So $G=2$. Without the leading $1/2$ in the loss, $G=4$; if predictions and labels can be arbitrary real numbers, there is no such global constant. The square loss of Lecture 1 and the half-square loss of this lecture must not be mixed up when it comes to constants.
 
 At this point, taking $G=1/2$ for classification and a legitimate Lipschitz constant for regression, we have
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le2G\sup_{P_X}\mathcal R_{P_X,n}(\mathcal F).
@@ -371,6 +401,7 @@ At this point, taking $G=1/2$ for classification and a legitimate Lipschitz cons
 ### 7.1 Sub-Gaussian does not require the variable to actually be Gaussian
 
 A zero-mean random variable $U$ satisfying
+
 \[
 \mathbb E e^{\lambda U}\le e^{\sigma^2\lambda^2/2}
 \quad\text{for all }\lambda\in\mathbb R,
@@ -379,6 +410,7 @@ A zero-mean random variable $U$ satisfying
 is called $\sigma$-sub-Gaussian. Here $\sigma^2$ is a variance proxy for the exponential moment and need not equal the actual variance.
 
 Control of the exponential moment converts into tail control: for $\lambda>0$, Markov's inequality gives
+
 \[
 \Pr(U\ge t)\le e^{-\lambda t}\mathbb E e^{\lambda U}
 \le e^{-\lambda t+\sigma^2\lambda^2/2}.
@@ -390,6 +422,7 @@ $\Pr(U\ge t)\le e^{-t^2/(2\sigma^2)}$. This explains why "sub-Gaussian" means Ga
 ### 7.2 A complete proof of Hoeffding's lemma
 
 If $\mathbb EU=0$ and $U\in[a,b]$, we want to prove
+
 \[
 \mathbb E e^{\lambda U}
 \le \exp\left(\frac{\lambda^2(b-a)^2}{8}\right),
@@ -398,12 +431,14 @@ If $\mathbb EU=0$ and $U\in[a,b]$, we want to prove
 i.e., $U$ is $(b-a)/2$-sub-Gaussian.
 
 Let $K(\lambda)=\log\mathbb E e^{\lambda U}$. Since $U$ is bounded, we can differentiate under the expectation. Define the exponentially tilted expectation
+
 \[
 \mathbb E_\lambda[g(U)]
 =\frac{\mathbb E[g(U)e^{\lambda U}]}{\mathbb E e^{\lambda U}}.
 \tag{34}
 \]
 Differentiating $K$ twice directly:
+
 \[
 K'(\lambda)=\mathbb E_\lambda U,\qquad
 K''(\lambda)=\mathbb E_\lambda U^2-(\mathbb E_\lambda U)^2
@@ -414,6 +449,7 @@ K''(\lambda)=\mathbb E_\lambda U^2-(\mathbb E_\lambda U)^2
 For any variable supported on $[a,b]$ with mean $\mu$,
 $(U-a)(b-U)\ge0$ gives
 $\mathbb EU^2\le(a+b)\mu-ab$, and hence
+
 \[
 \operatorname{Var}(U)
 \le(b-\mu)(\mu-a)
@@ -424,6 +460,7 @@ The last step says the product of two nonnegative numbers with a fixed sum is ma
 
 The tilted distribution is still supported on $[a,b]$, so $K''(\lambda)$ also satisfies (36). Since
 $K(0)=0,K'(0)=\mathbb EU=0$, Taylor's formula with integral remainder gives
+
 \[
 K(\lambda)=\lambda^2\int_0^1(1-s)K''(s\lambda)\,ds
 \le\frac{\lambda^2(b-a)^2}{8}.
@@ -434,6 +471,7 @@ This form works for positive and negative $\lambda$ alike. Exponentiating gives 
 ## 8. Lemma 3: why the maximal inequality depends only on $\ln M$
 
 Let $U_1,\ldots,U_M$ all be $\sigma$-sub-Gaussian variables; they are not required to be independent. For any $\lambda>0$:
+
 \[
 \begin{aligned}
 \exp(\lambda\mathbb E\max_iU_i)
@@ -446,6 +484,7 @@ Let $U_1,\ldots,U_M$ all be $\sigma$-sub-Gaussian variables; they are not requir
 \]
 
 The first step is Jensen's inequality for the convex exponential; the third step says a maximum of nonnegative numbers does not exceed their sum. Take logarithms and divide by $\lambda$:
+
 \[
 \mathbb E\max_iU_i\le\frac{\ln M}{\lambda}+\frac{\sigma^2\lambda}{2}.
 \tag{39}
@@ -454,6 +493,7 @@ The first step is Jensen's inequality for the convex exponential; the third step
 For $M>1,\sigma>0$, differentiate the right-hand side and set
 $-\ln M/\lambda^2+\sigma^2/2=0$, giving
 $\lambda_*=\sqrt{2\ln M}/\sigma$. Substituting back,
+
 \[
 \boxed{\mathbb E\max_iU_i\le\sigma\sqrt{2\ln M}.}
 \tag{40}
@@ -466,6 +506,7 @@ When $M=1$ the left-hand side is zero; when $\sigma=0$ the variables degenerate 
 ### 9.1 Each function corresponds to a random signed sum
 
 Fix the inputs $x_{1:n}$. For a finite class $\mathcal F$, define
+
 \[
 U_f=\sum_{t=1}^n\epsilon_tf(x_t),\qquad
 \sigma=\max_{f\in\mathcal F}\sqrt{\sum_{t=1}^nf(x_t)^2}.
@@ -474,6 +515,7 @@ U_f=\sum_{t=1}^n\epsilon_tf(x_t),\qquad
 
 For fixed $f$, the terms are independent with mean zero. Each term lies in
 $[-|f(x_t)|,|f(x_t)|]$, so by Hoeffding's lemma it is $|f(x_t)|$-sub-Gaussian. Therefore
+
 \[
 \begin{aligned}
 \mathbb E e^{\lambda U_f}
@@ -490,6 +532,7 @@ The first step is where independence is truly needed: it is the independence of 
 ### 9.2 Applying the maximal lemma and dividing by the sample size
 
 By (40):
+
 \[
 \boxed{
 \widehat{\mathcal R}_{x_{1:n}}(\mathcal F)
@@ -500,6 +543,7 @@ By (40):
 \]
 
 If $|f(x)|\le C$, then $\max_f\sum_tf(x_t)^2\le nC^2$, so
+
 \[
 \mathcal R_{P_X,n}(\mathcal F)
 \le C\sqrt{\frac{2\ln|\mathcal F|}{n}}.
@@ -507,6 +551,7 @@ If $|f(x)|\le C$, then $\max_f\sum_tf(x_t)^2\le nC^2$, so
 \]
 
 Combining with (30):
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le2GC\sqrt{\frac{2\ln|\mathcal F|}{n}}.
@@ -514,6 +559,7 @@ Combining with (30):
 \]
 
 For a fixed finite class with finite $G,C$, the right-hand side tends to zero. If we want the upper bound not to exceed $\varepsilon$, a sufficient condition is
+
 \[
 n\ge \frac{8G^2C^2\ln|\mathcal F|}{\varepsilon^2}.
 \tag{46}
@@ -528,6 +574,7 @@ $X_f=L_P(f)-\widehat L_S(f)$ is $B/(2\sqrt n)$-sub-Gaussian. Proof: each centere
 $L_P(f)-\ell(f,z_t)$ has mean zero and range length $B$; summing the independent terms and dividing by $n$ turns the squared exponential-moment parameter into $n(B/2)^2/n^2$.
 
 The maximal lemma then gives directly
+
 \[
 \mathbb E\max_fX_f
 \le\frac B{2\sqrt n}\sqrt{2\ln|\mathcal F|}.
@@ -541,6 +588,7 @@ So finite classes can indeed skip symmetrization and still get a guarantee. In a
 ### 10.1 Sample projections turn "infinitely many functions" into "finitely many behaviors"
 
 For $\mathcal F\subseteq\{-1,+1\}^{\mathcal X}$, define
+
 \[
 F_S=\mathcal F|_{x_{1:n}}
 =\{(f(x_1),\ldots,f(x_n)):f\in\mathcal F\}
@@ -549,6 +597,7 @@ F_S=\mathcal F|_{x_{1:n}}
 \]
 
 Although $\mathcal F$ may be uncountable, $|F_S|\le2^n$. And
+
 \[
 \widehat{\mathcal R}_{x_{1:n}}(\mathcal F)
 =\frac1n\mathbb E_\epsilon
@@ -559,6 +608,7 @@ Although $\mathcal F$ may be uncountable, $|F_S|\le2^n$. And
 This equality holds because the objective only reads the $f(x_t)$; functions with the same projection contribute exactly the same.
 
 The growth function is defined as the maximal number of behaviors over all sample locations:
+
 \[
 \Pi_{\mathcal F}(n)=\max_{x_{1:n}}|F_S|.
 \tag{50}
@@ -569,6 +619,7 @@ Since the number of possibilities is a finite integer, the maximum can be unders
 ### 10.2 The complexity bound and the failure of the trivial bound
 
 Every projected vector has squared norm $n$, so Massart's lemma gives
+
 \[
 \widehat{\mathcal R}_S(\mathcal F)
 \le\sqrt{\frac{2\ln|F_S|}{n}}
@@ -577,6 +628,7 @@ Every projected vector has squared norm $n$, so Massart's lemma gives
 \]
 
 In binary classification $2G=1$, hence
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sqrt{\frac{2\ln\Pi_{\mathcal F}(n)}{n}}.
@@ -597,6 +649,7 @@ Symmetrization replaces the population mean by a sample difference and then spli
 ### 11.1 Why the single-threshold class has exactly $n+1$ labelings
 
 The slides define
+
 \[
 f_\theta(x)=
 \begin{cases}
@@ -609,6 +662,7 @@ f_\theta(x)=
 Sort the distinct samples $x_1<\cdots<x_n$. Positive labels can only form a left prefix: the first $k$ are $+1$ and the rest are $-1$, for $k=0,\ldots,n$.
 
 Every $k$ is realizable: for $k=0$ take $\theta<x_1$; for $k=n$ take $\theta\ge x_n$; for the other $k$ take $x_k\le\theta<x_{k+1}$. Therefore
+
 \[
 \Pi_{\rm threshold}(n)=n+1,\qquad
 \mathcal V^{\rm iid}\le\sqrt{2\ln(n+1)/n}.
@@ -620,6 +674,7 @@ A proof of an "exact growth function" requires both an upper and a lower bound; 
 ### 11.2 Why the interval class gives $\binom{n+1}{2}+1$
 
 Predict $+1$ inside the interval and $-1$ outside:
+
 \[
 f_{\theta_1,\theta_2}(x)
 =
@@ -633,12 +688,14 @@ f_{\theta_1,\theta_2}(x)
 
 A nonempty set of positive labels must be a contiguous block $x_i,\ldots,x_j$ with
 $1\le i\le j\le n$. The total number of block lengths and positions is
+
 \[
 \sum_{i=1}^n(n-i+1)=\frac{n(n+1)}2=\binom{n+1}{2}.
 \tag{56}
 \]
 
 Every contiguous block is realizable by an interval; together with the all-negative labeling realized by placing the interval outside all the samples, we get
+
 \[
 \Pi_{\rm interval}(n)=\binom{n+1}{2}+1.
 \tag{57}
@@ -651,6 +708,7 @@ Then (52) gives $O(\sqrt{\ln(n+1)/n})$. One can also count by picking the two ga
 ### 12.1 The quantifiers in "shattering"
 
 A set of $m$ inputs is shattered if all $2^m$ label vectors can be realized by functions in the class:
+
 \[
 \exists x_1,\ldots,x_m,\quad
 \forall s\in\{-1,+1\}^m,\quad
@@ -659,6 +717,7 @@ A set of $m$ inputs is shattered if all $2^m$ label vectors can be realized by f
 \]
 
 The VC dimension is the supremum of the sizes of shattered point sets:
+
 \[
 \operatorname{VCdim}(\mathcal F)
 =\sup\{m:\Pi_{\mathcal F}(m)=2^m\}.
@@ -690,6 +749,7 @@ These examples show that VC dimension measures the number of points whose labels
 ## 13. Proposition 6: affine linear classifiers have VC dimension equal to the input dimension plus one
 
 To avoid clashing with the VC-dimension notation, here $p$ denotes the dimension of the input space. Consider
+
 \[
 \mathcal F_{\rm lin}
 =\{x\mapsto\operatorname{sign}(\langle\theta,x\rangle+b):
@@ -702,6 +762,7 @@ with the slide convention $\operatorname{sign}(u)=+1$ when $u\ge0$ and $-1$ othe
 
 Take the $p+1$ points $x_0=0,x_i=e_i\ (i=1,\ldots,p)$. For arbitrary labels
 $s_0,\ldots,s_p\in\{-1,+1\}$, let
+
 \[
 b=s_0,\qquad\theta_i=s_i-s_0.
 \tag{61}
@@ -709,6 +770,7 @@ b=s_0,\qquad\theta_i=s_i-s_0.
 Then
 $\langle\theta,x_0\rangle+b=s_0$ and
 $\langle\theta,e_i\rangle+b=s_i$. All labels are realized strictly, so
+
 \[
 \operatorname{VCdim}(\mathcal F_{\rm lin})\ge p+1.
 \tag{62}
@@ -720,17 +782,20 @@ This does not say "every set of $p+1$ points can be shattered"; it says there ex
 
 Take any $p+2$ points and augment them to
 $\widetilde x_i=(x_i,1)\in\mathbb R^{p+1}$. Linear dependence guarantees coefficients $a_i$, not all zero, with
+
 \[
 \sum_i a_ix_i=0,\qquad\sum_i a_i=0.
 \tag{63}
 \]
 
 Since the coefficients sum to zero, the nonzero coefficients include both positive and negative ones. Label the positive-coefficient points $+1$, the negative-coefficient points $-1$, and the zero-coefficient points arbitrarily. If some $(\theta,b)$ realizes this, then
+
 \[
 a_i(\langle\theta,x_i\rangle+b)\ge0
 \quad(a_i>0),
 \]
 while for $a_i<0$, the negative label forces the score to be strictly negative, which becomes strictly positive after multiplication by the negative coefficient. There is at least one negative coefficient, so
+
 \[
 0<
 \sum_i a_i(\langle\theta,x_i\rangle+b)
@@ -739,6 +804,7 @@ while for $a_i<0$, the negative label forces the score to be strictly negative, 
 \tag{64}
 \]
 a contradiction. Therefore no $p+2$ points can be shattered; combined with the lower bound:
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F_{\rm lin})=p+1.}
 \tag{65}
@@ -764,6 +830,7 @@ That is 14 in total. Why can no other four-point configuration exceed 14? Every 
 ### 14.1 "High frequency, hence complex" is not enough
 
 Consider
+
 \[
 \mathcal F_{\sin}=\{x\mapsto\operatorname{sign}(\sin(\theta x)):
 \theta\in\mathbb R\}.
@@ -775,12 +842,14 @@ That the number of oscillations can be large is only intuition. To prove infinit
 ### 14.2 An explicit construction via binary digits
 
 Fix $m\ge1$ and choose
+
 \[
 x_i=2^{i-1-m},\qquad i=1,\ldots,m.
 \tag{67}
 \]
 These points are pairwise distinct and all lie in $(0,1/2]$. For any desired labels $s_i$, define the bits
 $b_i=0$ when $s_i=+1$ and $b_i=1$ when $s_i=-1$. Let
+
 \[
 t=\sum_{j=1}^m b_j2^{-j}+2^{-(m+2)},
 \qquad
@@ -789,12 +858,14 @@ t=\sum_{j=1}^m b_j2^{-j}+2^{-(m+2)},
 \]
 
 Then
+
 \[
 \frac{\theta x_i}{2\pi}=2^{i-1}t.
 \tag{69}
 \]
 
 Multiplying (68) by $2^{i-1}$, the first $i-1$ binary digits form the integer part, and the fractional part is
+
 \[
 u_i=\frac{b_i}{2}
 +\sum_{j=i+1}^m b_j2^{i-1-j}
@@ -803,6 +874,7 @@ u_i=\frac{b_i}{2}
 \]
 
 If $b_i=0$, the tail term is strictly positive, while
+
 \[
 \sum_{j=i+1}^m2^{i-1-j}+2^{i-m-3}
 =\frac12-2^{i-m-1}+2^{i-m-3}<\frac12.
@@ -811,6 +883,7 @@ Hence $0<u_i<1/2$. If $b_i=1$, then $1/2<u_i<1$. The extra
 $2^{-(m+2)}$ tail term guarantees that no input lands exactly on a zero of the sine.
 
 Since sine is positive in the first half of each period and negative in the second,
+
 \[
 \operatorname{sign}(\sin(\theta x_i))
 =\operatorname{sign}(\sin(2\pi u_i))
@@ -824,6 +897,7 @@ Since sine is positive in the first half of each period and negative in the seco
 \]
 
 Every labeling is realizable, so for every $m$ there is a set of inputs that can be shattered:
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F_{\sin})=\infty.}
 \tag{72}
@@ -843,6 +917,7 @@ The three phases are $9\pi/16,9\pi/8,9\pi/4$, whose sine signs are positive, neg
 ### 15.1 The statement and its boundary cases
 
 If a nonempty binary class has VC dimension at most $d<\infty$, then
+
 \[
 \Pi_{\mathcal F}(n)
 \le g(d,n):=\sum_{j=0}^{\min(d,n)}\binom nj.
@@ -850,6 +925,7 @@ If a nonempty binary class has VC dimension at most $d<\infty$, then
 \]
 
 When $n\ge d\ge1$, one further has
+
 \[
 g(d,n)\le(en/d)^d.
 \tag{74}
@@ -860,6 +936,7 @@ Writing the case $n\le d$ into $g$ is useful: then $g(d,n)=2^n$, the trivial bou
 ### 15.2 What happens after deleting one coordinate
 
 Fix $n$ distinct inputs. Let $F_1$ be the set of all length $n-1$ vectors that appear after deleting the first coordinate of the original projection. Let
+
 \[
 F_2=\{v\in F_1:(-1,v)\text{ and }(+1,v)
 \text{ both appear in the original projection}\}.
@@ -867,6 +944,7 @@ F_2=\{v\in F_1:(-1,v)\text{ and }(+1,v)
 \]
 
 Every vector in $F_1$ can be extended by at least one first label; if it belongs to $F_2$, it can be extended by the other one as well. The exact count is therefore
+
 \[
 |F_S|=|F_1|+|F_2|.
 \tag{76}
@@ -883,6 +961,7 @@ The VC dimension of $F_1$ is at most $d$: otherwise one could shatter $d+1$ poin
 The VC dimension of $F_2$ is at most $d-1$: if it could shatter $d$ points among the remaining ones, then every labeling pattern there would come from a vector that admits both first labels $+1,-1$. The original class would then shatter those $d$ points plus the deleted point, $d+1$ in total, a contradiction.
 
 So by induction
+
 \[
 |F_1|\le g(d,n-1),\qquad
 |F_2|\le g(d-1,n-1).
@@ -894,6 +973,7 @@ If $F_2$ is empty it contributes zero, and no special VC dimension needs to be a
 ### 15.4 How Pascal's identity completes the induction
 
 For $n>d>0$:
+
 \[
 \begin{aligned}
 |F_S|
@@ -913,6 +993,7 @@ Out-of-range binomial coefficients are zero by convention. Since every input set
 ### 15.5 From a binomial sum to $(en/d)^d$
 
 Let $u=d/n\in(0,1]$. When $j\le d$, $u^d\le u^j$, so
+
 \[
 \begin{aligned}
 u^d\sum_{j=0}^d\binom nj
@@ -930,6 +1011,7 @@ The last inequality comes from $1+u\le e^u$, provable via the tangent lower boun
 When $n\le d$, some point set can realize all $2^n$ labelings; once $n>d$, the growth function is controlled by a polynomial of fixed degree $d$. Sauer gives an upper bound and does not guarantee that every class actually grows exactly like $n^d$.
 
 For the threshold class with $d=1$, the Sauer bound is $1+n$, identical to the exact growth function. For the interval class with $d=2$,
+
 \[
 1+n+\binom n2=1+\frac{n(n+1)}2,
 \tag{80}
@@ -941,6 +1023,7 @@ again identical to the exact growth function. This shows the combinatorial upper
 ### 16.1 Sufficiency: plug in the growth-function bound
 
 For binary classification with 0-1 loss and $n\ge d\ge1$, combining (52) and (74):
+
 \[
 \boxed{
 \mathcal V^{\rm iid}(\mathcal F,n)
@@ -962,6 +1045,7 @@ Fix any algorithm and training inputs; at least half of the support points do no
 
 Therefore the average candidate-distribution risk is at least
 $(1/2)\cdot(1/2)=1/4$, and at least one candidate distribution makes the algorithm's risk no less than $1/4$. Since the algorithm is arbitrary,
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F)=\infty
 \ \Longrightarrow\
@@ -975,6 +1059,7 @@ The comparator only needs to realize all labels on $X'$; how the class behaves o
 ### 16.3 What exactly the "closed loop" closes
 
 Under binary classification, 0-1 loss, iid sampling, distribution-uniform statements, and the usual measurability conditions of this lecture:
+
 \[
 \boxed{
 \text{finite VC dimension}
@@ -996,6 +1081,7 @@ $\sqrt{d\ln(en/d)/n}$ is already an unimprovable lower bound.
 ### 17.1 Sample size in expectation
 
 By (81), to require the upper bound to be at most $\varepsilon$, one can use the sufficient condition
+
 \[
 \frac{n}{\ln(en/d)}\ge\frac{2d}{\varepsilon^2},
 \qquad n\ge d\ge1.
@@ -1009,6 +1095,7 @@ The threshold class has a parameter $\theta$ ranging over all real numbers and u
 ### 17.2 Supplement: deriving a high-probability version for finite classes
 
 The main line of this lecture uses expectations. If the loss lies in a bounded interval of length $B$, then for a fixed function, the exponential moments and tail bounds of Section 7 give
+
 \[
 \Pr(|L_P(f)-\widehat L_S(f)|>t)
 \le2e^{-2nt^2/B^2}.
@@ -1016,6 +1103,7 @@ The main line of this lecture uses expectations. If the loss lies in a bounded i
 \]
 
 Apply a union bound over the $M=|\mathcal F|$ functions:
+
 \[
 \Pr\left(\sup_f|L_P(f)-\widehat L_S(f)|>t\right)
 \le2M e^{-2nt^2/B^2}.
@@ -1024,6 +1112,7 @@ Apply a union bound over the $M=|\mathcal F|$ functions:
 
 Set the right-hand side equal to $\delta$ and take
 $t=B\sqrt{\ln(2M/\delta)/(2n)}$. On an event of probability at least $1-\delta$, inserting two empirical-risk terms gives
+
 \[
 L_P(\widehat f_{\rm ERM})-\inf_fL_P(f)
 \le2t
@@ -1036,12 +1125,14 @@ Here the extra conditions of the high-probability theorem, the confidence term, 
 ### 17.3 Supplement: why realizable classification may enjoy a faster guarantee
 
 If a finite binary class has size $M$ and there exists a zero-risk target function, then ERM has zero training error. Take any fixed bad function with true risk greater than $\varepsilon$; the probability that it makes no mistake on all $n$ independent training samples is
+
 \[
 (1-L_P(f))^n\le(1-\varepsilon)^n\le e^{-n\varepsilon}.
 \tag{88}
 \]
 
 Union-bounding over the bad functions, the probability that a bad yet zero-training-error function exists is at most $Me^{-n\varepsilon}$. Therefore
+
 \[
 n\ge\frac{\ln M+\ln(1/\delta)}{\varepsilon}
 \tag{89}

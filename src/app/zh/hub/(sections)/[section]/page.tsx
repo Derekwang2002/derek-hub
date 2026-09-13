@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { HubNav } from "@/components/hub-nav";
 import { ResourceList } from "@/components/resource-list";
-import { getLocalizedResourcesBySection } from "../../../../../lib/localized-resources";
-import { RESOURCE_SECTIONS, getResourceSection } from "../../../../../lib/resources";
-import styles from "../../../hub/page.module.css";
+import { getLocalizedResourcesBySection } from "../../../../../../lib/localized-resources";
+import { RESOURCE_SECTIONS, getResourceSection } from "../../../../../../lib/resources";
 
 type Props = { params: Promise<{ section: string }> };
 
@@ -35,15 +33,8 @@ export default async function ChineseHubSectionPage({ params }: Props) {
   if (!section) notFound();
   const resources = await getLocalizedResourcesBySection(section.slug, "zh");
   return (
-    <main className={`page-enter ${styles.hubPage}`} lang="zh-CN">
-      <header className={styles.hero}>
-        <h1 className={styles.title}>Hub</h1>
-        <p className={styles.description}>{DESCRIPTIONS[section.slug]}</p>
-      </header>
-      <HubNav active={section.slug} locale="zh" />
-      <div className="list-swap" key={section.slug}>
-        <ResourceList emptyMessage={`暂无 ${section.label} 资源。`} locale="zh" resources={resources} />
-      </div>
-    </main>
+    <div className="list-swap" key={section.slug}>
+      <ResourceList emptyMessage={`暂无 ${section.label} 资源。`} locale="zh" resources={resources} />
+    </div>
   );
 }

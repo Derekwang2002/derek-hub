@@ -26,6 +26,7 @@ summary: "逐节展开 Lecture 1：监督学习的形式化、i.i.d. 假设、�
 ### 1.1 数据、预测器与学习算法是三个对象
 
 输入空间是 $\mathcal X$，输出空间是 $\mathcal Y$。训练集为
+
 \[
 S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 \tag{1}
@@ -34,6 +35,7 @@ S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 课件用 $a_{1:n}$ 简写序列。本文把样本视作有序元组，允许重复点；在计算“见过多少不同输入”时，才取其中不同元素的集合。
 
 预测器 $f\in\mathcal Y^{\mathcal X}$ 是函数 $f:\mathcal X\to\mathcal Y$。算法 $A$ 则是“从训练集到预测器”的映射：
+
 \[
 \widehat f=A(S),\qquad
 \widehat f(x)=A(S)(x).
@@ -47,12 +49,14 @@ S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 ### 1.2 损失到底衡量什么
 
 一般损失写成
+
 \[
 \ell:\mathcal Y^{\mathcal X}\times(\mathcal X\times\mathcal Y)\to\mathbb R.
 \tag{3}
 \]
 
 二分类的 0–1 损失与回归的平方损失分别为
+
 \[
 \ell(f,(x,y))=\mathbf1\{f(x)\ne y\},
 \qquad
@@ -67,6 +71,7 @@ S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 ### 2.1 独立同分布假设拆开来看
 
 假设存在未知分布 $P$，使训练样本与新测试点都来自它：
+
 \[
 z_1,\ldots,z_n,z\overset{\mathrm{iid}}{\sim}P,
 \qquad z_i=(x_i,y_i).
@@ -80,18 +85,21 @@ z_1,\ldots,z_n,z\overset{\mathrm{iid}}{\sim}P,
 ### 2.2 风险为什么比有限测试误差更适合理论
 
 固定一个 $f$，总体风险为
+
 \[
 L_P(f)=\mathbb E_{z\sim P}\ell(f,z).
 \tag{6}
 \]
 
 独立测试集 $T=(z'_1,\ldots,z'_m)$ 的测试误差为
+
 \[
 \widehat L_T(f)=\frac1m\sum_{i=1}^m\ell(f,z'_i).
 \tag{7}
 \]
 
 由期望的线性性和同分布性，
+
 \[
 \mathbb E_T\widehat L_T(f)
 =\frac1m\sum_i\mathbb E\ell(f,z'_i)
@@ -100,6 +108,7 @@ L_P(f)=\mathbb E_{z\sim P}\ell(f,z).
 \]
 
 因此测试误差是风险的无偏估计。若损失方差为 $\sigma_f^2<\infty$，独立性还给出
+
 \[
 \operatorname{Var}(\widehat L_T(f))
 =\frac1{m^2}\sum_i\sigma_f^2
@@ -112,6 +121,7 @@ L_P(f)=\mathbb E_{z\sim P}\ell(f,z).
 ### 2.3 训练之后的风险为什么又是随机变量
 
 固定 $f$ 时，$L_P(f)$ 是一个数。随机训练得到 $\widehat f=A(S,U)$ 时，$L_P(\widehat f)$ 随 $S,U$ 变化。因此学习算法的期望风险是
+
 \[
 \mathbb E_{S,U}L_P(A(S,U))
 =\mathbb E_{S,U}\mathbb E_{z\sim P}\ell(A(S,U),z).
@@ -126,6 +136,7 @@ $\mathbb E_T[\widehat L_T(\widehat f)\mid S,U]=L_P(\widehat f)$。如果不断�
 ### 3.1 公平硬币标签为何没人能预测得更好
 
 假设对每个 $x$，都有 $P(y=+1\mid x)=1/2$。独立的新标签与训练集及算法随机种子条件独立。固定 $S,U,x$，无论算法预测什么，
+
 \[
 \Pr(\widehat f(x)\ne y\mid S,U,x)=1/2.
 \tag{11}
@@ -140,6 +151,7 @@ $\mathbb E_T[\widehat L_T(\widehat f)\mid S,U]=L_P(\widehat f)$。如果不断�
 课件用经典参数统计作对比：例如假设 $x$ 为高斯向量、给定 $x$ 后 $y$ 为均值 $\langle\theta,x\rangle$ 的高斯变量，再估计参数。这是一个说明性的对比，不意味着全部现代统计学都只研究参数高斯模型。
 
 无知（agnostic）学习选择参考类 $\mathcal F$，要求算法与这个类中的最佳函数相比表现接近：
+
 \[
 L_P(\widehat f)-\inf_{f\in\mathcal F}L_P(f).
 \tag{12}
@@ -156,6 +168,7 @@ L_P(\widehat f)-\inf_{f\in\mathcal F}L_P(f).
 令样本 $z\in\mathcal Z$，决策 $a\in\mathcal D$，参考类
 $\mathcal F\subseteq\mathcal D$，损失
 $\ell:\mathcal D\times\mathcal Z\to\mathbb R$。定义
+
 \[
 L_P(a)=\mathbb E_{z\sim P}\ell(a,z),\qquad
 \mathcal E_P(A,n)=\mathbb E_{S,U}L_P(A(S,U))
@@ -170,11 +183,13 @@ Proper 算法的超额风险非负；improper 算法有时能优于参考类，�
 ### 4.2 样本复杂度怎样从速率得到
 
 若对所有允许分布有
+
 \[
 \mathcal E_P(A,n)\le Cn^{-1/2},
 \tag{14}
 \]
 要保证超额风险不超过 $\varepsilon$，解不等式：
+
 \[
 Cn^{-1/2}\le\varepsilon
 \iff n\ge C^2/\varepsilon^2.
@@ -197,11 +212,13 @@ Cn^{-1/2}\le\varepsilon
 ### 5.1 可实现 PAC 与无知学习的区别
 
 可实现二分类假设存在 $f^*\in\mathcal F$，使
+
 \[
 P(y=f^*(x)\mid x)=1.
 \tag{16}
 \]
 0–1 损失下 $L_P(f^*)=0$，所以
+
 \[
 \inf_{f\in\mathcal F}L_P(f)=0,\qquad
 \text{超额风险}=L_P(\widehat f).
@@ -209,6 +226,7 @@ P(y=f^*(x)\mid x)=1.
 \]
 
 PAC 保证常写为：给定误差 $\varepsilon>0$、失败概率 $0<\delta<1$，对任意输入边缘分布 $P_X$ 和任意目标 $f^*\in\mathcal F$，足够多训练样本后，
+
 \[
 \Pr_{S,U}(L_P(\widehat f)\le\varepsilon)\ge1-\delta.
 \tag{18}
@@ -219,6 +237,7 @@ PAC 保证常写为：给定误差 $\varepsilon>0$、失败概率 $0<\delta<1$�
 ### 5.2 期望保证和概率保证怎样关联
 
 对 $0\le X=L_P(\widehat f)\le1$，如果 (18) 成立，则
+
 \[
 \mathbb EX
 =\mathbb E[X\mathbf1_{X\le\varepsilon}]
@@ -228,6 +247,7 @@ PAC 保证常写为：给定误差 $\varepsilon>0$、失败概率 $0<\delta<1$�
 \]
 
 反过来，Markov 不等式给出
+
 \[
 \Pr(X>\varepsilon)\le\frac{\mathbb EX}{\varepsilon}.
 \tag{20}
@@ -237,18 +257,21 @@ PAC 保证常写为：给定误差 $\varepsilon>0$、失败概率 $0<\delta<1$�
 ### 5.3 密度估计为何用对数损失
 
 现在没有标签，样本 $z\sim P$，决策 $q$ 是相对于共同基础测度的概率密度，损失为
+
 \[
 \ell(q,z)=-\log q(z).
 \tag{21}
 \]
 
 若真实密度为 $p$，定义
+
 \[
 \operatorname{KL}(P\|Q)=\int p(z)\log\frac{p(z)}{q(z)}\,dz.
 \tag{22}
 \]
 
 在相关积分及差值有定义时，加减 $\mathbb E_P\log p(z)$：
+
 \[
 \begin{aligned}
 L_P(q)-L_P(f)
@@ -261,6 +284,7 @@ L_P(q)-L_P(f)
 \]
 
 为什么 KL 非负？若 $q$ 在 $p>0$ 的地方为零，则 KL 可能为 $+\infty$。否则用 $\log u\le u-1$：
+
 \[
 \mathbb E_P\log(q/p)
 \le\int_{\{p>0\}}q(z)\,dz-1\le0,
@@ -274,6 +298,7 @@ L_P(q)-L_P(f)
 ### 6.1 Minimax 量与量词
 
 课件定义
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 =\inf_A\sup_P
@@ -284,6 +309,7 @@ L_P(q)-L_P(f)
 外层 $\inf_A$ 寻找最佳学习规则；内层 $\sup_P$ 检查这个规则在最不利分布下的表现。“先选算法”指承诺一套从数据到输出的策略，而不是在看到数据前就选定最终预测器。
 
 若交换成 $\sup_P\inf_A$，内层最优算法可以针对已知 $P$ 设计，甚至直接输出其类内最佳决策，基本绕过了“分布未知”这件事。一般只有
+
 \[
 \sup_P\inf_A R(A,P)\le\inf_A\sup_P R(A,P),
 \tag{25}
@@ -292,6 +318,7 @@ L_P(q)-L_P(f)
 $\inf_{A'}R(A',P)\le R(A,P)\le\sup_{P'}R(A,P')$，依次取相应上下确界即可。
 
 课件把
+
 \[
 \limsup_{n\to\infty}\mathcal V^{\rm iid}(\mathcal F,n)=0
 \tag{26}
@@ -307,6 +334,7 @@ $\mathcal V(\mathcal F,n)$ 还依赖 $\mathcal D,\mathcal Z,\ell$ 及允许的�
 ### 7.1 目标不是找到一个让所有算法失败的分布
 
 对于所有二分类器组成的类 $\mathcal F=\{-1,+1\}^{\mathcal X}$，证明
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)\ge1/4.
 \tag{27}
@@ -319,6 +347,7 @@ $\mathcal V(\mathcal F,n)$ 还依赖 $\mathcal D,\mathcal Z,\ell$ 及允许的�
 固定 $2n$ 个不同输入组成 $X'$，令 $Q$ 为它们上的均匀分布。所有 $2^{2n}$ 种二元标记对应函数 $f_1,\ldots,f_N$，其中 $N=2^{2n}$。
 
 对每个 $k$，定义
+
 \[
 P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 \tag{28}
@@ -329,6 +358,7 @@ P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 ### 7.3 为什么新测试点至少有一半概率未见过
 
 固定训练输入序列 $S_X=(x_1,\ldots,x_n)$，令 $U(S_X)$ 为其中不同输入的集合。它至多包含 $n$ 个元素，而 $X'$ 有 $2n$ 个元素，所以
+
 \[
 \Pr_{x\sim Q}(x\notin U(S_X))
 =1-\frac{|U(S_X)|}{2n}\ge1/2.
@@ -342,6 +372,7 @@ P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 固定一个未见点 $x$。把 $N$ 种标记函数分成 $N/2$ 对，每对 $(f_k,f_{k'})$ 只在 $x$ 上不同，其他 $2n-1$ 个点完全一样。
 
 因为 $x$ 不在训练集中，两者诱导的有标签训练集相同。因此确定性算法在 $x$ 上的预测相同，但该点真实标签相反，有
+
 \[
 \mathbf1\{\widehat f_k(x)\ne f_k(x)\}
 +\mathbf1\{\widehat f_{k'}(x)\ne f_{k'}(x)\}=1.
@@ -351,6 +382,7 @@ P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 随机算法可在两种情形使用同一随机种子耦合，逐种子仍满足此等式；再取期望即可。
 
 对所有配对求和除以 $N$，得到平均错误率恰为 $1/2$。因此对任意算法，
+
 \[
 \begin{aligned}
 \frac1N\sum_{k=1}^N
@@ -368,6 +400,7 @@ P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 ### 7.5 补充：未见概率的精确计算
 
 固定测试点 $x$，每个训练点避开它的概率为 $1-1/(2n)$。独立性给出
+
 \[
 \Pr(x\notin S_X)=\left(1-\frac1{2n}\right)^n.
 \tag{32}
@@ -388,6 +421,7 @@ $(1-u)^n\ge1-nu$ 得到；它可对整数 $n$ 用归纳法证明。课件只需�
 设更大的比较空间最优风险为
 $L_{\rm all}^*=\inf_{a\in\mathcal D}L_P(a)$，类内最优为
 $L_{\mathcal F}^*=\inf_{f\in\mathcal F}L_P(f)$。代数恒等式是
+
 \[
 L_P(\widehat f)-L_{\rm all}^*
 =[L_P(\widehat f)-L_{\mathcal F}^*]
@@ -399,12 +433,14 @@ L_P(\widehat f)-L_{\rm all}^*
 
 为了展示泛化与优化的关系，设近似 ERM 输出 $\widetilde f\in\mathcal F$，满足
 $\widehat L_S(\widetilde f)\le\inf_f\widehat L_S(f)+\xi$。定义
+
 \[
 \Delta_S=\sup_{f\in\mathcal F}|L_P(f)-\widehat L_S(f)|.
 \tag{34}
 \]
 
 选择类内最优或任意接近最优的 $f^*$，逐步得到
+
 \[
 \begin{aligned}
 L_P(\widetilde f)
@@ -415,6 +451,7 @@ L_P(\widetilde f)
 \]
 
 于是
+
 \[
 L_P(\widetilde f)-L_{\rm all}^*
 \le2\Delta_S+\xi+(L_{\mathcal F}^*-L_{\rm all}^*).
@@ -440,6 +477,7 @@ L_P(\widetilde f)-L_{\rm all}^*
 ### 9.2 遗憾中的 comparator 为什么必须固定
 
 定义
+
 \[
 \operatorname{Reg}(\mathcal F,n)
 =\sum_{t=1}^n\ell(a_t,z_t)
@@ -448,6 +486,7 @@ L_P(\widetilde f)-L_{\rm all}^*
 \]
 
 对手是事后知道全部数据后挑出的**同一个固定 $f$**。它不是每轮都能换一个最佳动作的 oracle：
+
 \[
 \sum_t\inf_f\ell(f,z_t)
 \le\inf_f\sum_t\ell(f,z_t).
@@ -459,6 +498,7 @@ L_P(\widetilde f)-L_{\rm all}^*
 例如两个动作的两轮损失依次为 $(0,1)$、$(1,0)$，两个固定动作都累计损失 1；若算法恰好先选第一个再选第二个，累计损失为零，遗憾是 $-1$。所以单个序列上的遗憾可以为负。
 
 无遗憾学习要求最坏环境下的期望累计遗憾满足
+
 \[
 \mathbb E\operatorname{Reg}(\mathcal F,n)=o(n),
 \quad\text{等价于}\quad
@@ -477,6 +517,7 @@ L_P(\widetilde f)-L_{\rm all}^*
 自适应环境（adaptive）可以根据过去的实际动作和公共历史选择当前 $z_t$。但在课件的同时行动协议中，它不能看到当前新抽出的动作 $a_t$ 后再决定 $z_t$。
 
 可把公共历史写作
+
 \[
 h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 \quad q_t(\cdot\mid h_{t-1})\in\Delta(\mathcal D).
@@ -488,6 +529,7 @@ h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 ### 10.2 补充：为什么随机化可能必不可少
 
 考虑预测一个比特，损失为预测错误，参考类是两个常数预测器。对于确定性算法，环境可以从公开历史和算法推断当前预测，并令 $z_t=1-a_t$。算法每轮损失 1，累计为 $n$。两个常数的损失之和为 $n$，所以最佳常数损失至多 $n/2$，得到
+
 \[
 \operatorname{Reg}\ge n-n/2=n/2.
 \tag{40}
@@ -502,6 +544,7 @@ h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 ### 11.1 在线博弈值
 
 对指定环境类别 $\mathcal A$，定义
+
 \[
 \mathcal V^{\rm seq}(\mathcal F,n)
 =\inf_\pi\sup_{\alpha\in\mathcal A}
@@ -510,6 +553,7 @@ h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 \]
 
 自适应环境包含非自适应环境，所以
+
 \[
 \mathcal V^{\rm seq}_{\rm obl}
 \le\mathcal V^{\rm seq}_{\rm adap}.
@@ -517,6 +561,7 @@ h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 \]
 
 课件对自适应环境写出
+
 \[
 \mathcal V^{\rm seq}
 =\inf_{q_1}\sup_{z_1}\mathbb E_{a_1\sim q_1}
@@ -531,6 +576,7 @@ h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 ### 11.2 用后向归纳完整证明有限空间情形
 
 先假设 $\mathcal D,\mathcal Z$ 有限、损失有限、轮数有限，避免可测策略选择问题。终局收益为
+
 \[
 W_{n+1}(h_n)
 =\frac1n\left[
@@ -540,6 +586,7 @@ W_{n+1}(h_n)
 \]
 
 递归定义
+
 \[
 W_t(h_{t-1})
 =\inf_{q\in\Delta(\mathcal D)}\sup_{z\in\mathcal Z}
@@ -585,6 +632,7 @@ W_{t+1}(h_{t-1},a,z).
 ### 12.2 最重要的独立性等式
 
 令 $\mathcal H_{t-1}$ 包含此前样本及生成 $a_t$ 所需的算法随机性。因为 $z_t$ 是新的 iid 点，与这些信息独立，
+
 \[
 \mathbb E[\ell(a_t,z_t)\mid\mathcal H_{t-1}]
 =L_P(a_t).
@@ -597,6 +645,7 @@ $\mathbb E\ell(a_t,z_t)=\mathbb EL_P(a_t)$。如果算法先看了 $z_t$ 才产�
 ### 12.3 每一步不等式
 
 对任意固定 $f\in\mathcal F$，由均匀随机输出和 (46)：
+
 \[
 \begin{aligned}
 \mathbb EL_P(\widehat a)-L_P(f)
@@ -616,6 +665,7 @@ $\mathbb E\ell(a_t,z_t)=\mathbb EL_P(a_t)$。如果算法先看了 $z_t$ 才产�
 第三步是因为经验最优比较器损失不大于任何固定 $f$ 的经验损失，减去较小的数使差值更大。
 
 对左侧取 $\sup_f$，右侧不变，得到
+
 \[
 \mathbb EL_P(\widehat a)-\inf_{f\in\mathcal F}L_P(f)
 \le\mathbb E\operatorname{Reg}(\mathcal F,n)/n.
@@ -630,6 +680,7 @@ $\mathbb E\inf_f\widehat L_S(f)$ 与 $\inf_f\mathbb E\widehat L_S(f)$。证明�
 任意在线算法若对所有固定序列的期望平均遗憾不超过 $r_n$，则对随机生成的 iid 序列取平均后也不超过 $r_n$。所以其转换得到的批量算法对所有 $P$ 的超额风险不超过 $r_n$。
 
 对在线算法取 infimum，便得到
+
 \[
 \boxed{
 \mathcal V^{\rm iid}(\mathcal F,n)
@@ -645,6 +696,7 @@ $\mathbb E\inf_f\widehat L_S(f)$ 与 $\inf_f\mathbb E\widehat L_S(f)$。证明�
 
 若 $\mathcal D$ 是凸集、$\ell(a,z)$ 对 $a$ 凸，则
 $\bar a=n^{-1}\sum_ta_t\in\mathcal D$，Jensen 不等式给出
+
 \[
 L_P(\bar a)\le\frac1n\sum_tL_P(a_t).
 \tag{50}
@@ -657,6 +709,7 @@ L_P(\bar a)\le\frac1n\sum_tL_P(a_t).
 ### 13.1 把问题写成课件的抽象符号
 
 设有 $K$ 个动作，
+
 \[
 \mathcal D=\mathcal F=\{1,\ldots,K\},\quad
 \mathcal Z=[0,1]^K,\quad
@@ -665,12 +718,14 @@ L_P(\bar a)\le\frac1n\sum_tL_P(a_t).
 \]
 
 每轮环境设定损失向量 $z_t$，算法选择 $a_t$，只观察
+
 \[
 b_t=z_t(a_t).
 \tag{52}
 \]
 
 遗憾仍相对最佳固定动作：
+
 \[
 \operatorname{Reg}
 =\sum_tz_t(a_t)-\min_{i=1,\ldots,K}\sum_tz_t(i).
@@ -688,6 +743,7 @@ b_t=z_t(a_t).
 ### 13.3 补充：一个反馈估计公式解释探索的作用
 
 若当前按 $p_t$ 抽取动作，所有 $p_t(i)>0$，可定义
+
 \[
 \widehat z_t(i)=
 \frac{\mathbf1\{a_t=i\}z_t(a_t)}{p_t(i)}.
@@ -695,6 +751,7 @@ b_t=z_t(a_t).
 \]
 
 条件于过去信息及当前已选定的 $z_t$，当前动作才被抽样，因此
+
 \[
 \mathbb E[\widehat z_t(i)\mid\text{过去},z_t]
 =p_t(i)\frac{z_t(i)}{p_t(i)}
@@ -703,6 +760,7 @@ b_t=z_t(a_t).
 \]
 
 但其二阶矩为
+
 \[
 \mathbb E[\widehat z_t(i)^2\mid\text{过去},z_t]
 =\frac{z_t(i)^2}{p_t(i)}.
@@ -726,6 +784,7 @@ b_t=z_t(a_t).
 统计学习面对未知分布，但 iid 结构提供了过去与未来的联系。在线学习去掉固定分布假设，要求每轮在反馈前决策。部分信息进一步限制反馈，使算法不仅要选择损失小的动作，还要获得足够的信息。
 
 本讲不是证明三种框架下的具体最优速率，而是建立评价标准和两个基本逻辑结论：
+
 \[
 \text{所有函数组成的类不一定可学习},
 \qquad

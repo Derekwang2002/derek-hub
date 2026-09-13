@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { HubNav } from "@/components/hub-nav";
 import { ResourceList } from "@/components/resource-list";
 import {
   RESOURCE_SECTIONS,
   getResourceSection
-} from "../../../../lib/resources";
-import styles from "../page.module.css";
-import { getLocalizedResourcesBySection } from "../../../../lib/localized-resources";
+} from "../../../../../lib/resources";
+import { getLocalizedResourcesBySection } from "../../../../../lib/localized-resources";
 
 type HubSectionPageProps = {
   params: Promise<{
@@ -69,20 +67,11 @@ export default async function HubSectionPage({ params }: HubSectionPageProps) {
   const resources = await getLocalizedResourcesBySection(section.slug, "en");
 
   return (
-    <main className={`page-enter ${styles.hubPage}`}>
-      <header className={styles.hero}>
-        <h1 className={styles.title}>Hub</h1>
-        <p className={styles.description}>{section.description}</p>
-      </header>
-
-      <HubNav active={section.slug} />
-
-      <div className="list-swap" key={section.slug}>
-        <ResourceList
-          emptyMessage={`No ${section.label.toLowerCase()} resources yet.`}
-          resources={resources}
-        />
-      </div>
-    </main>
+    <div className="list-swap" key={section.slug}>
+      <ResourceList
+        emptyMessage={`No ${section.label.toLowerCase()} resources yet.`}
+        resources={resources}
+      />
+    </div>
   );
 }

@@ -26,6 +26,7 @@ The two core theorems say respectively that "not every class is learnable" and t
 ### 1.1 Data, predictor, and learning algorithm are three different objects
 
 The input space is $\mathcal X$ and the output space is $\mathcal Y$. The training set is
+
 \[
 S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 \tag{1}
@@ -34,6 +35,7 @@ S=((x_1,y_1),\ldots,(x_n,y_n))\in(\mathcal X\times\mathcal Y)^n.
 The slides abbreviate sequences as $a_{1:n}$. This report treats samples as ordered tuples, allowing repeated points; only when counting "how many distinct inputs have been seen" do we take the set of distinct elements among them.
 
 A predictor $f\in\mathcal Y^{\mathcal X}$ is a function $f:\mathcal X\to\mathcal Y$. The algorithm $A$ is instead a mapping "from training sets to predictors":
+
 \[
 \widehat f=A(S),\qquad
 \widehat f(x)=A(S)(x).
@@ -47,12 +49,14 @@ Cat-versus-dog classification can encode images as $x\in\mathbb R^d$ with labels
 ### 1.2 What exactly does the loss measure
 
 A general loss is written
+
 \[
 \ell:\mathcal Y^{\mathcal X}\times(\mathcal X\times\mathcal Y)\to\mathbb R.
 \tag{3}
 \]
 
 The 0–1 loss for binary classification and the squared loss for regression are respectively
+
 \[
 \ell(f,(x,y))=\mathbf1\{f(x)\ne y\},
 \qquad
@@ -67,6 +71,7 @@ The former only distinguishes right from wrong; the latter also penalizes the ma
 ### 2.1 The i.i.d. assumption taken apart
 
 Assume there is an unknown distribution $P$ from which both the training samples and new test points are drawn:
+
 \[
 z_1,\ldots,z_n,z\overset{\mathrm{iid}}{\sim}P,
 \qquad z_i=(x_i,y_i).
@@ -80,18 +85,21 @@ In practice, a random split supports this model only when the original data itse
 ### 2.2 Why risk is better suited to theory than finite test error
 
 Fix an $f$; the population risk is
+
 \[
 L_P(f)=\mathbb E_{z\sim P}\ell(f,z).
 \tag{6}
 \]
 
 The test error on an independent test set $T=(z'_1,\ldots,z'_m)$ is
+
 \[
 \widehat L_T(f)=\frac1m\sum_{i=1}^m\ell(f,z'_i).
 \tag{7}
 \]
 
 By linearity of expectation and identical distribution,
+
 \[
 \mathbb E_T\widehat L_T(f)
 =\frac1m\sum_i\mathbb E\ell(f,z'_i)
@@ -100,6 +108,7 @@ By linearity of expectation and identical distribution,
 \]
 
 Hence the test error is an unbiased estimate of the risk. If the loss variance is $\sigma_f^2<\infty$, independence also gives
+
 \[
 \operatorname{Var}(\widehat L_T(f))
 =\frac1{m^2}\sum_i\sigma_f^2
@@ -112,6 +121,7 @@ Risk removes the extra random fluctuation brought by a finite test set. If $P$ w
 ### 2.3 Why the risk after training is again a random variable
 
 For fixed $f$, $L_P(f)$ is a number. When random training produces $\widehat f=A(S,U)$, $L_P(\widehat f)$ varies with $S,U$. Therefore the expected risk of a learning algorithm is
+
 \[
 \mathbb E_{S,U}L_P(A(S,U))
 =\mathbb E_{S,U}\mathbb E_{z\sim P}\ell(A(S,U),z).
@@ -126,6 +136,7 @@ $\mathbb E_T[\widehat L_T(\widehat f)\mid S,U]=L_P(\widehat f)$. If the same tes
 ### 3.1 Why nobody can predict fair-coin labels better
 
 Suppose that for every $x$, $P(y=+1\mid x)=1/2$. An independent new label is conditionally independent of the training set and the algorithm's random seed. Fix $S,U,x$: whatever the algorithm predicts,
+
 \[
 \Pr(\widehat f(x)\ne y\mid S,U,x)=1/2.
 \tag{11}
@@ -140,6 +151,7 @@ But this does not mean the excess risk on this distribution cannot tend to zero:
 The slides use classical parametric statistics as a contrast: for example, assume $x$ is a Gaussian vector and, given $x$, $y$ is a Gaussian variable with mean $\langle\theta,x\rangle$, then estimate the parameters. This is an illustrative contrast; it does not mean all of modern statistics studies only parametric Gaussian models.
 
 Agnostic learning chooses a reference class $\mathcal F$ and requires the algorithm to perform nearly as well as the best function in that class:
+
 \[
 L_P(\widehat f)-\inf_{f\in\mathcal F}L_P(f).
 \tag{12}
@@ -156,6 +168,7 @@ If $\mathcal F$ itself cannot express the task well, being close to its best fun
 Let the sample be $z\in\mathcal Z$, the decision $a\in\mathcal D$, the reference class
 $\mathcal F\subseteq\mathcal D$, and the loss
 $\ell:\mathcal D\times\mathcal Z\to\mathbb R$. Define
+
 \[
 L_P(a)=\mathbb E_{z\sim P}\ell(a,z),\qquad
 \mathcal E_P(A,n)=\mathbb E_{S,U}L_P(A(S,U))
@@ -170,11 +183,13 @@ A proper algorithm has nonnegative excess risk; an improper algorithm can someti
 ### 4.2 How sample complexity is obtained from a rate
 
 If for all allowed distributions
+
 \[
 \mathcal E_P(A,n)\le Cn^{-1/2},
 \tag{14}
 \]
 then to guarantee excess risk at most $\varepsilon$, solve the inequality:
+
 \[
 Cn^{-1/2}\le\varepsilon
 \iff n\ge C^2/\varepsilon^2.
@@ -197,11 +212,13 @@ The minimax formulation in this course studies the latter. A finite-sample algor
 ### 5.1 The difference between realizable PAC and agnostic learning
 
 Realizable binary classification assumes there exists $f^*\in\mathcal F$ such that
+
 \[
 P(y=f^*(x)\mid x)=1.
 \tag{16}
 \]
 Under the 0–1 loss $L_P(f^*)=0$, so
+
 \[
 \inf_{f\in\mathcal F}L_P(f)=0,\qquad
 \text{excess risk}=L_P(\widehat f).
@@ -209,6 +226,7 @@ Under the 0–1 loss $L_P(f^*)=0$, so
 \]
 
 The PAC guarantee is often written as: given error $\varepsilon>0$ and failure probability $0<\delta<1$, for any input marginal distribution $P_X$ and any target $f^*\in\mathcal F$, after enough training samples,
+
 \[
 \Pr_{S,U}(L_P(\widehat f)\le\varepsilon)\ge1-\delta.
 \tag{18}
@@ -219,6 +237,7 @@ The PAC guarantee is often written as: given error $\varepsilon>0$ and failure p
 ### 5.2 How expectation guarantees relate to probability guarantees
 
 For $0\le X=L_P(\widehat f)\le1$, if (18) holds, then
+
 \[
 \mathbb EX
 =\mathbb E[X\mathbf1_{X\le\varepsilon}]
@@ -228,6 +247,7 @@ For $0\le X=L_P(\widehat f)\le1$, if (18) holds, then
 \]
 
 Conversely, Markov's inequality gives
+
 \[
 \Pr(X>\varepsilon)\le\frac{\mathbb EX}{\varepsilon}.
 \tag{20}
@@ -237,18 +257,21 @@ Hence an expectation of at most $\varepsilon\delta$ suffices to obtain failure p
 ### 5.3 Why density estimation uses the log loss
 
 Now there are no labels; the sample is $z\sim P$, the decision $q$ is a probability density relative to a common base measure, and the loss is
+
 \[
 \ell(q,z)=-\log q(z).
 \tag{21}
 \]
 
 If the true density is $p$, define
+
 \[
 \operatorname{KL}(P\|Q)=\int p(z)\log\frac{p(z)}{q(z)}\,dz.
 \tag{22}
 \]
 
 Whenever the relevant integrals and differences are defined, add and subtract $\mathbb E_P\log p(z)$:
+
 \[
 \begin{aligned}
 L_P(q)-L_P(f)
@@ -261,6 +284,7 @@ L_P(q)-L_P(f)
 \]
 
 Why is KL nonnegative? If $q$ is zero where $p>0$, the KL may be $+\infty$. Otherwise use $\log u\le u-1$:
+
 \[
 \mathbb E_P\log(q/p)
 \le\int_{\{p>0\}}q(z)\,dz-1\le0,
@@ -274,6 +298,7 @@ Therefore minimizing the expected log loss is equivalent to finding the in-class
 ### 6.1 The minimax quantity and its quantifiers
 
 The slides define
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 =\inf_A\sup_P
@@ -284,6 +309,7 @@ The slides define
 The outer $\inf_A$ searches for the best learning rule; the inner $\sup_P$ checks how this rule performs under the most unfavorable distribution. "Choosing the algorithm first" means committing to a strategy from data to output, not selecting the final predictor before seeing the data.
 
 If it is swapped to $\sup_P\inf_A$, the inner optimal algorithm can be designed for the known $P$, even directly outputting its best in-class decision, essentially bypassing the fact that "the distribution is unknown". In general one only has
+
 \[
 \sup_P\inf_A R(A,P)\le\inf_A\sup_P R(A,P),
 \tag{25}
@@ -292,6 +318,7 @@ and the two cannot be exchanged unconditionally. Proof of (25): for any fixed $A
 $\inf_{A'}R(A',P)\le R(A,P)\le\sup_{P'}R(A,P')$; take the corresponding suprema and infima in turn.
 
 The slides take
+
 \[
 \limsup_{n\to\infty}\mathcal V^{\rm iid}(\mathcal F,n)=0
 \tag{26}
@@ -307,6 +334,7 @@ $\mathcal V(\mathcal F,n)$ also depends on $\mathcal D,\mathcal Z,\ell$ and the 
 ### 7.1 The goal is not to find one distribution on which all algorithms fail
 
 For the class of all binary classifiers $\mathcal F=\{-1,+1\}^{\mathcal X}$, prove
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)\ge1/4.
 \tag{27}
@@ -319,6 +347,7 @@ The quantifiers are "for every algorithm, there exists a hard distribution", not
 Fix a set $X'$ of $2n$ distinct inputs and let $Q$ be the uniform distribution on them. All $2^{2n}$ binary labelings correspond to functions $f_1,\ldots,f_N$, where $N=2^{2n}$.
 
 For each $k$, define
+
 \[
 P_k(x,y)=\frac1{2n}\mathbf1\{x\in X',\,y=f_k(x)\}.
 \tag{28}
@@ -329,6 +358,7 @@ Every $P_k$ is noiseless and realizable: the reference class contains $f_k$, so 
 ### 7.3 Why a new test point is unseen with probability at least half
 
 Fix a training input sequence $S_X=(x_1,\ldots,x_n)$ and let $U(S_X)$ be the set of distinct inputs in it. It contains at most $n$ elements, while $X'$ has $2n$ elements, so
+
 \[
 \Pr_{x\sim Q}(x\notin U(S_X))
 =1-\frac{|U(S_X)|}{2n}\ge1/2.
@@ -342,6 +372,7 @@ This lower bound holds for every training input sequence, with repeated sampling
 Fix an unseen point $x$. Partition the $N$ labeling functions into $N/2$ pairs, where each pair $(f_k,f_{k'})$ differs only on $x$ and is identical on the other $2n-1$ points.
 
 Because $x$ is not in the training set, the two induce the same labeled training set. Hence a deterministic algorithm makes the same prediction on $x$, but the true labels at that point are opposite, giving
+
 \[
 \mathbf1\{\widehat f_k(x)\ne f_k(x)\}
 +\mathbf1\{\widehat f_{k'}(x)\ne f_{k'}(x)\}=1.
@@ -351,6 +382,7 @@ Because $x$ is not in the training set, the two induce the same labeled training
 A randomized algorithm can use the same random seed in the two cases as a coupling, so the equality still holds seed by seed; then take expectations.
 
 Summing over all pairs and dividing by $N$ gives an average error rate of exactly $1/2$. Therefore, for any algorithm,
+
 \[
 \begin{aligned}
 \frac1N\sum_{k=1}^N
@@ -368,6 +400,7 @@ An average of finitely many numbers being at least $1/4$ means the risk under at
 ### 7.5 Supplementary: exact computation of the unseen probability
 
 Fix a test point $x$; each training point avoids it with probability $1-1/(2n)$. Independence gives
+
 \[
 \Pr(x\notin S_X)=\left(1-\frac1{2n}\right)^n.
 \tag{32}
@@ -388,6 +421,7 @@ A class needs some structural constraint for the training data to constrain beha
 Let the optimal risk over the larger comparison space be
 $L_{\rm all}^*=\inf_{a\in\mathcal D}L_P(a)$, and the in-class optimum be
 $L_{\mathcal F}^*=\inf_{f\in\mathcal F}L_P(f)$. The algebraic identity is
+
 \[
 L_P(\widehat f)-L_{\rm all}^*
 =[L_P(\widehat f)-L_{\mathcal F}^*]
@@ -399,12 +433,14 @@ The second term is the approximation error. Enlarging $\mathcal F$ does not incr
 
 To show how generalization relates to optimization, suppose an approximate ERM outputs $\widetilde f\in\mathcal F$ satisfying
 $\widehat L_S(\widetilde f)\le\inf_f\widehat L_S(f)+\xi$. Define
+
 \[
 \Delta_S=\sup_{f\in\mathcal F}|L_P(f)-\widehat L_S(f)|.
 \tag{34}
 \]
 
 Choosing the in-class optimum, or any $f^*$ arbitrarily close to it, step by step gives
+
 \[
 \begin{aligned}
 L_P(\widetilde f)
@@ -415,6 +451,7 @@ L_P(\widetilde f)
 \]
 
 Hence
+
 \[
 L_P(\widetilde f)-L_{\rm all}^*
 \le2\Delta_S+\xi+(L_{\mathcal F}^*-L_{\rm all}^*).
@@ -440,6 +477,7 @@ In the slides' abstract supervised-learning instance, $a_t$ can be an entire pre
 ### 9.2 Why the comparator in regret must be fixed
 
 Define
+
 \[
 \operatorname{Reg}(\mathcal F,n)
 =\sum_{t=1}^n\ell(a_t,z_t)
@@ -448,6 +486,7 @@ Define
 \]
 
 The opponent is **the same fixed $f$** chosen in hindsight after seeing all the data. It is not an oracle that may switch to a new best action every round:
+
 \[
 \sum_t\inf_f\ell(f,z_t)
 \le\inf_f\sum_t\ell(f,z_t).
@@ -459,6 +498,7 @@ The left side allows per-round minimization, hence is smaller, and the task rela
 For example, suppose two actions have losses $(0,1)$ and then $(1,0)$ over two rounds; both fixed actions accumulate loss 1. If the algorithm happens to pick the first action and then the second, its cumulative loss is zero and the regret is $-1$. So regret on a single sequence can be negative.
 
 No-regret learning requires the expected cumulative regret in the worst environment to satisfy
+
 \[
 \mathbb E\operatorname{Reg}(\mathcal F,n)=o(n),
 \quad\text{equivalently}\quad
@@ -477,6 +517,7 @@ An oblivious environment knows the learning algorithm but fixes the entire $z_{1
 An adaptive environment may choose the current $z_t$ based on past actual actions and the public history. But under the simultaneous-move protocol of the slides, it cannot see the currently drawn action $a_t$ before deciding $z_t$.
 
 One can write the public history as
+
 \[
 h_{t-1}=(a_1,z_1,\ldots,a_{t-1},z_{t-1}),
 \quad q_t(\cdot\mid h_{t-1})\in\Delta(\mathcal D).
@@ -488,6 +529,7 @@ The environment knows the algorithm, so it can infer the conditional distributio
 ### 10.2 Supplementary: why randomization may be indispensable
 
 Consider predicting a bit, where the loss is a wrong prediction and the reference class consists of the two constant predictors. Against a deterministic algorithm, the environment can infer the current prediction from the public history and the algorithm, and set $z_t=1-a_t$. The algorithm loses 1 every round, accumulating $n$. The losses of the two constants sum to $n$, so the best constant loses at most $n/2$, giving
+
 \[
 \operatorname{Reg}\ge n-n/2=n/2.
 \tag{40}
@@ -502,6 +544,7 @@ Randomization makes the actual action impossible to infer exactly, but being "ra
 ### 11.1 The online value of the game
 
 For a specified environment class $\mathcal A$, define
+
 \[
 \mathcal V^{\rm seq}(\mathcal F,n)
 =\inf_\pi\sup_{\alpha\in\mathcal A}
@@ -510,6 +553,7 @@ For a specified environment class $\mathcal A$, define
 \]
 
 Adaptive environments include oblivious ones, so
+
 \[
 \mathcal V^{\rm seq}_{\rm obl}
 \le\mathcal V^{\rm seq}_{\rm adap}.
@@ -517,6 +561,7 @@ Adaptive environments include oblivious ones, so
 \]
 
 For adaptive environments the slides write
+
 \[
 \mathcal V^{\rm seq}
 =\inf_{q_1}\sup_{z_1}\mathbb E_{a_1\sim q_1}
@@ -531,6 +576,7 @@ Each subsequent $q_t,z_t$ may depend on the history realized so far. This is not
 ### 11.2 A complete backward-induction proof for finite spaces
 
 First assume $\mathcal D,\mathcal Z$ are finite, the loss is finite, and the number of rounds is finite, to avoid measurable strategy-selection issues. The terminal payoff is
+
 \[
 W_{n+1}(h_n)
 =\frac1n\left[
@@ -540,6 +586,7 @@ W_{n+1}(h_n)
 \]
 
 Define recursively
+
 \[
 W_t(h_{t-1})
 =\inf_{q\in\Delta(\mathcal D)}\sup_{z\in\mathcal Z}
@@ -585,6 +632,7 @@ Randomly choosing a past decision keeps the output space unchanged, so it is leg
 ### 12.2 The most important independence equality
 
 Let $\mathcal H_{t-1}$ contain the previous samples and the algorithmic randomness needed to produce $a_t$. Because $z_t$ is a fresh iid point, independent of this information,
+
 \[
 \mathbb E[\ell(a_t,z_t)\mid\mathcal H_{t-1}]
 =L_P(a_t).
@@ -597,6 +645,7 @@ $\mathbb E\ell(a_t,z_t)=\mathbb EL_P(a_t)$. If the algorithm looked at $z_t$ bef
 ### 12.3 Each step of the inequality
 
 For any fixed $f\in\mathcal F$, by the uniform random output and (46):
+
 \[
 \begin{aligned}
 \mathbb EL_P(\widehat a)-L_P(f)
@@ -616,6 +665,7 @@ For any fixed $f\in\mathcal F$, by the uniform random output and (46):
 The third step holds because the empirical best comparator's loss is no larger than any fixed $f$'s empirical loss, and subtracting a smaller number makes the difference larger.
 
 Taking $\sup_f$ on the left side, with the right side unchanged, gives
+
 \[
 \mathbb EL_P(\widehat a)-\inf_{f\in\mathcal F}L_P(f)
 \le\mathbb E\operatorname{Reg}(\mathcal F,n)/n.
@@ -630,6 +680,7 @@ $\mathbb E\inf_f\widehat L_S(f)$ with $\inf_f\mathbb E\widehat L_S(f)$. The proo
 If an online algorithm has expected average regret at most $r_n$ on all fixed sequences, then averaging over randomly generated iid sequences also keeps it at most $r_n$. So the batch algorithm obtained from its conversion has excess risk at most $r_n$ for all $P$.
 
 Taking the infimum over online algorithms yields
+
 \[
 \boxed{
 \mathcal V^{\rm iid}(\mathcal F,n)
@@ -645,6 +696,7 @@ If the online cumulative regret is $O(\sqrt n)$, the batch excess risk is $O(n^{
 
 If $\mathcal D$ is convex and $\ell(a,z)$ is convex in $a$, then
 $\bar a=n^{-1}\sum_ta_t\in\mathcal D$, and Jensen's inequality gives
+
 \[
 L_P(\bar a)\le\frac1n\sum_tL_P(a_t).
 \tag{50}
@@ -657,6 +709,7 @@ In this case the averaged decision can replace randomly picking one decision. Ge
 ### 13.1 Writing the problem in the slides' abstract notation
 
 Suppose there are $K$ actions,
+
 \[
 \mathcal D=\mathcal F=\{1,\ldots,K\},\quad
 \mathcal Z=[0,1]^K,\quad
@@ -665,12 +718,14 @@ Suppose there are $K$ actions,
 \]
 
 Each round the environment sets a loss vector $z_t$, the algorithm chooses $a_t$, and only observes
+
 \[
 b_t=z_t(a_t).
 \tag{52}
 \]
 
 Regret is still relative to the best fixed action:
+
 \[
 \operatorname{Reg}
 =\sum_tz_t(a_t)-\min_{i=1,\ldots,K}\sum_tz_t(i).
@@ -688,6 +743,7 @@ In the first environment, always choosing action 1 incurs linear regret $n/2$. T
 ### 13.3 Supplementary: a feedback-estimation formula explaining the role of exploration
 
 If the current action is drawn according to $p_t$ with all $p_t(i)>0$, one can define
+
 \[
 \widehat z_t(i)=
 \frac{\mathbf1\{a_t=i\}z_t(a_t)}{p_t(i)}.
@@ -695,6 +751,7 @@ If the current action is drawn according to $p_t$ with all $p_t(i)>0$, one can d
 \]
 
 Conditioned on past information and the already-chosen current $z_t$, the current action is only then sampled, so
+
 \[
 \mathbb E[\widehat z_t(i)\mid\text{past},z_t]
 =p_t(i)\frac{z_t(i)}{p_t(i)}
@@ -703,6 +760,7 @@ Conditioned on past information and the already-chosen current $z_t$, the curren
 \]
 
 But its second moment is
+
 \[
 \mathbb E[\widehat z_t(i)^2\mid\text{past},z_t]
 =\frac{z_t(i)^2}{p_t(i)}.
@@ -726,6 +784,7 @@ So when the slides say there is no obvious nested expression of the same kind, i
 Statistical learning faces an unknown distribution, but the iid structure provides the link between past and future. Online learning removes the fixed-distribution assumption and requires a decision each round before the feedback. Partial information further restricts the feedback, so the algorithm must not only choose low-loss actions but also acquire enough information.
 
 This lecture does not prove concrete optimal rates under the three frameworks; it establishes the evaluation criteria and two basic logical conclusions:
+
 \[
 \text{the class of all functions is not necessarily learnable},
 \qquad

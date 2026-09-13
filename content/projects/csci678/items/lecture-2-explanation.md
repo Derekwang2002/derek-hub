@@ -30,6 +30,7 @@ $\inf_{\text{算法}}\sup_{\text{分布}}\text{超额风险}$ 很难直接计算
 ### 1.1 风险和博弈值
 
 令 $S=(z_1,\ldots,z_n)\overset{\rm iid}{\sim}P^n$，定义
+
 \[
 L_P(f)=\mathbb E_{z\sim P}\ell(f,z),\qquad
 \widehat L_S(f)=\frac1n\sum_{t=1}^n\ell(f,z_t).
@@ -37,6 +38,7 @@ L_P(f)=\mathbb E_{z\sim P}\ell(f,z),\qquad
 \]
 
 学习的博弈值为
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 =\inf_A\sup_P\left[
@@ -46,12 +48,14 @@ L_P(f)=\mathbb E_{z\sim P}\ell(f,z),\qquad
 算法可能有内部随机性，期望默认也包括它。
 
 ERM 选择
+
 \[
 \widehat f_{\rm ERM}\in\arg\min_{f\in\mathcal F}\widehat L_S(f).
 \tag{3}
 \]
 
 因为对所有算法取 infimum 不大于任意一个具体算法的最坏误差，
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sup_P\left[
@@ -64,6 +68,7 @@ ERM 选择
 ### 1.2 最小值不取到怎么办
 
 即使 argmin 不存在，也可选择近似 ERM：
+
 \[
 \widehat L_S(\widetilde f)
 \le\inf_f\widehat L_S(f)+\xi_n.
@@ -74,12 +79,14 @@ ERM 选择
 ### 1.3 正则化与约束类：补全论证并说明限制
 
 设 $f_\lambda$ 最小化
+
 \[
 \widehat L_S(f)+\lambda\Psi(f),\qquad\lambda>0.
 \tag{6}
 \]
 令 $c=\Psi(f_\lambda)$。若有 $g$ 满足 $\Psi(g)\le c$ 且
 $\widehat L_S(g)<\widehat L_S(f_\lambda)$，那么
+
 \[
 \widehat L_S(g)+\lambda\Psi(g)
 <\widehat L_S(f_\lambda)+\lambda\Psi(f_\lambda),
@@ -93,6 +100,7 @@ $\widehat L_S(g)<\widehat L_S(f_\lambda)$，那么
 ### 2.1 ERM 到单侧统一偏差的完整推导
 
 先假设 $f^*\in\arg\min_fL_P(f)$。它可依赖 $P$，但不依赖当前样本。于是
+
 \[
 \begin{aligned}
 \mathbb EL_P(\widehat f_{\rm ERM})-L_P(f^*)
@@ -106,6 +114,7 @@ $\widehat L_S(g)<\widehat L_S(f_\lambda)$，那么
 第一个等号使用无偏性 $\mathbb E\widehat L_S(f^*)=L_P(f^*)$；第二步使用 ERM 的经验最优性，减去更小的经验损失使差值更大；第三步把数据选出的一个函数放宽到整个类。
 
 因此
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sup_P\mathbb E\sup_f[L_P(f)-\widehat L_S(f)].
@@ -119,6 +128,7 @@ $L(\widehat f)-L(f^*)\le2\sup_f|L(f)-\widehat L(f)|$
 ### 2.2 经验过程是一整族随机变量
 
 对每个固定 $f$，令
+
 \[
 X_f(S)=L_P(f)-\widehat L_S(f).
 \tag{9}
@@ -127,6 +137,7 @@ X_f(S)=L_P(f)-\widehat L_S(f).
 $X_f(S)\to0$。但算法根据样本选择函数，所以需要同时控制整族的最大偏差。
 
 课件采用的期望单侧统一收敛条件是
+
 \[
 \limsup_{n\to\infty}\sup_P\mathbb E_S\sup_{f\in\mathcal F}X_f(S)=0.
 \tag{10}
@@ -141,6 +152,7 @@ $X_f(S)\to0$。但算法根据样本选择函数，所以需要同时控制整�
 任意固定函数只在有限个输入上正确；这些点的概率为零，所以总体 0–1 风险为 1。对任意固定函数，经验风险也几乎必然趋于 1。
 
 但给定当前训练输入集，类中有函数在所有训练点上预测 $+1$，因此训练损失为零、总体风险仍为 1：
+
 \[
 \sup_{f\in\mathcal F}[L_P(f)-\widehat L_S(f)]=1.
 \tag{11}
@@ -151,6 +163,7 @@ $X_f(S)\to0$。但算法根据样本选择函数，所以需要同时控制整�
 ## 3. Rademacher 复杂度：只测量类迎合随机符号的能力
 
 对函数类 $\mathcal H\subseteq\mathbb R^{\mathcal Z}$，固定样本位置，定义
+
 \[
 \widehat{\mathcal R}_S(\mathcal H)
 =\frac1n\mathbb E_{\epsilon_{1:n}}
@@ -160,6 +173,7 @@ $X_f(S)\to0$。但算法根据样本选择函数，所以需要同时控制整�
 \tag{12}
 \]
 其中符号彼此独立。非条件版本为
+
 \[
 \mathcal R_{P,n}(\mathcal H)
 =\mathbb E_{S\sim P^n}\widehat{\mathcal R}_S(\mathcal H).
@@ -182,12 +196,14 @@ $\mathbb E\sup_h|\sum_t\epsilon_th(z_t)|/n$，单函数类一般不再为零，�
 ### 4.1 定义损失类
 
 把预测器转成样本空间上的函数：
+
 \[
 \ell(\mathcal F)=\{h_f:h_f(z)=\ell(f,z),\ f\in\mathcal F\}.
 \tag{14}
 \]
 
 要证明
+
 \[
 \boxed{\mathbb E_S\sup_f[L_P(f)-\widehat L_S(f)]
 \le2\mathcal R_{P,n}(\ell(\mathcal F)).}
@@ -198,6 +214,7 @@ $\mathbb E\sup_h|\sum_t\epsilon_th(z_t)|/n$，单函数类一般不再为零，�
 
 令 $S'=(z'_1,\ldots,z'_n)$ 为独立的 $P^n$ 样本。由于
 $L_P(f)=\mathbb E_{S'}n^{-1}\sum_t\ell(f,z'_t)$，
+
 \[
 \begin{aligned}
 \mathbb E_S\sup_f[L_P(f)-\widehat L_S(f)]
@@ -215,6 +232,7 @@ $\sup_f\mathbb E X_f\le\mathbb E\sup_fX_f$。
 ### 4.3 随机符号为何能凭空出现
 
 固定任意符号序列。当 $\epsilon_t=-1$ 时交换 $(z_t,z'_t)$，当它为 $+1$ 时不交换。每对样本的联合分布都是 $P\times P$，交换不改变它；各对之间仍然独立。因此
+
 \[
 \mathbb E_{S,S'}\sup_f\sum_t[\ell(f,z'_t)-\ell(f,z_t)]
 =\mathbb E_{S,S',\epsilon}\sup_f
@@ -243,12 +261,14 @@ $\sup_f\mathbb E X_f\le\mathbb E\sup_fX_f$。
 ## 5. 引理 1：二分类 0–1 损失为何恰好乘以 $1/2$
 
 当 $y,f(x)\in\{-1,+1\}$，有恒等式
+
 \[
 \mathbf1\{f(x)\ne y\}=\frac{1-yf(x)}2.
 \tag{19}
 \]
 
 因为同号时 $yf(x)=1$，异号时为 $-1$，分别得到损失 0 与 1。固定有标签样本后，
+
 \[
 \begin{aligned}
 \widehat{\mathcal R}_S(\ell(\mathcal F))
@@ -263,6 +283,7 @@ $\sup_f\mathbb E X_f\le\mathbb E\sup_fX_f$。
 
 第一项为零。因为 $y_t$ 已固定、为 $\pm1$，符号
 $-\epsilon_ty_t$ 仍然独立、等概率取 $\pm1$。于是再对样本取期望：
+
 \[
 \mathcal R_{P,n}(\ell(\mathcal F))
 =\tfrac12\mathcal R_{P_X,n}(\mathcal F).
@@ -276,12 +297,14 @@ $-\epsilon_ty_t$ 仍然独立、等概率取 $\pm1$。于是再对样本取期�
 ### 6.1 条件与目标
 
 假设 $\ell(f,(x,y))=\widetilde\ell(f(x),y)$，且对于所有允许的预测值、标签，
+
 \[
 |\widetilde\ell(u,y)-\widetilde\ell(v,y)|\le G|u-v|.
 \tag{22}
 \]
 
 要证明
+
 \[
 \widehat{\mathcal R}_S(\ell(\mathcal F))
 \le G\widehat{\mathcal R}_{x_{1:n}}(\mathcal F).
@@ -291,6 +314,7 @@ $-\epsilon_ty_t$ 仍然独立、等概率取 $\pm1$。于是再对样本取期�
 ### 6.2 先只替换最后一个坐标
 
 固定 $\epsilon_1,\ldots,\epsilon_{n-1}$，记
+
 \[
 A_f=\sum_{t=1}^{n-1}\epsilon_t\widetilde\ell(f(x_t),y_t),
 \qquad \phi(u)=\widetilde\ell(u,y_n).
@@ -298,6 +322,7 @@ A_f=\sum_{t=1}^{n-1}\epsilon_t\widetilde\ell(f(x_t),y_t),
 \]
 
 对最后一个符号的两个可能值取平均：
+
 \[
 \begin{aligned}
 \mathbb E_{\epsilon_n}\sup_f[A_f+\epsilon_n\phi(f(x_n))]
@@ -315,6 +340,7 @@ A_f=\sum_{t=1}^{n-1}\epsilon_t\widetilde\ell(f(x_t),y_t),
 
 $A_f+A_g$ 在交换 $f,g$ 时不变，而
 $f(x_n)-g(x_n)$ 改变符号。因此每个绝对值为正的差，都能通过交换顺序成为不带绝对值的正差：
+
 \[
 \sup_{f,g}[A_f+A_g+G|f(x_n)-g(x_n)|]
 =\sup_{f,g}[A_f+A_g+G(f(x_n)-g(x_n))].
@@ -322,6 +348,7 @@ $f(x_n)-g(x_n)$ 改变符号。因此每个绝对值为正的差，都能通过�
 \]
 
 重新把 supremum 拆回去：
+
 \[
 \begin{aligned}
 \frac12\sup_{f,g}[A_f+A_g+Gf(x_n)-Gg(x_n)]
@@ -333,6 +360,7 @@ $f(x_n)-g(x_n)$ 改变符号。因此每个绝对值为正的差，都能通过�
 \]
 
 于是最后坐标的非线性损失被 $Gf(x_n)$ 替换，复杂度不会变小。再对前面符号取期望，依次替换第 $n-1,\ldots,1$ 个坐标，得到
+
 \[
 \mathbb E\sup_f\sum_t\epsilon_t\widetilde\ell(f(x_t),y_t)
 \le\mathbb E\sup_f\sum_t\epsilon_tGf(x_t).
@@ -347,6 +375,7 @@ $\sum_{t<n}\epsilon_t[\widetilde\ell(f(x_t),y_t)+\widetilde\ell(g(x_t),y_t)]$，
 
 课件这里用的是半平方损失
 $\widetilde\ell(u,y)=\tfrac12(u-y)^2$。对 $u,v,y\in[-1,1]$：
+
 \[
 \begin{aligned}
 |\widetilde\ell(u,y)-\widetilde\ell(v,y)|
@@ -360,6 +389,7 @@ $\widetilde\ell(u,y)=\tfrac12(u-y)^2$。对 $u,v,y\in[-1,1]$：
 所以 $G=2$。若损失没有前面的 $1/2$，则 $G=4$；若预测和标签可取任意实数，就没有这个全局常数。Lecture 1 的平方损失和本讲的半平方损失不能在常数上混用。
 
 至此，分类取 $G=1/2$，回归取合法 Lipschitz 常数，有
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le2G\sup_{P_X}\mathcal R_{P_X,n}(\mathcal F).
@@ -371,6 +401,7 @@ $\widetilde\ell(u,y)=\tfrac12(u-y)^2$。对 $u,v,y\in[-1,1]$：
 ### 7.1 次高斯不是要求随机变量真的服从高斯分布
 
 零均值随机变量 $U$ 若满足
+
 \[
 \mathbb E e^{\lambda U}\le e^{\sigma^2\lambda^2/2}
 \quad\text{对所有 }\lambda\in\mathbb R,
@@ -379,6 +410,7 @@ $\widetilde\ell(u,y)=\tfrac12(u-y)^2$。对 $u,v,y\in[-1,1]$：
 就称为 $\sigma$-次高斯。这里 $\sigma^2$ 是指数矩的方差代理，不一定等于实际方差。
 
 指数矩控制能转成尾概率控制：对 $\lambda>0$，Markov 不等式给出
+
 \[
 \Pr(U\ge t)\le e^{-\lambda t}\mathbb E e^{\lambda U}
 \le e^{-\lambda t+\sigma^2\lambda^2/2}.
@@ -390,6 +422,7 @@ $\Pr(U\ge t)\le e^{-t^2/(2\sigma^2)}$。这解释了“次高斯”表示类似�
 ### 7.2 Hoeffding 引理的完整证明
 
 若 $\mathbb EU=0$，且 $U\in[a,b]$，要证明
+
 \[
 \mathbb E e^{\lambda U}
 \le \exp\left(\frac{\lambda^2(b-a)^2}{8}\right),
@@ -398,12 +431,14 @@ $\Pr(U\ge t)\le e^{-t^2/(2\sigma^2)}$。这解释了“次高斯”表示类似�
 即 $U$ 是 $(b-a)/2$-次高斯。
 
 令 $K(\lambda)=\log\mathbb E e^{\lambda U}$。因 $U$ 有界，可对期望求导。定义指数倾斜后的期望
+
 \[
 \mathbb E_\lambda[g(U)]
 =\frac{\mathbb E[g(U)e^{\lambda U}]}{\mathbb E e^{\lambda U}}.
 \tag{34}
 \]
 直接对 $K$ 求两次导数：
+
 \[
 K'(\lambda)=\mathbb E_\lambda U,\qquad
 K''(\lambda)=\mathbb E_\lambda U^2-(\mathbb E_\lambda U)^2
@@ -414,6 +449,7 @@ K''(\lambda)=\mathbb E_\lambda U^2-(\mathbb E_\lambda U)^2
 任意支持在 $[a,b]$ 的变量，均值为 $\mu$ 时，由
 $(U-a)(b-U)\ge0$ 得
 $\mathbb EU^2\le(a+b)\mu-ab$，从而
+
 \[
 \operatorname{Var}(U)
 \le(b-\mu)(\mu-a)
@@ -424,6 +460,7 @@ $\mathbb EU^2\le(a+b)\mu-ab$，从而
 
 倾斜分布仍支持在 $[a,b]$，所以 $K''(\lambda)$ 也满足 (36)。又
 $K(0)=0,K'(0)=\mathbb EU=0$，积分余项形式的 Taylor 公式给出
+
 \[
 K(\lambda)=\lambda^2\int_0^1(1-s)K''(s\lambda)\,ds
 \le\frac{\lambda^2(b-a)^2}{8}.
@@ -434,6 +471,7 @@ K(\lambda)=\lambda^2\int_0^1(1-s)K''(s\lambda)\,ds
 ## 8. 引理 3：最大值不等式为何只依赖 $\ln M$
 
 设 $U_1,\ldots,U_M$ 都是 $\sigma$-次高斯变量，不要求彼此独立。对任意 $\lambda>0$：
+
 \[
 \begin{aligned}
 \exp(\lambda\mathbb E\max_iU_i)
@@ -446,6 +484,7 @@ K(\lambda)=\lambda^2\int_0^1(1-s)K''(s\lambda)\,ds
 \]
 
 第一步是凸函数指数的 Jensen 不等式；第三步是非负数最大值不超过和。取对数除以 $\lambda$：
+
 \[
 \mathbb E\max_iU_i\le\frac{\ln M}{\lambda}+\frac{\sigma^2\lambda}{2}.
 \tag{39}
@@ -454,6 +493,7 @@ K(\lambda)=\lambda^2\int_0^1(1-s)K''(s\lambda)\,ds
 当 $M>1,\sigma>0$，对右侧求导，令
 $-\ln M/\lambda^2+\sigma^2/2=0$，得到
 $\lambda_*=\sqrt{2\ln M}/\sigma$。代入可得
+
 \[
 \boxed{\mathbb E\max_iU_i\le\sigma\sqrt{2\ln M}.}
 \tag{40}
@@ -466,6 +506,7 @@ $M=1$ 时左侧为零；$\sigma=0$ 时变量退化为零，也不需要上述除
 ### 9.1 每个函数对应一个随机符号和
 
 固定输入 $x_{1:n}$，对有限类 $\mathcal F$ 定义
+
 \[
 U_f=\sum_{t=1}^n\epsilon_tf(x_t),\qquad
 \sigma=\max_{f\in\mathcal F}\sqrt{\sum_{t=1}^nf(x_t)^2}.
@@ -474,6 +515,7 @@ U_f=\sum_{t=1}^n\epsilon_tf(x_t),\qquad
 
 对固定 $f$，各项独立、均值零。每项落在
 $[-|f(x_t)|,|f(x_t)|]$，由 Hoeffding 引理是 $|f(x_t)|$-次高斯。因此
+
 \[
 \begin{aligned}
 \mathbb E e^{\lambda U_f}
@@ -490,6 +532,7 @@ $[-|f(x_t)|,|f(x_t)|]$，由 Hoeffding 引理是 $|f(x_t)|$-次高斯。因此
 ### 9.2 应用最大值引理并除以样本量
 
 由 (40)：
+
 \[
 \boxed{
 \widehat{\mathcal R}_{x_{1:n}}(\mathcal F)
@@ -500,6 +543,7 @@ $[-|f(x_t)|,|f(x_t)|]$，由 Hoeffding 引理是 $|f(x_t)|$-次高斯。因此
 \]
 
 若 $|f(x)|\le C$，则 $\max_f\sum_tf(x_t)^2\le nC^2$，所以
+
 \[
 \mathcal R_{P_X,n}(\mathcal F)
 \le C\sqrt{\frac{2\ln|\mathcal F|}{n}}.
@@ -507,6 +551,7 @@ $[-|f(x_t)|,|f(x_t)|]$，由 Hoeffding 引理是 $|f(x_t)|$-次高斯。因此
 \]
 
 结合 (30)：
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le2GC\sqrt{\frac{2\ln|\mathcal F|}{n}}.
@@ -514,6 +559,7 @@ $[-|f(x_t)|,|f(x_t)|]$，由 Hoeffding 引理是 $|f(x_t)|$-次高斯。因此
 \]
 
 固定有限类且 $G,C$ 有限时，右侧趋零。若希望上界不超过 $\varepsilon$，一个充分条件是
+
 \[
 n\ge \frac{8G^2C^2\ln|\mathcal F|}{\varepsilon^2}.
 \tag{46}
@@ -528,6 +574,7 @@ $X_f=L_P(f)-\widehat L_S(f)$ 是 $B/(2\sqrt n)$-次高斯。证明：每个中�
 $L_P(f)-\ell(f,z_t)$ 均值零、区间长度为 $B$，独立求和再除以 $n$，指数矩参数平方变成 $n(B/2)^2/n^2$。
 
 最大值引理直接给出
+
 \[
 \mathbb E\max_fX_f
 \le\frac B{2\sqrt n}\sqrt{2\ln|\mathcal F|}.
@@ -541,6 +588,7 @@ $L_P(f)-\ell(f,z_t)$ 均值零、区间长度为 $B$，独立求和再除以 $n$
 ### 10.1 样本投影把“函数无限”转成“行为有限”
 
 对 $\mathcal F\subseteq\{-1,+1\}^{\mathcal X}$，定义
+
 \[
 F_S=\mathcal F|_{x_{1:n}}
 =\{(f(x_1),\ldots,f(x_n)):f\in\mathcal F\}
@@ -549,6 +597,7 @@ F_S=\mathcal F|_{x_{1:n}}
 \]
 
 尽管 $\mathcal F$ 可能不可数，$|F_S|\le2^n$。而
+
 \[
 \widehat{\mathcal R}_{x_{1:n}}(\mathcal F)
 =\frac1n\mathbb E_\epsilon
@@ -559,6 +608,7 @@ F_S=\mathcal F|_{x_{1:n}}
 这个等式成立是因为目标只读取 $f(x_t)$；具有相同投影的函数贡献完全相同。
 
 增长函数定义为所有样本位置上的最大行为数量：
+
 \[
 \Pi_{\mathcal F}(n)=\max_{x_{1:n}}|F_S|.
 \tag{50}
@@ -569,6 +619,7 @@ F_S=\mathcal F|_{x_{1:n}}
 ### 10.2 复杂度界及平凡界的失败
 
 每个投影向量的平方范数为 $n$，Massart 引理给出
+
 \[
 \widehat{\mathcal R}_S(\mathcal F)
 \le\sqrt{\frac{2\ln|F_S|}{n}}
@@ -577,6 +628,7 @@ F_S=\mathcal F|_{x_{1:n}}
 \]
 
 二分类中的 $2G=1$，因此
+
 \[
 \mathcal V^{\rm iid}(\mathcal F,n)
 \le\sqrt{\frac{2\ln\Pi_{\mathcal F}(n)}{n}}.
@@ -597,6 +649,7 @@ $L_P(f)-\widehat L_S(f)$ 不能只由投影向量恢复。
 ### 11.1 单阈值类为何恰有 $n+1$ 种标记
 
 课件定义
+
 \[
 f_\theta(x)=
 \begin{cases}
@@ -609,6 +662,7 @@ f_\theta(x)=
 排序不同样本 $x_1<\cdots<x_n$。正标签只能形成左侧前缀：前 $k$ 个为 $+1$，其余为 $-1$，其中 $k=0,\ldots,n$。
 
 每个 $k$ 都能实现：$k=0$ 取 $\theta<x_1$，$k=n$ 取 $\theta\ge x_n$，其他 $k$ 取 $x_k\le\theta<x_{k+1}$。因此
+
 \[
 \Pi_{\rm threshold}(n)=n+1,\qquad
 \mathcal V^{\rm iid}\le\sqrt{2\ln(n+1)/n}.
@@ -620,6 +674,7 @@ f_\theta(x)=
 ### 11.2 区间类为何是 $\binom{n+1}{2}+1$
 
 区间内预测 $+1$，区间外预测 $-1$：
+
 \[
 f_{\theta_1,\theta_2}(x)
 =
@@ -633,12 +688,14 @@ f_{\theta_1,\theta_2}(x)
 
 非空正标签必须是一个连续块 $x_i,\ldots,x_j$，其中
 $1\le i\le j\le n$。块长度与位置的总数为
+
 \[
 \sum_{i=1}^n(n-i+1)=\frac{n(n+1)}2=\binom{n+1}{2}.
 \tag{56}
 \]
 
 每个连续块都可用区间实现，再加上区间落在所有样本之外实现的全负标签，得到
+
 \[
 \Pi_{\rm interval}(n)=\binom{n+1}{2}+1.
 \tag{57}
@@ -651,6 +708,7 @@ $1\le i\le j\le n$。块长度与位置的总数为
 ### 12.1 “打散”中的量词
 
 一组 $m$ 个输入被打散，意味着所有 $2^m$ 个标签向量都可由类中函数实现：
+
 \[
 \exists x_1,\ldots,x_m,\quad
 \forall s\in\{-1,+1\}^m,\quad
@@ -659,6 +717,7 @@ $1\le i\le j\le n$。块长度与位置的总数为
 \]
 
 VC 维为可打散点集大小的上确界：
+
 \[
 \operatorname{VCdim}(\mathcal F)
 =\sup\{m:\Pi_{\mathcal F}(m)=2^m\}.
@@ -690,6 +749,7 @@ VC 维为可打散点集大小的上确界：
 ## 13. 命题 6：仿射线性分类器的 VC 维为输入维数加一
 
 为避免与 VC 维符号混淆，这里用 $p$ 表示输入空间维数。考虑
+
 \[
 \mathcal F_{\rm lin}
 =\{x\mapsto\operatorname{sign}(\langle\theta,x\rangle+b):
@@ -702,6 +762,7 @@ VC 维为可打散点集大小的上确界：
 
 取 $p+1$ 个点 $x_0=0,x_i=e_i\ (i=1,\ldots,p)$。对任意标签
 $s_0,\ldots,s_p\in\{-1,+1\}$，令
+
 \[
 b=s_0,\qquad\theta_i=s_i-s_0.
 \tag{61}
@@ -709,6 +770,7 @@ b=s_0,\qquad\theta_i=s_i-s_0.
 于是
 $\langle\theta,x_0\rangle+b=s_0$，
 $\langle\theta,e_i\rangle+b=s_i$。所有标签均被严格实现，因此
+
 \[
 \operatorname{VCdim}(\mathcal F_{\rm lin})\ge p+1.
 \tag{62}
@@ -720,17 +782,20 @@ $\langle\theta,e_i\rangle+b=s_i$。所有标签均被严格实现，因此
 
 任取 $p+2$ 个点，把它们增广成
 $\widetilde x_i=(x_i,1)\in\mathbb R^{p+1}$。线性相关性保证存在不全为零的 $a_i$，使
+
 \[
 \sum_i a_ix_i=0,\qquad\sum_i a_i=0.
 \tag{63}
 \]
 
 因为系数和为零，非零系数中既有正数又有负数。给正系数点标 $+1$，给负系数点标 $-1$，零系数点任意。若由某个 $(\theta,b)$ 实现，则
+
 \[
 a_i(\langle\theta,x_i\rangle+b)\ge0
 \quad(a_i>0),
 \]
 而当 $a_i<0$ 时，负标签要求分数严格小于零，乘负系数后严格大于零。至少有一个负系数，所以
+
 \[
 0<
 \sum_i a_i(\langle\theta,x_i\rangle+b)
@@ -739,6 +804,7 @@ a_i(\langle\theta,x_i\rangle+b)\ge0
 \tag{64}
 \]
 矛盾。因此任何 $p+2$ 个点都不能打散，结合下界：
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F_{\rm lin})=p+1.}
 \tag{65}
@@ -764,6 +830,7 @@ a_i(\langle\theta,x_i\rangle+b)\ge0
 ### 14.1 不能只说“频率高，所以复杂”
 
 考虑
+
 \[
 \mathcal F_{\sin}=\{x\mapsto\operatorname{sign}(\sin(\theta x)):
 \theta\in\mathbb R\}.
@@ -775,12 +842,14 @@ a_i(\langle\theta,x_i\rangle+b)\ge0
 ### 14.2 用二进制位给出显式构造
 
 固定 $m\ge1$，选择
+
 \[
 x_i=2^{i-1-m},\qquad i=1,\ldots,m.
 \tag{67}
 \]
 这些点互不相同，且全部在 $(0,1/2]$。对任意希望的标签 $s_i$，定义比特
 $b_i=0$ 当 $s_i=+1$，$b_i=1$ 当 $s_i=-1$。令
+
 \[
 t=\sum_{j=1}^m b_j2^{-j}+2^{-(m+2)},
 \qquad
@@ -789,12 +858,14 @@ t=\sum_{j=1}^m b_j2^{-j}+2^{-(m+2)},
 \]
 
 于是
+
 \[
 \frac{\theta x_i}{2\pi}=2^{i-1}t.
 \tag{69}
 \]
 
 将 (68) 乘以 $2^{i-1}$，前 $i-1$ 个二进制位形成整数部分，小数部分为
+
 \[
 u_i=\frac{b_i}{2}
 +\sum_{j=i+1}^m b_j2^{i-1-j}
@@ -803,6 +874,7 @@ u_i=\frac{b_i}{2}
 \]
 
 若 $b_i=0$，尾项严格为正，而
+
 \[
 \sum_{j=i+1}^m2^{i-1-j}+2^{i-m-3}
 =\frac12-2^{i-m-1}+2^{i-m-3}<\frac12.
@@ -811,6 +883,7 @@ u_i=\frac{b_i}{2}
 $2^{-(m+2)}$ 尾项保证没有任何输入恰好落在正弦为零的边界。
 
 由于正弦每周期前半段为正、后半段为负，
+
 \[
 \operatorname{sign}(\sin(\theta x_i))
 =\operatorname{sign}(\sin(2\pi u_i))
@@ -824,6 +897,7 @@ $2^{-(m+2)}$ 尾项保证没有任何输入恰好落在正弦为零的边界。
 \]
 
 任意标签都能实现，因此任意 $m$ 都有一组可打散输入：
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F_{\sin})=\infty.}
 \tag{72}
@@ -843,6 +917,7 @@ $t=1/4+1/32=9/32,\ \theta=9\pi/2$。
 ### 15.1 定理及边界
 
 若非空二分类类 VC 维至多为 $d<\infty$，则
+
 \[
 \Pi_{\mathcal F}(n)
 \le g(d,n):=\sum_{j=0}^{\min(d,n)}\binom nj.
@@ -850,6 +925,7 @@ $t=1/4+1/32=9/32,\ \theta=9\pi/2$。
 \]
 
 当 $n\ge d\ge1$，进一步有
+
 \[
 g(d,n)\le(en/d)^d.
 \tag{74}
@@ -860,6 +936,7 @@ g(d,n)\le(en/d)^d.
 ### 15.2 删除一个坐标后发生了什么
 
 固定 $n$ 个不同输入。令 $F_1$ 是原投影删除第一个坐标后出现的所有长度 $n-1$ 向量。令
+
 \[
 F_2=\{v\in F_1:(-1,v)\text{ 和 }(+1,v)
 \text{ 都出现在原投影中}\}.
@@ -867,6 +944,7 @@ F_2=\{v\in F_1:(-1,v)\text{ 和 }(+1,v)
 \]
 
 每个 $F_1$ 中的向量至少能接上一个首标签；若它属于 $F_2$，还能再接另一个。于是精确计数为
+
 \[
 |F_S|=|F_1|+|F_2|.
 \tag{76}
@@ -883,6 +961,7 @@ $F_1$ 的 VC 维至多为 $d$：否则剩余点上能打散 $d+1$ 个点，原�
 $F_2$ 的 VC 维至多为 $d-1$：若它能打散剩余点中的 $d$ 个点，则每个标签模式都来自一个可同时接上首标签 $+1,-1$ 的向量。因此原类能打散这 $d$ 个点加被删去的点，共 $d+1$ 个，矛盾。
 
 所以归纳得到
+
 \[
 |F_1|\le g(d,n-1),\qquad
 |F_2|\le g(d-1,n-1).
@@ -894,6 +973,7 @@ $F_2$ 的 VC 维至多为 $d-1$：若它能打散剩余点中的 $d$ 个点，�
 ### 15.4 Pascal 恒等式如何完成归纳
 
 对 $n>d>0$：
+
 \[
 \begin{aligned}
 |F_S|
@@ -913,6 +993,7 @@ $F_2$ 的 VC 维至多为 $d-1$：若它能打散剩余点中的 $d$ 个点，�
 ### 15.5 从二项式和到 $(en/d)^d$
 
 令 $u=d/n\in(0,1]$。当 $j\le d$ 时，$u^d\le u^j$，所以
+
 \[
 \begin{aligned}
 u^d\sum_{j=0}^d\binom nj
@@ -930,6 +1011,7 @@ u^d\sum_{j=0}^d\binom nj
 当 $n\le d$ 时某些点集能实现全部 $2^n$ 标签；当 $n>d$ 后，增长函数被固定次数 $d$ 的多项式量级控制。Sauer 给的是上界，不保证所有类实际恰按 $n^d$ 增长。
 
 阈值类 $d=1$ 时，Sauer 上界为 $1+n$，与精确增长函数相同。区间类 $d=2$ 时，
+
 \[
 1+n+\binom n2=1+\frac{n(n+1)}2,
 \tag{80}
@@ -941,6 +1023,7 @@ u^d\sum_{j=0}^d\binom nj
 ### 16.1 充分性：代入增长函数界
 
 对二分类 0–1 损失、$n\ge d\ge1$，结合 (52)、(74)：
+
 \[
 \boxed{
 \mathcal V^{\rm iid}(\mathcal F,n)
@@ -962,6 +1045,7 @@ u^d\sum_{j=0}^d\binom nj
 
 因此平均候选分布风险至少
 $(1/2)\cdot(1/2)=1/4$，至少存在一个候选分布使算法风险不低于 $1/4$。算法任意，所以
+
 \[
 \boxed{\operatorname{VCdim}(\mathcal F)=\infty
 \ \Longrightarrow\
@@ -975,6 +1059,7 @@ $(1/2)\cdot(1/2)=1/4$，至少存在一个候选分布使算法风险不低于 $
 ### 16.3 “闭环”到底闭合了什么
 
 在本讲二分类、0–1 损失、iid、分布一致以及通常可测性条件下：
+
 \[
 \boxed{
 \text{有限 VC 维}
@@ -996,6 +1081,7 @@ $\sqrt{d\ln(en/d)/n}$ 的每个对数因子都已经是不可改进的下界。
 ### 17.1 期望样本量
 
 由 (81)，要求上界至多 $\varepsilon$，可以使用充分条件
+
 \[
 \frac{n}{\ln(en/d)}\ge\frac{2d}{\varepsilon^2},
 \qquad n\ge d\ge1.
@@ -1009,6 +1095,7 @@ $\sqrt{d\ln(en/d)/n}$ 的每个对数因子都已经是不可改进的下界。
 ### 17.2 补充：有限类的高概率版本怎样推导
 
 本讲主线使用期望。如果损失落在长度 $B$ 的有界区间，对固定函数，由第 7 节的指数矩及尾界：
+
 \[
 \Pr(|L_P(f)-\widehat L_S(f)|>t)
 \le2e^{-2nt^2/B^2}.
@@ -1016,6 +1103,7 @@ $\sqrt{d\ln(en/d)/n}$ 的每个对数因子都已经是不可改进的下界。
 \]
 
 对 $M=|\mathcal F|$ 个函数使用并集界：
+
 \[
 \Pr\left(\sup_f|L_P(f)-\widehat L_S(f)|>t\right)
 \le2M e^{-2nt^2/B^2}.
@@ -1024,6 +1112,7 @@ $\sqrt{d\ln(en/d)/n}$ 的每个对数因子都已经是不可改进的下界。
 
 令右侧等于 $\delta$，取
 $t=B\sqrt{\ln(2M/\delta)/(2n)}$。在这个概率至少 $1-\delta$ 的事件上，插入两项经验风险得到
+
 \[
 L_P(\widehat f_{\rm ERM})-\inf_fL_P(f)
 \le2t
@@ -1036,12 +1125,14 @@ L_P(\widehat f_{\rm ERM})-\inf_fL_P(f)
 ### 17.3 补充：为什么可实现分类可能有更快保证
 
 若有限二分类类大小为 $M$，且存在零风险目标函数，则 ERM 训练误差为零。任取真实风险大于 $\varepsilon$ 的固定坏函数，它在全部 $n$ 个独立训练样本上都不犯错的概率为
+
 \[
 (1-L_P(f))^n\le(1-\varepsilon)^n\le e^{-n\varepsilon}.
 \tag{88}
 \]
 
 对坏函数并集取界，存在坏但训练误差为零的函数的概率至多 $Me^{-n\varepsilon}$。因此
+
 \[
 n\ge\frac{\ln M+\ln(1/\delta)}{\varepsilon}
 \tag{89}
