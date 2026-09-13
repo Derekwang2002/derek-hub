@@ -11,7 +11,10 @@ Each lecture note follows a fixed structure: the problem the lecture solves, the
 
 ## 2. Currently published
 
-- [Lecture 3 Preview Report: Covering Numbers, Dudley's Entropy Integral, and Pseudo-dimension](/projects/csci678/lecture-3-preview) — complexity control for infinite real-valued function classes, refined in three steps from pointwise covering to sample-projection covering to chaining.
-- [Lecture 3 Full Translation](/projects/csci678/lecture-3-full-translation) — a complete translation of the lecture slides, preserving the original theorem numbering and proof structure; meant to be read alongside the preview report.
+Each lecture has two companion documents: a detailed explanation report (section-by-section, filling in proof details) and a full translation of the slides (preserving the original numbering and structure).
+
+- Lecture 1: [Detailed Explanation](/projects/csci678/lecture-1-explanation) | [Full Translation](/projects/csci678/lecture-1-full-translation) — formalizing the learning problem, the statistical learning framework, the no-free-lunch theorem, online and partial-information learning.
+- Lecture 2: [Detailed Explanation](/projects/csci678/lecture-2-explanation) | [Full Translation](/projects/csci678/lecture-2-full-translation) — uniform convergence, symmetrization and Rademacher complexity, growth function and VC dimension.
+- Lecture 3: [Preview Report](/projects/csci678/lecture-3-preview) | [Full Translation](/projects/csci678/lecture-3-full-translation) — covering numbers, Dudley's entropy integral, and pseudo-dimension.
 
 Notes for later lectures will be added over time. Project news lives under [Updates](/projects/csci678/updates).

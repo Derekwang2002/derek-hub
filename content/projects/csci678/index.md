@@ -11,7 +11,10 @@ CSCI 678 是 USC 开设的理论机器学习课程（Fall 2026，Haipeng Luo）�
 
 ## 2. 当前收录
 
-- [Lecture 3 预习报告：覆盖数、Dudley 熵积分与伪维数](/zh/projects/csci678/lecture-3-preview)——无限实值函数类的复杂度控制，从逐点覆盖到样本投影覆盖再到 chaining 的三次精化。
-- [Lecture 3 课件完整翻译](/zh/projects/csci678/lecture-3-full-translation)——课件全文的中文翻译，定理编号与证明结构依照原文保留，适合与预习报告对照阅读。
+每讲收录两篇配套文档：讲解报告（逐节展开、补全证明细节）与课件完整翻译（保留原文编号与结构）。
+
+- Lecture 1：[详细讲解报告](/zh/projects/csci678/lecture-1-explanation) ｜ [课件完整翻译](/zh/projects/csci678/lecture-1-full-translation)——学习问题的形式化、统计学习框架、无免费午餐定理、在线与部分信息学习。
+- Lecture 2：[详细讲解报告](/zh/projects/csci678/lecture-2-explanation) ｜ [课件完整翻译](/zh/projects/csci678/lecture-2-full-translation)——一致收敛、对称化与 Rademacher 复杂度、增长函数与 VC 维。
+- Lecture 3：[预习报告](/zh/projects/csci678/lecture-3-preview) ｜ [课件完整翻译](/zh/projects/csci678/lecture-3-full-translation)——覆盖数、Dudley 熵积分与伪维数。
 
 后续讲次的笔记会持续加入。项目动态集中在 [Updates](/zh/projects/csci678/updates)。

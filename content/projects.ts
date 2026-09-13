@@ -154,6 +154,38 @@ export const projectDefinitions: ProjectDefinition[] = [
     ],
     items: [
       {
+        slug: "lecture-1-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-14",
+        reviewedRevision: "lecture1-explanation-report@2026-09-14"
+      },
+      {
+        slug: "lecture-1-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-14",
+        reviewedRevision: "lecture1-full-translation@2026-09-14"
+      },
+      {
+        slug: "lecture-2-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-14",
+        reviewedRevision: "lecture2-explanation-report@2026-09-14"
+      },
+      {
+        slug: "lecture-2-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-14",
+        reviewedRevision: "lecture2-full-translation@2026-09-14"
+      },
+      {
         slug: "lecture-3-preview",
         sectionSlug: "lecture-notes",
         kind: "document",
