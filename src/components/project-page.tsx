@@ -170,7 +170,7 @@ export async function ProjectUpdatesPage({
           locale={locale}
           project={project}
         />
-        <p className={styles.eyebrow}>CALL-E / Updates</p>
+        <p className={styles.eyebrow}>{project.name} / Updates</p>
         <h1>{locale === "zh" ? "项目动态" : "Project updates"}</h1>
         <p>
           {locale === "zh"
@@ -224,7 +224,7 @@ function ProjectHeader({
   return (
     <header className={styles.projectHero}>
       <Breadcrumbs current={title} locale={locale} project={project} section={item ? sectionLabel : undefined} />
-      <p className={styles.eyebrow}>CALL-E / {sectionLabel}</p>
+      <p className={styles.eyebrow}>{project.name} / {sectionLabel}</p>
       <h1>{title}</h1>
       <p>{summary}</p>
       <div className={styles.heroMeta}>
@@ -254,7 +254,7 @@ function Breadcrumbs({
     <nav aria-label={locale === "zh" ? "面包屑" : "Breadcrumb"} className={styles.breadcrumbs}>
       <Link href={localePath(locale, "/projects")}>Projects</Link>
       <span aria-hidden="true">/</span>
-      <Link href={project.href}>CALL-E</Link>
+      <Link href={project.href}>{project.name}</Link>
       {section ? <><span aria-hidden="true">/</span><span>{section}</span></> : null}
       <span aria-hidden="true">/</span>
       <span aria-current="page">{current}</span>
@@ -389,7 +389,7 @@ export async function getProjectMetadata(
   if (!project) return { title: locale === "zh" ? "项目未找到" : "Project not found" };
   if (updates) {
     const title = locale === "zh" ? `${project.overview.title} 项目动态` : `${project.overview.title} Updates`;
-    return localizedMetadata(title, locale === "zh" ? "CALL-E 项目里程碑与关联内容。" : "CALL-E milestones and associated publications.", `${project.href}/updates`, `/projects/${projectSlug}/updates`);
+    return localizedMetadata(title, locale === "zh" ? `${project.name} 项目里程碑与关联内容。` : `${project.name} milestones and associated publications.`, `${project.href}/updates`, `/projects/${projectSlug}/updates`);
   }
   const item = itemSlug ? await getProjectItem(projectSlug, itemSlug, locale) : null;
   if (itemSlug && !item) return { title: locale === "zh" ? "文档未找到" : "Document not found" };

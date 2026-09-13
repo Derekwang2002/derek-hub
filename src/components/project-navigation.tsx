@@ -51,15 +51,15 @@ export function ProjectNavigation({
   return (
     <>
       <aside
-        aria-label={locale === "zh" ? "CALL-E 项目目录" : "CALL-E project contents"}
+        aria-label={locale === "zh" ? `${project.name} 项目目录` : `${project.name} project contents`}
         className={styles.desktopNav}
       >
-        <p className={styles.navEyebrow}>CALL-E</p>
+        <p className={styles.navEyebrow}>{project.name}</p>
         {contents}
       </aside>
       <details className={styles.mobileNav}>
         <summary>{locale === "zh" ? "项目目录" : "Project contents"}</summary>
-        <nav aria-label={locale === "zh" ? "CALL-E 项目目录" : "CALL-E project contents"}>
+        <nav aria-label={locale === "zh" ? `${project.name} 项目目录` : `${project.name} project contents`}>
           {contents}
         </nav>
       </details>

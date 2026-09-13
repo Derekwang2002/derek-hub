@@ -45,6 +45,7 @@ type ProjectItemDefinition = {
 
 type ProjectDefinition = {
   slug: string;
+  name: { en: string; zh: string };
   status: ProjectStatus;
   overview: {
     updated: string;

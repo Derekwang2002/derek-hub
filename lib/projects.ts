@@ -28,6 +28,7 @@ export type ProjectItemDefinition = {
 
 export type ProjectDefinition = {
   slug: string;
+  name: Record<ContentLocale, string>;
   status: ProjectStatus;
   overview: {
     updated: string;
@@ -58,6 +59,7 @@ export type ProjectSection = {
 export type Project = {
   href: string;
   lastUpdated: string;
+  name: string;
   overview: ProjectDocument;
   reviewedRevision?: string;
   sections: ProjectSection[];
@@ -287,6 +289,7 @@ async function loadProject(
   return {
     href: localePath(locale, `/projects/${definition.slug}`),
     lastUpdated,
+    name: definition.name[locale],
     overview,
     reviewedRevision: definition.overview.reviewedRevision,
     sections,
@@ -301,6 +304,7 @@ function validateDefinitions(): void {
     validateSlug(project.slug, "Project");
     if (projectSlugs.has(project.slug)) throw new Error(`Duplicate Project slug "${project.slug}".`);
     projectSlugs.add(project.slug);
+    if (!project.name?.en.trim() || !project.name?.zh.trim()) throw new Error(`Project "${project.slug}" requires both name labels.`);
     validateDate(project.overview.updated, `${project.slug} overview`);
 
     const sectionSlugs = new Set<string>();

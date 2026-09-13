@@ -3,6 +3,7 @@ import type { ProjectDefinition } from "../lib/projects";
 export const projectDefinitions: ProjectDefinition[] = [
   {
     slug: "call-e",
+    name: { en: "CALL-E", zh: "CALL-E" },
     status: "active",
     overview: {
       updated: "2026-08-21",
@@ -120,6 +121,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "ai-intelligence",
+    name: { en: "AI Radar", zh: "AI Radar" },
     status: "active",
     overview: {
       updated: "2026-09-01",
@@ -141,6 +143,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "csci678",
+    name: { en: "CSCI 678", zh: "CSCI 678" },
     status: "active",
     overview: {
       updated: "2026-09-11",
@@ -170,6 +173,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "derek-hub",
+    name: { en: "Derek Hub", zh: "Derek Hub" },
     status: "active",
     overview: {
       updated: "2026-09-01",
