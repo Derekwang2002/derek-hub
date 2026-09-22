@@ -1,27 +1,23 @@
 ---
-title: "What Does Layered Architecture Isolate? Change, Dependencies, and Cost"
-summary: "Starting with a course enrollment example split into domain, service, API, and database code, explore why layering can help even when business rules change fastest, when to split a system, and what the extra structure costs."
+title: "What does layered architecture isolate? Change, dependencies, and cost"
+summary: "Business rules often change faster than the database or API. A course enrollment example helps work through what layering saves, and what extra work it creates."
 ---
 
-One sentence is easy to remember when learning layered architecture: parts that change easily should depend on parts that do not.
+While organizing notes on the enrollment example in [“Learn Architecture Design in Five Minutes” on Bilibili](https://www.bilibili.com/video/BV1CXet6gE6X/), my first interpretation was simple: parts that change easily should depend on parts that do not. So the API and database go on the outside, the service handles the workflow, and the domain holds the business rules.
 
-A course enrollment example seems to fit that explanation. The API and database sit on the outside, a service orchestrates the workflow, and the domain holds the core rules. The outer parts may switch frameworks or databases, while the enrollment rules remain relatively stable.
+I got stuck on the claim that business rules are relatively stable. When a product changes enrollment eligibility, pricing, or approval steps, the domain and service are exactly where those edits go. The database and web framework might stay the same for years. Measured by edit frequency, the business code can be the least stable part.
 
-Real product development often looks different. The database and web framework stay unchanged for years, while the product team adjusts eligibility, pricing, and workflows every week. The domain and service may be the most frequently edited parts of the system.
+Does that dependency direction still make sense? And if an enrollment feature could fit in a few dozen lines, what work do all these extra files and interfaces actually save?
 
-Should the dependencies then point the other way? If not, what does layering protect? And is a small project justified in adding all those files and interfaces?
+Those questions made dependency inversion and interfaces more concrete for me: a rule can change often without forcing its callers to change. I will keep using enrollment to work through this. The discussion of scale and engineering costs extends the original example.
 
-My view is that **layering earns its value by separating responsibilities according to why they change, then using explicit contracts to limit how changes spread. Edit frequency is a useful observation, but it cannot determine dependency direction on its own.**
+## Four responsibilities inside one enrollment function
 
-This article starts with summary notes on the enrollment example in the Bilibili video [“Learn Architecture Design in Five Minutes”](https://www.bilibili.com/video/BV1CXet6gE6X/), then draws on Clean Architecture, hexagonal architecture, and Transaction Script. The discussion of scale and tradeoffs extends the original example.
+Enrollment can fit in a single function: parse the request, load the student and course, check for duplicates and capacity, save, and return an HTTP response.
 
-## Four Responsibilities Inside One Enrollment Function
+The trouble shows up when editing it. Even checking that a full course rejects enrollment requires reading past queries and HTTP error handling. A test may need a database connection before it can get started.
 
-The most direct implementation usually combines several tasks: parse a request, load a student and course, check for duplicate enrollment and capacity, save the result, and return an HTTP response.
-
-The code works, but understanding and checking one rule requires dealing with business conditions, SQL, connections, and HTTP errors at the same time. A single function has several reasons to change.
-
-Separating those responsibilities gives each part a different question to answer:
+The example separates the code like this:
 
 | Part | Core question | Enrollment example |
 |---|---|---|
@@ -30,104 +26,94 @@ Separating those responsibilities gives each part a different question to answer
 | API | How do external callers request an operation and understand its result? | Parse parameters and turn business outcomes into HTTP responses |
 | Database implementation | How is data actually read and persisted? | SQL, ORM usage, field mappings, and storage operations |
 
-Here, service means application use-case orchestration; it does not imply an independently deployed microservice. A domain can use objects with behavior, or ordinary data structures and functions. Putting enrollment behavior inside a `Course` object is a modeling choice, not a mandatory form.
+Here, the service coordinates a use case inside the application. It does not need its own deployment. The domain can also be ordinary functions. Putting enrollment behavior inside a `Course` object suits this example, but not every behavior needs to live in a class.
 
-Four layers also do not require four particular folders. The original Clean Architecture article explicitly describes its layer count as schematic; responsibilities and source-code dependencies are what matter. [Reference: The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+As for how many layers to use, the [original Clean Architecture article](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) is clear that the layer count is schematic. Creating four matching folders does not guarantee that responsibilities have been separated.
 
 ![Enrollment architecture: server connects api and db, both depend on service, and service depends on domain.](/blog/layered-architecture-and-change/original-layered-architecture.png)
 
-Figure 1: The enrollment example's layers, to be read alongside the [original video](https://www.bilibili.com/video/BV1CXet6gE6X/). The `server` is the composition root that creates objects, wires dependencies, and starts the application; the highlighted `domain` owns business rules. The `db → service` arrow is shorthand: more precisely, the DB implements a storage interface defined on the business side, as the next diagram shows. This is a dependency sketch, not the order in which a request visits the layers.
+Figure 1: The enrollment architecture from the [original video](https://www.bilibili.com/video/BV1CXet6gE6X/). The `server` is the composition root: it creates objects, connects their dependencies, and starts the application. The yellow area holds domain rules. The `db → service` arrow abbreviates the DB implementing a storage interface defined on the business side. These arrows show code dependencies, not request execution order.
 
-## Stability Has at Least Three Meanings
+## Stability has at least three meanings
 
-Before deciding what should depend on what, distinguish three questions.
+I initially read “stable” as “rarely edited.” That leaves out the caller.
 
-**Does the implementation change frequently?** This is the frequency of code edits that version history can reveal.
+An eligibility function can change its internal conditions every week while keeping the same parameters, results, and failure behavior. Its callers may need no edits at all. The implementation changes often; the external contract stays relatively stable. That contract covers how to call it, how it can fail, and what it guarantees, not just the function signature.
 
-**Does the external contract change frequently?** Do the parameters, results, errors, and behavioral guarantees that callers must understand keep changing? A contract includes failure modes and calling constraints, not just a function signature.
+Another kind of stability is being unaffected by unrelated changes. Product decisions can change enrollment eligibility, but an HTTP framework upgrade should not. That is the isolation we want when putting business rules on the inside.
 
-**Is it easily affected by changes elsewhere?** Enrollment eligibility may change with product decisions, but should not change because the HTTP framework is upgraded.
+A module that has not changed for a year can still bind its callers tightly to its internal data structures if it exposes them all. The same database product can host constantly changing queries, schemas, indexes, and transaction code. An API's public contract can change without replacing its framework either.
 
-These dimensions are different. A module can change its internal rules every week while preserving its external contract. Another can remain untouched for a year yet tightly couple its callers to many exposed implementation details.
+Rare edits, unchanged callers, and independence from a particular kind of change are different things. Counting Git commits cannot tell us which part should depend on which.
 
-In this context, saying that business rules are stable is better understood as an aim to keep them unaffected by unrelated technical changes. It does not mean that business rules stay unchanged over time.
+## Dependency inversion changes source-code dependencies
 
-Likewise, using the same database product for years does not mean storage code stays the same. Queries, schemas, indexes, and transaction handling may keep evolving. Keeping an API framework does not guarantee that its public contract stays unchanged either.
+A service that needs a course still calls a storage object at runtime. Dependency inversion concerns the source code: must the service reference that specific PostgreSQL storage class?
 
-Sorting the four layers by Git commit counts and choosing dependency directions from that ranking confuses these different kinds of change.
-
-## Dependency Inversion Changes Source-Code Dependencies
-
-A service that needs a course naturally calls a storage operation at runtime. Dependency inversion does not remove that call.
-
-It changes what the service needs to know when its code is written.
-
-With a direct dependency on an implementation, the service must know a particular PostgreSQL storage class. With a storage interface defined on the business side, it only needs to know that courses can be retrieved and enrollment results saved. The concrete implementation is supplied from outside.
+The business side can define an `EnrollmentStore` interface describing what it needs to read and save. The service uses that interface, and the PostgreSQL adapter implements it. Writing the enrollment workflow then requires no direct reference to the PostgreSQL implementation.
 
 ![Source dependencies: the API uses the enrollment use case, which uses domain rules and a storage interface implemented by the PostgreSQL adapter.](/blog/layered-architecture-and-change/dependencies-en.svg)
 
 Figure 2: Source-code dependencies. Solid arrows mean usage; the dashed arrow means interface implementation. Arrows point toward the dependency. [View full size](/blog/layered-architecture-and-change/dependencies-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/dependencies-en.mmd)
 
-The dashed arrow means that the PostgreSQL adapter implements an interface defined on the business side. It does not mean the database initiates a runtime call to the service. Abbreviating this relationship as “the DB depends on the service” can confuse source dependencies with execution order.
+This also explains the easily misread `db → service` arrow in the original sketch. The DB implementation depends on an interface declared on the business side. It is not initiating a call to the service.
 
-Dependency injection handles assembly: create a storage object, pass it to the service, and let the API use that service. Ordinary constructor or function arguments are sufficient; a dependency injection container is optional.
+When starting the program, create a concrete storage object, pass it to the service, and let the API use that service. That is dependency injection. Constructor or ordinary function arguments can do the job without a container.
 
 ![Successful enrollment at runtime: the API calls the service, which reads storage, applies domain rules, saves, and returns a result.](/blog/layered-architecture-and-change/runtime-en.svg)
 
-Figure 3: Runtime calls, read from top to bottom. The service calls an injected storage object, so it can use a DB implementation while its source code depends only on an interface. Failure paths are omitted; this read-and-save sequence alone does not guarantee transaction or concurrency safety, a limitation discussed later. [View full size](/blog/layered-architecture-and-change/runtime-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/runtime-en.mmd)
+Figure 3: A successful enrollment, read from top to bottom. The service calls the DB implementation through an injected object while its source can reference only an interface. Failure paths are omitted; transactions and concurrency still need separate handling. [View full size](/blog/layered-architecture-and-change/runtime-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/runtime-en.mmd)
 
-An interface does not become better simply by becoming more generic. If a storage interface still makes callers supply SQL, understand ORM sessions, and manipulate database row objects, business code still needs to know storage details. An interface earns its value through the complexity it actually hides from callers.
+Adding an interface does not automatically hide the details. If callers still supply SQL, manage ORM sessions, and handle database row objects, understanding enrollment still requires understanding storage. That interface saves little work.
 
-## Layering Can Work Even When the Domain Changes Fastest
+## Layering can work even when the domain changes fastest
 
-Suppose the enrollment use case exposes this operation:
+Back to the original question. Suppose enrollment looks like this:
 
 ```text
 enroll(student_id, course_id) -> EnrollmentResult
 ```
 
-The product team changes the rule from “enrollment is allowed until the course starts” to “enrollment closes 24 hours before the course starts.” If existing data includes the start time and existing failure results can express rejection, this change may only require updating the eligibility rule and its tests.
+The product changes the cutoff from “until the course starts” to “24 hours before the course starts.” If the data already includes the start time and an existing failure result can express this rejection, updating the eligibility check and its tests may be enough.
 
-The service still loads data, applies the rule, and saves the result. The API still accepts two IDs. Storage still retrieves the same information.
+The service follows the same steps, the API still accepts two IDs, and the database needs no additional fields for the query. The domain has changed, but its callers may not need to.
 
-**A change inside the domain does not require every caller to change.** Changing an implementation and changing its external contract are different events.
+This is where layering starts to look worthwhile to me. If the cutoff changes often, give that time check an easy-to-find home and a straightforward test. Editing it should not require setting up a complete HTTP request and database connection again.
 
-The more frequently business rules change, the more useful it can be to express them in one place and verify them independently. A maintainer adjusting the enrollment cutoff can focus on the time condition without also understanding HTTP requests and database connections.
+In his [original hexagonal architecture article](https://alistair.cockburn.us/hexagonal-architecture), Cockburn discusses exactly these concerns: testing an application independently of its UI and database, and allowing programs or batch jobs to use the same application behavior.
 
-One central motivation for hexagonal architecture is to test an application independently of a particular UI or database, and to drive it through different entry points such as user interactions, programs, or batch jobs. [Reference: Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture)
-
-The situation changes if the product moves from “enrollment succeeds immediately” to “pay first, then obtain approval, then confirm enrollment.” New business semantics may require several coordinated changes:
+But a change from “enrollment succeeds immediately” to “pay first, then obtain approval, then confirm enrollment” reaches further:
 
 - The domain adds states such as awaiting payment and awaiting approval, along with transition rules.
 - The service orchestrates payment and approval.
 - The database stores the new states and records.
 - The API exposes the relevant operations and returns new outcomes.
 
-These changes are coupled by the requirement itself. A reasonable architecture can give each part a clear responsibility, but cannot eliminate changes that follow necessarily from new business semantics.
+It is hardly surprising that all four layers change here. The meaning of successful enrollment has changed, so callers and storage may need to adapt. Squeezing the new workflow into an old interface just to preserve it could make the code harder to understand.
 
-When evaluating decoupling, a more useful question is whether a change across modules is required by the business or caused by leaked implementation details.
+The distinction to make is whether the new business behavior requires those edits, or whether exposed implementation details are forcing other code to follow along.
 
 ![Comparing change impact: a cutoff adjustment may affect only rules and tests if existing contracts suffice; adding payment and approval requires coordinated changes across all four layers.](/blog/layered-architecture-and-change/change-scope-en.svg)
 
-Figure 4: The reach of two business changes. The left path assumes existing data and result contracts remain sufficient; the right path spreads across layers because it introduces new business semantics. [View full size](/blog/layered-architecture-and-change/change-scope-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/change-scope-en.mmd)
+Figure 4: Two product changes with quite different reach. The left path assumes existing data and results can express the new rule; the right adds business states that require the layers to work together. [View full size](/blog/layered-architecture-and-change/change-scope-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/change-scope-en.mmd)
 
-### Keep Frequently Changing Rules in a Smaller Area
+### Keep frequently changing rules in a smaller area
 
-If the enrollment workflow stays relatively fixed but ordinary, membership, and promotional courses use different eligibility rules, start by extracting eligibility into an independent function. The workflow only needs to know whether enrollment is allowed and the reason for rejection.
+If ordinary, membership, and promotional courses have different eligibility rules but similar enrollment steps, I would start by extracting eligibility into a function. The workflow gets an approval or a rejection with a reason, then proceeds accordingly.
 
-Consider a strategy interface when multiple rule sets actually need to be switched or maintained independently. For one simple condition, a clear function is usually enough.
+Once multiple rule sets need to be switched or maintained separately, consider a strategy interface. With just one condition, write that condition clearly first. A generic rules engine would add its own maintenance work.
 
-If product exploration might overturn every rule, keep the model simple and allow it to be refactored. Building a generic rules engine too early can freeze poorly understood variation into a framework that is harder to change.
+During product exploration, the entire set of rules may be overturned. I would rather keep the model simple enough to rewrite than try to anticipate every future requirement.
 
-It is also perfectly normal for the API and database to remain stable for a long time. Layering can still earn its keep by reducing testing and maintenance costs. If those benefits are absent too, a complete isolation structure is difficult to justify solely because the database might change someday.
+It is also fine if the API and database never change. Layering is useful if it makes everyday edits and tests easier. Without even that benefit, “we might switch databases someday” is a weak reason to write another set of interfaces.
 
-## How Large Must a Business Be Before This Is Worthwhile?
+## How large must a business be before this is worthwhile?
 
-User count, QPS, and lines of code are not reliable thresholds on their own.
+I cannot give a useful answer like “start layering after ten thousand users.” User count and maintenance difficulty are not that directly related.
 
-A high-traffic query service can contain very little business logic. A settlement system used by a few hundred people can deserve careful modeling because its monetary, approval, and state rules are complex. Traffic primarily raises capacity and performance concerns; responsibility design primarily addresses understanding, change, and collaboration. The two cannot be directly converted into one another.
+A high-traffic query service might have few business rules. A settlement system used by a few hundred people could have difficult monetary and approval states to handle. The first needs to address throughput; the second needs clear rules even with little traffic.
 
-I pay more attention to problems that already exist:
+Rather than looking for a scale threshold, I would check whether these problems have appeared:
 
 | Existing problem | Separation worth considering |
 |---|---|
@@ -137,96 +123,73 @@ I pay more attention to problems that already exist:
 | State and monetary rules are scattered, causing edits to be missed | Establish one authoritative place to maintain each rule |
 | A requirement repeatedly causes rework in unrelated modules | Check for shared data structures and leaked implementation details |
 
-Business complexity, the spread of changes, team collaboration, and expected maintenance lifetime usually explain more than reaching a particular number of users.
+How often these problems occur, how many people need to make changes together, and how long the project will be maintained all affect whether the effort is worthwhile. A temporary tool and a long-lived product need not be split in the same way.
 
-Nor must every feature use the same structure. A complex enrollment workflow can have independent rules and a storage interface, while a nearby read-only list simply queries and returns data. Modules carry different amounts of complexity and can use different amounts of structure.
+Even within one project, different choices can make sense. A complicated enrollment workflow may deserve independent rules and a storage interface, while a nearby read-only list simply queries and returns data.
 
-## Benefits and Costs Show Up in Everyday Maintenance
+## Benefits and costs show up in everyday maintenance
 
-The most common benefit of layering is reducing how much must be understood and verified to make a change.
+The work layering saves is often mundane: no hunting for several copies of an eligibility check, no starting the whole service to test a rule. If a future bulk import can call the existing enrollment logic, there is one less copy to keep in sync. For a team, knowing what a module accepts and returns is usually less work than first learning its entire implementation.
 
-- **Changes stay local.** Enrollment eligibility has a clear home, without multiple copies to find.
-- **Tests become direct.** Supply inputs to a rule and check its results with less environment setup.
-- **Behavior can be reused.** A web interface, background task, and bulk import can share business behavior.
-- **Collaboration becomes clearer.** Modules interact through explicit contracts, reducing the need to share knowledge of their internals.
+But someone has to maintain the additions. Interfaces need names, objects need assembly, and data moves between models. Reading a feature means visiting more files. With an unsuitable interface, adding one field can become an edit across five layers.
 
-The costs are additional interfaces, data mappings, object assembly, and file navigation. Multiple models must remain consistent, and the team must understand the contracts. A poorly chosen abstraction can make a simple field change travel through five layers.
-
-A typical warning sign is a chain whose layers merely forward arguments:
+Take this call chain:
 
 ```text
 Controller -> Service -> Repository -> ORM
 ```
 
-The chain alone does not prove the design is wrong. What matters is whether each layer owns rules, conversions, or constraints, and whether it hides complexity. If each exposes almost the same information and maintainers still need to read all the way through, the extra structure offers little benefit.
+If each layer handles its own rules or conversions, this can be perfectly reasonable. But if arguments pass straight down and results pass straight back up, and only the ORM code explains what happens, the forwarding layers deserve another look.
 
-Try a deletion test: if a module disappeared, would the complexity it handles reappear across several callers? If so, it is doing useful work. If that complexity disappears with the module, it may have been unnecessary forwarding.
+I would ask what happens if a layer is removed. Does the work it handled spread into several callers? If so, it was saving duplication. If removing it only means opening one fewer file, it may not be needed.
 
-An approximate economic framework can help:
+The size of the benefit depends on actual requirements. Small savings on frequent changes can add up; avoiding a missed edit or a round of cross-team clarification also counts. On the other side are the initial extraction effort and the recurring cost of maintaining interfaces and mappings.
 
-```text
-Expected benefit:
-recurring changes × effort saved per change
-+ reduced regression and coordination cost
+Rather than assign architecture a universal return, I would work through a few recent requirements: with this proposed split, which edits would disappear, and what extra work would it introduce?
 
-Expected cost:
-initial extraction + ongoing interface and mapping maintenance
-```
+## Two practical costs hidden in the enrollment example
 
-This is not a precise formula, and there is no universal percentage improvement. It is a reminder to examine actual changes: could recent requirements have been located faster, implemented with fewer repeated edits, and verified more easily?
+### Switching databases takes more than one line of assembly code
 
-## Two Practical Costs Hidden in the Enrollment Example
+The example makes a database switch look straightforward: change one line at the assembly point. But that is the last step, after the new implementation has been written and satisfies the old contract.
 
-### Switching Databases Takes More Than One Line of Assembly Code
+A real move from SQLite to PostgreSQL may involve SQL dialects, existing data, transaction isolation, and performance. The interface can reduce edits to enrollment logic. The migration work is still there.
 
-“Swap the implementation at the assembly point” assumes that the new implementation already exists and satisfies the original contract.
+I would not use a possible future database switch as the only justification. Current testing, maintenance, or reuse needs are easier to assess.
 
-A real migration from SQLite to PostgreSQL may also involve SQL dialects, data migration, transaction isolation, and performance verification. An interface can reduce coupling between business code and a concrete implementation, but cannot perform that migration work.
+### Correct rules do not guarantee correct concurrent behavior
 
-Database replaceability is therefore often better treated as an additional capability the architecture provides. Whether abstraction is worthwhile still depends on current testing, maintenance, and reuse needs.
+With one place left, two requests can both read that a place is available, pass their domain checks, and save successfully. Each rule check looks correct on its own; the course still ends up over capacity.
 
-### Correct Rules Do Not Guarantee Correct Concurrent Behavior
+Preventing this may require locking in a transaction, checking a version during an update, or including the capacity condition in an atomic write. A suitable unique constraint can also prevent duplicate enrollment.
 
-Suppose a course has one remaining place. Two requests load it simultaneously, and both domain checks conclude that a place is available. Both may then save successfully.
+These decisions need to be made together: which steps must succeed or fail as a group, how storage provides that guarantee, and how the workflow handles failure. An interface with only `get` and `save`, but no consistency requirements, leaves a practical problem for its users to solve.
 
-An in-memory capacity check expresses business intent but does not independently guarantee consistency under concurrency. A concrete solution may need locking inside a transaction, an update with a version check, or a capacity condition included in an atomic write. An appropriate unique constraint can also prevent duplicate enrollment.
+Pure rule tests can check eligibility. Database integration tests and necessary concurrency tests must check that real storage upholds those requirements too. Passing tests against an in-memory substitute does not replace that work.
 
-These mechanisms require coordinated design: the use case determines what atomicity an operation requires, storage supplies the relevant guarantees, and failures return to the business workflow for handling. A simple `get` plus `save` interface that leaves its consistency contract unspecified can hide the most important part of the problem.
+## Start small and add structure gradually
 
-Pure rule tests, storage integration tests, and necessary concurrency tests therefore have distinct responsibilities. An in-memory substitute cannot prove that a real database behaves correctly under transactions.
+Starting a small project, I would let routes handle HTTP and write a business function that clearly expresses one operation, calling the ORM directly where needed. Simple CRUD does not need a domain, service, and repository for every table.
 
-## Start Small and Add Structure Gradually
+Fowler's [Transaction Script](https://martinfowler.com/eaaCatalog/transactionScript.html) organizes a business request as a procedure and extracts common steps. It is a reasonable starting point to take seriously.
 
-I prefer to add structure as problems appear.
+When eligibility checks and state transitions become difficult to read or test, extract those rules. Functions are fine to begin with. Consider richer object models when a group of data and behavior needs to be maintained together.
 
-**First, express one use case clearly.** Let the route handle HTTP and a business function describe the operation, using an ORM directly where appropriate. Simple CRUD does not require a domain, service, and repository for every table.
+Interfaces can come later too. If a real database makes rule tests awkward, or payments and notifications already have different implementations, provide a way to substitute those parts. A test substitute counts as an actual use, though it does not remove the need for integration checks against the real implementation.
 
+As the business grows, I would organize modules around enrollment, payments, and courses, letting each use as much internal layering as it needs. That avoids pushing every feature into an ever-growing service.
 
-Organizing a business request as a procedure, with common steps extracted into subprocedures, corresponds to Fowler's Transaction Script. It is an established way of organizing business logic in its own right. [Reference: Transaction Script](https://martinfowler.com/eaaCatalog/transactionScript.html)
+At this point, the application can still be a single process. Microservices require a separate assessment of network calls, deployment and operations, and consistency across services.
 
-**Second, extract rules that have become complex.** Gather calculations, eligibility decisions, and state transitions so they can be tested independently. Start with functions; introduce richer models when objects have data and behavior that actually need to be maintained together.
+## Ask each layer which costs it removes
 
-**Third, introduce interfaces for real substitution needs.** If a real database obstructs rule testing, or payment and notification capabilities already have different implementations, introduce small interfaces at those points. A test substitute can be a real substitution need, while still requiring integration checks against the real implementation.
+I now find it more useful to picture the next requirement. The cutoff changes again: can I find the rule, edit it, and run its tests? If payment and approval are added, which parts really need to change together, and do the interfaces make those requirements clear?
 
-**Fourth, organize around business modules as the system grows.** Enrollment, payments, and courses maintain their own capabilities, with an appropriate degree of layering inside each module. Avoid a giant service that accumulates every feature.
-
-All of these steps can happen in one application and one process. Splitting modules and splitting microservices address different problems. The network, operational, and consistency costs of independent deployment deserve a separate evaluation.
-
-## Ask Each Layer Which Costs It Removes
-
-Returning to the original question, frequent changes to the domain and service do not directly invalidate layering. They make it more important to identify which changes a stable contract can contain within a module and which truly alter the overall workflow.
-
-I would condense this discussion into three judgments:
-
-- Dependencies should target explicit business capabilities and contracts; code edit frequency alone cannot rank them.
-- Layering works when common changes become more local, rules become easier to verify, and callers need to understand fewer details.
-- The extent of separation should follow actual complexity and maintenance benefits. Each layer needs responsibilities that justify the cost of its existence.
-
-For a particular project, the most useful follow-up is concrete: after adding this module, where will the next common requirement be implemented, how much will a maintainer need to understand, and how will they know nothing has broken?
+Frequent changes to the domain and service do not make me think layering has failed. What gives me pause is writing a pile of interfaces and still having to read everything from top to bottom for every edit. In that situation, I would try consolidating the layers that only forward calls, then see which responsibilities still deserve separate treatment.
 
 ## References
 
-- [“Learn Architecture Design in Five Minutes” on Bilibili](https://www.bilibili.com/video/BV1CXet6gE6X/): this discussion starts with summary notes on the video's course enrollment example; this article is not a verbatim transcript of the video.
+- [“Learn Architecture Design in Five Minutes” on Bilibili](https://www.bilibili.com/video/BV1CXet6gE6X/): the course enrollment example; this article started with summary notes on the video.
 - [Robert C. Martin: The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html): separation of concerns, source-code dependency direction, and interactions between inner and outer layers.
 - [Alistair Cockburn: Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture): ports and adapters, and the motivation for testing applications independently of UI and database implementations.
 - [Martin Fowler: Transaction Script](https://martinfowler.com/eaaCatalog/transactionScript.html): organizing procedural logic around business requests.
