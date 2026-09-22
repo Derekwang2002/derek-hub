@@ -1,0 +1,15 @@
+sequenceDiagram
+    accTitle: 一次报名请求的运行时调用
+    accDescr: API 调用 service；service 通过注入的存储对象读取数据，调用 domain 检查规则，通过存储对象保存，再向 API 返回结果。此图展示成功路径的顺序，不保证事务和并发安全。
+    participant A as API
+    participant S as service
+    participant D as domain
+    participant R as DB adapter
+    A->>S: ① 发起报名
+    S->>R: ② 读取学生与课程
+    R-->>S: 返回数据
+    S->>D: ③ 检查并执行规则
+    D-->>S: 返回业务结果
+    S->>R: ④ 保存报名
+    R-->>S: 确认保存
+    S-->>A: ⑤ 返回结果

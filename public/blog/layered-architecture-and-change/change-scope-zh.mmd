@@ -1,0 +1,13 @@
+flowchart TB
+    accTitle: 两类业务变更的影响范围
+    accDescr: 调整报名截止时间，在既有数据和结果契约足够时，可以只修改规则和测试；新增付款与审核会引入新状态，需要 domain、service、API 和 DB 协同修改。
+    CHANGE["产品需求变化"] --> RULE["调整报名截止时间"]
+    CHANGE --> WORKFLOW["增加付款与审核"]
+    RULE --> CONTRACT["已有数据与结果契约\n仍可表达新规则"]
+    CONTRACT --> LOCAL["可能只修改\n规则与对应测试"]
+    WORKFLOW --> STATES["新增业务状态\n和操作语义"]
+    STATES --> SHARED["domain · service\nAPI · DB 协同修改"]
+    classDef local fill:#eaf2ea,stroke:#7f9b7f,color:#272722
+    classDef coordinated fill:#fff3be,stroke:#b6a355,color:#272722
+    class CONTRACT,LOCAL local
+    class STATES,SHARED coordinated

@@ -1,0 +1,11 @@
+flowchart TB
+    accTitle: Source dependencies of enrollment
+    accDescr: The API depends on the use case, which depends on domain rules and a storage interface. The PostgreSQL adapter implements that business-owned interface; the use case does not depend on the concrete adapter.
+    API["API · HTTP adapter"] --> USE["service · Enrollment use case"]
+    USE --> DOMAIN["domain · Enrollment rules"]
+    USE --> PORT["EnrollmentStore\nBusiness-owned interface"]
+    DB["DB · PostgreSQL adapter"] -.->|"implements"| PORT
+    classDef domain fill:#fff3be,stroke:#b6a355,color:#272722
+    classDef contract fill:#eaf2ea,stroke:#7f9b7f,color:#272722
+    class DOMAIN domain
+    class PORT contract

@@ -1,0 +1,11 @@
+flowchart TB
+    accTitle: 报名用例的源代码依赖
+    accDescr: API 依赖报名用例，用例依赖领域规则和存储接口。PostgreSQL 适配器实现业务侧的存储接口；用例不直接依赖具体适配器。
+    API["API · HTTP 适配器"] --> USE["service · 报名用例"]
+    USE --> DOMAIN["domain · 报名规则"]
+    USE --> PORT["EnrollmentStore\n业务侧的存储接口"]
+    DB["DB · PostgreSQL 适配器"] -.->|"实现接口"| PORT
+    classDef domain fill:#fff3be,stroke:#b6a355,color:#272722
+    classDef contract fill:#eaf2ea,stroke:#7f9b7f,color:#272722
+    class DOMAIN domain
+    class PORT contract

@@ -34,6 +34,10 @@ Here, service means application use-case orchestration; it does not imply an ind
 
 Four layers also do not require four particular folders. The original Clean Architecture article explicitly describes its layer count as schematic; responsibilities and source-code dependencies are what matter. [Reference: The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
+![Enrollment architecture: server connects api and db, both depend on service, and service depends on domain.](/blog/layered-architecture-and-change/original-layered-architecture.png)
+
+Figure 1: The enrollment example's layers, to be read alongside the [original video](https://www.bilibili.com/video/BV1CXet6gE6X/). The `server` is the composition root that creates objects, wires dependencies, and starts the application; the highlighted `domain` owns business rules. The `db → service` arrow is shorthand: more precisely, the DB implements a storage interface defined on the business side, as the next diagram shows. This is a dependency sketch, not the order in which a request visits the layers.
+
 ## Stability Has at Least Three Meanings
 
 Before deciding what should depend on what, distinguish three questions.
@@ -60,24 +64,17 @@ It changes what the service needs to know when its code is written.
 
 With a direct dependency on an implementation, the service must know a particular PostgreSQL storage class. With a storage interface defined on the business side, it only needs to know that courses can be retrieved and enrollment results saved. The concrete implementation is supplied from outside.
 
-```text
-Source dependencies:
+![Source dependencies: the API uses the enrollment use case, which uses domain rules and a storage interface implemented by the PostgreSQL adapter.](/blog/layered-architecture-and-change/dependencies-en.svg)
 
-API adapter ----------> EnrollmentService ------> Domain
-                               |
-                               v
-                      EnrollmentStore interface
-                               ^
-                               |
-                     PostgreSQL adapter
+Figure 2: Source-code dependencies. Solid arrows mean usage; the dashed arrow means interface implementation. Arrows point toward the dependency. [View full size](/blog/layered-architecture-and-change/dependencies-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/dependencies-en.mmd)
 
-Runtime call:
-EnrollmentService -> injected store object -> database
-```
-
-The upward arrow means that the PostgreSQL adapter implements an interface defined on the business side. It does not mean the database initiates a runtime call to the service. Abbreviating this relationship as “the DB depends on the service” can confuse source dependencies with execution order.
+The dashed arrow means that the PostgreSQL adapter implements an interface defined on the business side. It does not mean the database initiates a runtime call to the service. Abbreviating this relationship as “the DB depends on the service” can confuse source dependencies with execution order.
 
 Dependency injection handles assembly: create a storage object, pass it to the service, and let the API use that service. Ordinary constructor or function arguments are sufficient; a dependency injection container is optional.
+
+![Successful enrollment at runtime: the API calls the service, which reads storage, applies domain rules, saves, and returns a result.](/blog/layered-architecture-and-change/runtime-en.svg)
+
+Figure 3: Runtime calls, read from top to bottom. The service calls an injected storage object, so it can use a DB implementation while its source code depends only on an interface. Failure paths are omitted; this read-and-save sequence alone does not guarantee transaction or concurrency safety, a limitation discussed later. [View full size](/blog/layered-architecture-and-change/runtime-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/runtime-en.mmd)
 
 An interface does not become better simply by becoming more generic. If a storage interface still makes callers supply SQL, understand ORM sessions, and manipulate database row objects, business code still needs to know storage details. An interface earns its value through the complexity it actually hides from callers.
 
@@ -109,6 +106,10 @@ The situation changes if the product moves from “enrollment succeeds immediate
 These changes are coupled by the requirement itself. A reasonable architecture can give each part a clear responsibility, but cannot eliminate changes that follow necessarily from new business semantics.
 
 When evaluating decoupling, a more useful question is whether a change across modules is required by the business or caused by leaked implementation details.
+
+![Comparing change impact: a cutoff adjustment may affect only rules and tests if existing contracts suffice; adding payment and approval requires coordinated changes across all four layers.](/blog/layered-architecture-and-change/change-scope-en.svg)
+
+Figure 4: The reach of two business changes. The left path assumes existing data and result contracts remain sufficient; the right path spreads across layers because it introduces new business semantics. [View full size](/blog/layered-architecture-and-change/change-scope-en.svg) · [Mermaid source](/blog/layered-architecture-and-change/change-scope-en.mmd)
 
 ### Keep Frequently Changing Rules in a Smaller Area
 

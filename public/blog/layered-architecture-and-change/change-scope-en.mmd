@@ -1,0 +1,13 @@
+flowchart TB
+    accTitle: The reach of two business changes
+    accDescr: A new enrollment cutoff can stay within rules and tests when existing data and result contracts remain sufficient. Adding payment and approval creates new states and requires coordinated domain, service, API, and database changes.
+    CHANGE["Product requirement changes"] --> RULE["Adjust enrollment cutoff"]
+    CHANGE --> WORKFLOW["Add payment and approval"]
+    RULE --> CONTRACT["Existing data and results\ncan express the new rule"]
+    CONTRACT --> LOCAL["May change only\nrules and their tests"]
+    WORKFLOW --> STATES["New business states\nand operation semantics"]
+    STATES --> SHARED["Coordinate changes across\ndomain · service · API · DB"]
+    classDef local fill:#eaf2ea,stroke:#7f9b7f,color:#272722
+    classDef coordinated fill:#fff3be,stroke:#b6a355,color:#272722
+    class CONTRACT,LOCAL local
+    class STATES,SHARED coordinated

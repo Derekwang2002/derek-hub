@@ -38,6 +38,10 @@ draft: false
 
 四层也不是四个必选文件夹。Clean Architecture 的原始说明明确指出，层数是示意；真正重要的是职责和源代码依赖的组织方式。[参考：The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 
+![报名案例的分层示意图：server 连接 api 和 db，二者依赖 service，service 依赖 domain。](/blog/layered-architecture-and-change/original-layered-architecture.png)
+
+图 1：报名案例的分层示意，结合[原视频](https://www.bilibili.com/video/BV1CXet6gE6X/)阅读。`server` 是创建对象、连接依赖并启动应用的组装入口；黄色标出的 `domain` 承担领域规则。图中的 `db → service` 是简写，更准确的关系是 DB 实现业务侧定义的存储接口，下文会将它展开。这张图表达依赖组织，不是请求依次经过各层的调用流程。
+
 ## “稳定”至少有三种含义
 
 讨论谁应该依赖谁之前，需要先区分三个问题。
@@ -64,24 +68,17 @@ service 要读取课程，自然需要在运行时调用存储操作。依赖倒
 
 直接依赖具体实现时，service 必须知道某个 PostgreSQL 存储类。引入业务侧定义的存储接口后，service 只需要知道“能够读取课程、保存报名结果”，具体实现由外部提供。
 
-```text
-Source dependencies:
+![源代码依赖图：API 依赖报名用例，用例依赖 domain 和存储接口，PostgreSQL 适配器实现该接口。](/blog/layered-architecture-and-change/dependencies-zh.svg)
 
-API adapter ----------> EnrollmentService ------> Domain
-                               |
-                               v
-                      EnrollmentStore interface
-                               ^
-                               |
-                     PostgreSQL adapter
+图 2：源代码依赖。实线表示使用，虚线表示实现接口；箭头都指向被依赖的部分。[查看大图](/blog/layered-architecture-and-change/dependencies-zh.svg) · [Mermaid 源文件](/blog/layered-architecture-and-change/dependencies-zh.mmd)
 
-Runtime call:
-EnrollmentService -> injected store object -> database
-```
-
-图中向上的箭头表示 PostgreSQL adapter 实现业务侧定义的接口，不表示数据库在运行时主动调用 service。将这层关系简写成“DB 依赖 service”，容易让人混淆源代码依赖与执行顺序。
+图中的虚线表示 PostgreSQL adapter 实现业务侧定义的接口，不表示数据库在运行时主动调用 service。将这层关系简写成“DB 依赖 service”，容易让人混淆源代码依赖与执行顺序。
 
 依赖注入则负责组装：创建存储对象，把它传给 service，再让 API 使用这个 service。普通的构造函数参数或函数参数就能完成，不一定需要依赖注入容器。
+
+![报名成功路径的运行时顺序：API 调用 service，service 读取存储、执行 domain 规则、保存，再返回结果。](/blog/layered-architecture-and-change/runtime-zh.svg)
+
+图 3：运行时调用，从上到下阅读。service 调用的是注入的存储对象，因此能够使用 DB 实现，同时在源代码中只依赖接口。图中省略了失败分支；读取与保存的顺序本身不保证事务或并发安全，后文会讨论这个限制。[查看大图](/blog/layered-architecture-and-change/runtime-zh.svg) · [Mermaid 源文件](/blog/layered-architecture-and-change/runtime-zh.mmd)
 
 接口也不是越通用越好。若一个所谓的存储接口仍要求调用者传 SQL、理解 ORM session 和数据库行对象，业务代码仍然需要掌握存储细节。接口的价值取决于它实际隐藏了多少调用者不必知道的复杂性。
 
@@ -113,6 +110,10 @@ service 继续获取数据、调用规则、保存结果；API 继续接收两�
 这种联动来自需求本身。合理的架构可以让各部分承担清楚的职责，却不能消除业务语义变化带来的必然修改。
 
 评价解耦时，更有用的问题是：这次跨模块修改是需求必然要求的，还是因为实现细节泄露造成的？
+
+![变更影响对比：在既有契约足够时，调整截止时间可能只改规则与测试；新增付款和审核则需要四层协同修改。](/blog/layered-architecture-and-change/change-scope-zh.svg)
+
+图 4：两类业务变更的影响范围。左侧依赖“已有数据和结果契约足够”的前提；右侧的跨层修改来自新增业务语义。[查看大图](/blog/layered-architecture-and-change/change-scope-zh.svg) · [Mermaid 源文件](/blog/layered-architecture-and-change/change-scope-zh.mmd)
 
 ### 将经常变化的规则收拢到更小的范围
 

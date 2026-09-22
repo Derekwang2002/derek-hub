@@ -1,0 +1,15 @@
+sequenceDiagram
+    accTitle: Runtime calls during enrollment
+    accDescr: The API calls the service, which reads data through its injected store, calls the domain rules, saves through the store, and returns a result. This shows the successful call sequence, not transaction or concurrency guarantees.
+    participant A as API
+    participant S as service
+    participant D as domain
+    participant R as DB adapter
+    A->>S: ① Enroll
+    S->>R: ② Load student and course
+    R-->>S: Return data
+    S->>D: ③ Apply rules
+    D-->>S: Business result
+    S->>R: ④ Save enrollment
+    R-->>S: Confirm save
+    S-->>A: ⑤ Return result
