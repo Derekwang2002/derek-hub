@@ -17,7 +17,7 @@ draft: false
 
 我的理解是：**分层的价值在于按变化原因划分职责，用明确的契约限制变化的传播。修改频率只是观察信号，不能单独决定依赖方向。**
 
-本文从 B 站《5 分钟学会架构设计》的报名案例总结笔记出发，再结合 Clean Architecture、六边形架构和 Transaction Script，讨论这些问题。关于适用规模和取舍的部分，是在案例基础上的进一步分析。
+本文从 B 站[《5 分钟学会架构设计》](https://www.bilibili.com/video/BV1CXet6gE6X/)的报名案例总结笔记出发，再结合 Clean Architecture、六边形架构和 Transaction Script，讨论这些问题。关于适用规模和取舍的部分，是在案例基础上的进一步分析。
 
 ## 从一个报名函数拆出四种职责
 
@@ -228,7 +228,7 @@ initial extraction + ongoing interface and mapping maintenance
 
 ## 参考资料
 
-- B 站《5 分钟学会架构设计》的课程报名案例总结笔记：本文的讨论起点；本文未对视频逐字转录。
+- B 站[《5 分钟学会架构设计》](https://www.bilibili.com/video/BV1CXet6gE6X/)：本文从该视频的课程报名案例总结笔记出发，并非视频的逐字转录。
 - [Robert C. Martin：The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)：职责分离、源代码依赖方向与内外层交互。
 - [Alistair Cockburn：Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture)：端口与适配器，以及应用脱离 UI 和数据库进行测试的动机。
 - [Martin Fowler：Transaction Script](https://martinfowler.com/eaaCatalog/transactionScript.html)：按业务请求组织过程式逻辑的方式。

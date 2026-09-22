@@ -13,7 +13,7 @@ Should the dependencies then point the other way? If not, what does layering pro
 
 My view is that **layering earns its value by separating responsibilities according to why they change, then using explicit contracts to limit how changes spread. Edit frequency is a useful observation, but it cannot determine dependency direction on its own.**
 
-This article starts with summary notes on the enrollment example in the Bilibili video “Learn Architecture Design in Five Minutes,” then draws on Clean Architecture, hexagonal architecture, and Transaction Script. The discussion of scale and tradeoffs extends the original example.
+This article starts with summary notes on the enrollment example in the Bilibili video [“Learn Architecture Design in Five Minutes”](https://www.bilibili.com/video/BV1CXet6gE6X/), then draws on Clean Architecture, hexagonal architecture, and Transaction Script. The discussion of scale and tradeoffs extends the original example.
 
 ## Four Responsibilities Inside One Enrollment Function
 
@@ -225,7 +225,7 @@ For a particular project, the most useful follow-up is concrete: after adding th
 
 ## References
 
-- Summary notes on the course enrollment example in the Bilibili video “Learn Architecture Design in Five Minutes”: the starting point for this discussion; this article is not a verbatim transcript of the video.
+- [“Learn Architecture Design in Five Minutes” on Bilibili](https://www.bilibili.com/video/BV1CXet6gE6X/): this discussion starts with summary notes on the video's course enrollment example; this article is not a verbatim transcript of the video.
 - [Robert C. Martin: The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html): separation of concerns, source-code dependency direction, and interactions between inner and outer layers.
 - [Alistair Cockburn: Hexagonal Architecture](https://alistair.cockburn.us/hexagonal-architecture): ports and adapters, and the motivation for testing applications independently of UI and database implementations.
 - [Martin Fowler: Transaction Script](https://martinfowler.com/eaaCatalog/transactionScript.html): organizing procedural logic around business requests.
