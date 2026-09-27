@@ -121,14 +121,15 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "ai-intelligence",
-    name: { en: "AI Radar", zh: "AI Radar" },
+    name: { en: "MATRIX", zh: "MATRIX" },
     status: "active",
     overview: {
-      updated: "2026-09-01",
-      reviewedRevision: "00abc421"
+      updated: "2026-09-27",
+      reviewedRevision: "matrix-v2-local-design@2026-09-27"
     },
     sections: [
-      { slug: "methodology", label: { en: "Methodology", zh: "方法论" } }
+      { slug: "methodology", label: { en: "Methodology", zh: "方法论" } },
+      { slug: "product-design", label: { en: "Product & Design", zh: "产品与设计" } }
     ],
     items: [
       {
@@ -138,6 +139,22 @@ export const projectDefinitions: ProjectDefinition[] = [
         status: "published",
         updated: "2026-09-01",
         reviewedRevision: "00abc421"
+      },
+      {
+        slug: "product-and-intelligence-design",
+        sectionSlug: "product-design",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-27",
+        reviewedRevision: "matrix-v2-local-design@2026-09-27"
+      },
+      {
+        slug: "glass-interface-design",
+        sectionSlug: "product-design",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-27",
+        reviewedRevision: "matrix-neutral-glass-local@2026-09-27"
       }
     ]
   },

@@ -39,3 +39,5 @@ Trends have a full lifecycle: `candidate -> emerging -> strengthening -> establi
 ## 6. Focus areas
 
 Foundation models; AI agents (frameworks, tool calling, MCP, memory, sandboxes, long-running agents); AI engineering (RAG, context engineering, evaluation, model serving); open source (projects with real growth signals); research (papers with code and benchmarks); infrastructure; developer tools; and business/policy events only when they could actually change the technical ecosystem.
+
+> This article preserves the earlier mechanism snapshot. Current product, evidence, and review contracts are covered in [MATRIX v2](/projects/ai-intelligence/product-and-intelligence-design).

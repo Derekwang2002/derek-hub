@@ -39,3 +39,5 @@ Radar 的价值不在单次运行，而在长期增量积累。本文依据 revi
 ## 6. 关注领域
 
 Foundation Models、AI Agent（framework、tool calling、MCP、memory、sandbox、long-running agents）、AI Engineering（RAG、context engineering、evaluation、model serving）、Open Source（有真实增长信号的项目）、Research（有 code、有 benchmark 的论文）、Infrastructure、Developer Tools，以及仅限可能实际改变技术生态的 Business & Policy 事件。
+
+> 本文保留早期机制快照；当前产品、证据与复核契约见 [MATRIX v2](/zh/projects/ai-intelligence/product-and-intelligence-design).

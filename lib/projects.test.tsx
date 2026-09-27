@@ -48,8 +48,8 @@ test("loads the CALL-E tree with exact locale parity", async () => {
 
 test("Project index exposes only public Projects", async () => {
   assert.deepEqual((await getAllProjects("en")).map((project) => project.slug), [
-    "csci678",
     "ai-intelligence",
+    "csci678",
     "derek-hub",
     "call-e"
   ]);
