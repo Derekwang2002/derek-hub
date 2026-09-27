@@ -163,8 +163,8 @@ export const projectDefinitions: ProjectDefinition[] = [
     name: { en: "CSCI 678", zh: "CSCI 678" },
     status: "active",
     overview: {
-      updated: "2026-09-11",
-      reviewedRevision: "lecture3-preview-report@2026-09-11"
+      updated: "2026-09-17",
+      reviewedRevision: "lecture4-notes@2026-09-17"
     },
     sections: [
       { slug: "lecture-notes", label: { en: "Lecture Notes", zh: "课程笔记" } }
@@ -217,6 +217,22 @@ export const projectDefinitions: ProjectDefinition[] = [
         status: "published",
         updated: "2026-09-11",
         reviewedRevision: "lecture3-full-translation@2026-09-11"
+      },
+      {
+        slug: "lecture-4-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-17",
+        reviewedRevision: "lecture4-explanation-report@2026-09-17"
+      },
+      {
+        slug: "lecture-4-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-09-17",
+        reviewedRevision: "lecture4-full-translation@2026-09-17"
       }
     ]
   },
