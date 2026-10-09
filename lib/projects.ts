@@ -6,6 +6,7 @@ import { localePath } from "./locale";
 import { getAllLocalizedPosts } from "./localized-posts";
 import { getPublicResources } from "./resources";
 import { localizeResource } from "./localized-resources";
+import { collectionPath, collectionSection, postPath } from "./content-sections";
 
 export type ProjectStatus = "draft" | "active" | "archived";
 export type ProjectItemStatus = "draft" | "published";
@@ -94,11 +95,12 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const UPDATE_FILE_PATTERN = /^(\d{4}-\d{2}-\d{2})-([a-z0-9]+(?:-[a-z0-9]+)*)\.md$/;
 const RESERVED_ITEM_SLUGS = new Set(["updates"]);
 
-export async function getAllProjects(locale: ContentLocale): Promise<Project[]> {
+export async function getAllProjects(locale: ContentLocale, section: "projects" | "notes" | "all" = "projects"): Promise<Project[]> {
   validateDefinitions();
   const projects = await Promise.all(
     projectDefinitions
       .filter((definition) => definition.status !== "draft")
+      .filter((definition) => section === "all" || collectionSection(definition.slug) === section)
       .map((definition) => loadProject(definition, locale))
   );
 
@@ -146,8 +148,8 @@ export async function getProjectPager(
     )
   ];
   const href = itemSlug
-    ? localePath(locale, `/projects/${projectSlug}/${itemSlug}`)
-    : localePath(locale, `/projects/${projectSlug}`);
+    ? `${project.href}/${itemSlug}`
+    : project.href;
   const index = nodes.findIndex((node) => node.href === href);
   if (index < 0) return { previous: null, next: null };
   return {
@@ -189,21 +191,21 @@ export async function getProjectUpdates(
       return {
         ...document,
         date,
-        href: `${localePath(locale, `/projects/${projectSlug}/updates`)}#${date}-${slug}`,
+        href: `${localePath(locale, `${collectionPath(projectSlug)}/updates`)}#${date}-${slug}`,
         slug,
         type: "project" as const
       };
     })
   );
   const [posts, resources] = await Promise.all([
-    getAllLocalizedPosts(locale),
+    getAllLocalizedPosts(locale, "all"),
     getPublicResources()
   ]);
   const associatedPosts: ProjectUpdate[] = posts
     .filter((post) => post.projects.includes(projectSlug))
     .map((post) => ({
       date: post.date,
-      href: localePath(locale, `/blog/${post.slug}`),
+      href: localePath(locale, postPath(post.slug)),
       slug: `blog-${post.slug}`,
       summary: post.summary,
       title: post.title,
@@ -232,9 +234,9 @@ export async function getProjectUpdates(
   );
 }
 
-export function getProjectDefinitions(): readonly ProjectDefinition[] {
+export function getProjectDefinitions(section: "projects" | "notes" | "all" = "projects"): readonly ProjectDefinition[] {
   validateDefinitions();
-  return projectDefinitions;
+  return projectDefinitions.filter(definition => section === "all" || collectionSection(definition.slug) === section);
 }
 
 async function loadProject(
@@ -264,7 +266,7 @@ async function loadProject(
       return {
         ...item,
         ...document,
-        href: localePath(locale, `/projects/${definition.slug}/${item.slug}`),
+        href: localePath(locale, `${collectionPath(definition.slug)}/${item.slug}`),
         sectionLabel: section.label[locale]
       };
     })
@@ -289,7 +291,7 @@ async function loadProject(
   ].sort((a, b) => b.localeCompare(a))[0];
 
   return {
-    href: localePath(locale, `/projects/${definition.slug}`),
+    href: localePath(locale, collectionPath(definition.slug)),
     lastUpdated,
     name: definition.name[locale],
     summary: definition.summary[locale],

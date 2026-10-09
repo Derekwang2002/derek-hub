@@ -7,6 +7,9 @@ import { PostBodyLayout } from "./post-body-layout";
 import { ProjectNavigation } from "./project-navigation";
 import { ProjectPager } from "./project-pager";
 import { TitleNote } from "./title-note";
+import { ArticleHeader } from "./article-header";
+import { collectionPath, collectionSection } from "../../lib/content-sections";
+import { readingMinutes } from "../../lib/post-metadata";
 import { formatContentDate, localePath, type ContentLocale } from "../../lib/locale";
 import {
   getAllProjects,
@@ -92,14 +95,14 @@ export async function ProjectOverviewPage({
           <UpdateList locale={locale} updates={updates} />
         ) : (
           <p className={styles.emptyUpdates}>
-            {locale === "zh" ? "暂无项目动态。" : "No project updates yet."}
+            {locale === "zh" ? "暂无动态。" : "No updates yet."}
           </p>
         )}
         <Link className={styles.textLink} href={`${project.href}/updates`}>
           {locale === "zh" ? "查看全部动态 →" : "View all updates →"}
         </Link>
       </section>
-      <ProjectRevision locale={locale} revision={project.reviewedRevision} />
+      {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={project.reviewedRevision} /> : null}
       <ProjectPager locale={locale} pager={pager} />
     </ProjectPageShell>
   );
@@ -141,7 +144,7 @@ export async function ProjectItemPage({
         summary={item.summary}
         title={item.title}
       />}>{rendered}</PostBodyLayout>}
-      <ProjectRevision locale={locale} revision={item.reviewedRevision} />
+      {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={item.reviewedRevision} /> : null}
       <ProjectPager locale={locale} pager={pager} />
     </ProjectPageShell>
   );
@@ -158,10 +161,11 @@ export async function ProjectUpdatesPage({
   if (!project) notFound();
   const updates = await getProjectUpdates(projectSlug, locale);
   const href = `${project.href}/updates`;
+  const notes = collectionSection(project.slug) === "notes";
   return (
     <ProjectPageShell activeHref={href} locale={locale} project={project}>
       <header className={styles.updatesHero}>
-        <h1>{locale === "zh" ? "项目动态" : "Project updates"}</h1>
+        <h1>{notes ? (locale === "zh" ? "笔记更新" : "Note updates") : (locale === "zh" ? "项目动态" : "Project updates")}</h1>
         <p>
           {locale === "zh"
             ? "里程碑、发布与关联内容，按时间倒序整理。"
@@ -171,7 +175,7 @@ export async function ProjectUpdatesPage({
       {updates.length > 0 ? (
         <UpdateList locale={locale} updates={updates} />
       ) : (
-        <p className={styles.emptyUpdates}>{locale === "zh" ? "暂无项目动态。" : "No project updates yet."}</p>
+        <p className={styles.emptyUpdates}>{locale === "zh" ? "暂无动态。" : "No updates yet."}</p>
       )}
     </ProjectPageShell>
   );
@@ -208,6 +212,16 @@ function ProjectHeader({
   summary: string;
   title: string;
 }) {
+  if (collectionSection(project.slug) === "notes") {
+    return <ArticleHeader
+      title={title} summary={summary} updated={item?.updated ?? project.lastUpdated}
+      minutes={readingMinutes(item?.content ?? project.overview.content)} locale={locale}
+      breadcrumbs={[
+        { label: locale === "zh" ? "笔记" : "Notes", href: localePath(locale, "/notes") },
+        ...(item ? [{ label: project.name, href: project.href }] : [])
+      ]}
+    />;
+  }
   return (
     <header className={styles.projectHero}>
       <h1>{title}</h1>
@@ -267,7 +281,7 @@ function UpdateList({
           <div className={styles.updateMeta}>
             <span>
               {update.type === "project"
-                ? locale === "zh" ? "项目动态" : "Project update"
+                ? locale === "zh" ? "更新" : "Update"
                 : update.type === "blog" ? "Blog" : "Demo"}
             </span>
             <time dateTime={update.date}>{formatContentDate(update.date, locale)}</time>
@@ -317,14 +331,14 @@ export async function getProjectMetadata(
   const project = await getProject(projectSlug, locale);
   if (!project) return { title: locale === "zh" ? "项目未找到" : "Project not found" };
   if (updates) {
-    const title = locale === "zh" ? `${project.overview.title} 项目动态` : `${project.overview.title} Updates`;
-    return localizedMetadata(title, locale === "zh" ? `${project.name} 项目里程碑与关联内容。` : `${project.name} milestones and associated publications.`, `${project.href}/updates`, `/projects/${projectSlug}/updates`);
+    const title = locale === "zh" ? `${project.overview.title} 更新` : `${project.overview.title} Updates`;
+    return localizedMetadata(title, locale === "zh" ? `${project.name} 更新与关联内容。` : `${project.name} updates and associated publications.`, `${project.href}/updates`, `${collectionPath(projectSlug)}/updates`);
   }
   const item = itemSlug ? await getProjectItem(projectSlug, itemSlug, locale) : null;
   if (itemSlug && !item) return { title: locale === "zh" ? "文档未找到" : "Document not found" };
   const title = item?.title ?? project.overview.title;
   const description = item?.summary ?? project.overview.summary;
-  return localizedMetadata(title, description, item?.href ?? project.href, `/projects/${projectSlug}${itemSlug ? `/${itemSlug}` : ""}`);
+  return localizedMetadata(title, description, item?.href ?? project.href, `${collectionPath(projectSlug)}${itemSlug ? `/${itemSlug}` : ""}`);
 }
 
 function localizedMetadata(

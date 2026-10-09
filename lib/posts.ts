@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { postSection } from "./content-sections";
 import {
   blogPostCollections,
   blogPostSources,
@@ -44,14 +45,14 @@ export type TagCount = {
 type FrontmatterValue = string | boolean | string[];
 type Frontmatter = Record<string, FrontmatterValue>;
 
-export async function getAllPosts(): Promise<Post[]> {
+export async function getAllPosts(section: "blog" | "notes" | "all" = "blog"): Promise<Post[]> {
   const posts = await loadAllPosts();
-  return sortPostsByDateDesc(toPublicPosts(posts));
+  return sortPostsByDateDesc(toPublicPosts(posts).filter(post => section === "all" || postSection(post.slug) === section));
 }
 
 export async function getSelectedPosts(): Promise<Post[]> {
   const posts = await loadAllPosts();
-  return sortPostsByDateDesc(toPublicPosts(posts).filter((post) => post.selected === true));
+  return sortPostsByDateDesc(toPublicPosts(posts).filter((post) => postSection(post.slug) === "blog" && post.selected === true));
 }
 
 export async function getPostsByTag(tag: string): Promise<Post[]> {
@@ -62,7 +63,7 @@ export async function getPostsByTag(tag: string): Promise<Post[]> {
 
   const posts = await loadAllPosts();
   const matchingPosts = toPublicPosts(posts).filter((post) =>
-    post.tags.some((postTag) => normalizeTagSlug(postTag) === tagSlug)
+    postSection(post.slug) === "blog" && post.tags.some((postTag) => normalizeTagSlug(postTag) === tagSlug)
   );
 
   return sortPostsByDateDesc(matchingPosts);
@@ -70,7 +71,7 @@ export async function getPostsByTag(tag: string): Promise<Post[]> {
 
 export async function getAllTagsWithCounts(): Promise<TagCount[]> {
   const posts = await loadAllPosts();
-  const publicPosts = toPublicPosts(posts);
+  const publicPosts = toPublicPosts(posts).filter(post => postSection(post.slug) === "blog");
   const tagMap = new Map<string, { count: number; variants: Set<string> }>();
 
   for (const post of publicPosts) {

@@ -5,7 +5,7 @@ summary: "逐步推导 fat-shattering 维数、单调函数类速率、原子抽
 
 > 依据 Haipeng Luo 的 Lecture 4（Fall 2026，共 9 页）。按“问题—定义—推导—含义”展开，覆盖命题 1–2、定理 1–4、引理 1–2及两张实验图。定理 1 的深层组合结论与完整多分类 margin 泛化定理在课件中未证明，本文明确说明使用位置；其余关键步骤均展开。补充结论、常数修正和原文笔误单独标明。
 >
-> 原课件：lecture4.pdf（本地原课件，未在线发布）。配套：[完整中文翻译](/zh/projects/csci678/lecture-4-full-translation)。前置：[Lecture 3 详解](/zh/projects/csci678/lecture-3-preview)。默认样本独立同分布，函数类非空，相关上确界可测、期望存在；回归部分函数值在 $[-1,1]$，网络部分无偏置且激活为逐坐标 ReLU。统计上界不保证训练优化可高效求解。
+> 原课件：lecture4.pdf（本地原课件，未在线发布）。配套：[完整中文翻译](/zh/notes/csci678/lecture-4-full-translation)。前置：[Lecture 3 详解](/zh/notes/csci678/lecture-3-preview)。默认样本独立同分布，函数类非空，相关上确界可测、期望存在；回归部分函数值在 $[-1,1]$，网络部分无偏置且激活为逐坐标 ReLU。统计上界不保证训练优化可高效求解。
 
 ## 阅读导航：这一讲连接了哪两件事
 

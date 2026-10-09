@@ -37,5 +37,8 @@ jobs:
       - name: Table of contents tests
         run: npm run test:toc
 
+      - name: Notes routing tests
+        run: npm run test:notes
+
       - name: Build
         run: npm run build

@@ -5,7 +5,7 @@ summary: "逐节展开 Lecture 2：从 ERM 的 minimax 上界到对称化、Rade
 
 > 根据 Haipeng Luo 的 Lecture 2（2026 年秋季，原课件 8 页）展开。沿用 Lecture 3 讲解报告的形式，覆盖定理 1、2，引理 1–4，命题 1–7，以及讲义省略的辅助证明。每一步尽量说明使用的条件和它在整体论证中的作用。
 >
-> 原课件：lecture2.pdf（未在线发布）。本站配套：[课件完整翻译](/zh/projects/csci678/lecture-2-full-translation)；前后衔接：[Lecture 1](/zh/projects/csci678/lecture-1-explanation)、[Lecture 3](/zh/projects/csci678/lecture-3-preview)。默认函数类非空，必要的可测性、可积性成立；涉及有界集中界时另行写出有界条件。不假设所有优化问题都能高效求解。
+> 原课件：lecture2.pdf（未在线发布）。本站配套：[课件完整翻译](/zh/notes/csci678/lecture-2-full-translation)；前后衔接：[Lecture 1](/zh/notes/csci678/lecture-1-explanation)、[Lecture 3](/zh/notes/csci678/lecture-3-preview)。默认函数类非空，必要的可测性、可积性成立；涉及有界集中界时另行写出有界条件。不假设所有优化问题都能高效求解。
 
 ## 阅读导航：把难求的 minimax 值逐步变成可计算的复杂度
 

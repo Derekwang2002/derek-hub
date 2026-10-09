@@ -5,7 +5,7 @@ summary: "Complete English reading edition of the nine-page Lecture 4 handout: f
 
 **Fall 2026. Instructor: Haipeng Luo.**
 
-> English reading edition restored from the nine-page Lecture 4 handout. It preserves every section, theorem, proposition, lemma, numbered equation, proof argument, and experimental discussion. Editorial notes identify notation or constant issues rather than silently changing the source. Figures are extracted from the handout. Companion: [detailed explanation](/projects/csci678/lecture-4-explanation).
+> English reading edition restored from the nine-page Lecture 4 handout. It preserves every section, theorem, proposition, lemma, numbered equation, proof argument, and experimental discussion. Editorial notes identify notation or constant issues rather than silently changing the source. Figures are extracted from the handout. Companion: [detailed explanation](/notes/csci678/lecture-4-explanation).
 
 ## 1 Regression: Fat-Shattering Dimension
 

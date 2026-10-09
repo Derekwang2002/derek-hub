@@ -5,7 +5,7 @@ summary: "A section-by-section expansion of Lecture 1: the formalization of supe
 
 > Expanded from Haipeng Luo's Lecture 1 (Fall 2026, 8 pages of original slides). The structure follows the Lecture 3 explanation report: state the purpose of each problem, explain the quantifiers and notation, prove the formulas step by step, and discuss the examples and the boundaries of each conclusion. Content marked "Supplementary" explains the original text; it does not claim that the slides proved additional theorems.
 >
-> Original slides: lecture1.pdf (not published online). Companion on this site: [full slides translation](/projects/csci678/lecture-1-full-translation); follow-up explanations: [Lecture 2](/projects/csci678/lecture-2-explanation), [Lecture 3](/projects/csci678/lecture-3-preview). Losses and random variables are measurable by default, so that every expectation and difference written here is defined. Arguments on finite spaces need no extra measurability techniques; when generalizing to general spaces, the corresponding conditions should be retained.
+> Original slides: lecture1.pdf (not published online). Companion on this site: [full slides translation](/notes/csci678/lecture-1-full-translation); follow-up explanations: [Lecture 2](/notes/csci678/lecture-2-explanation), [Lecture 3](/notes/csci678/lecture-3-preview). Losses and random variables are measurable by default, so that every expectation and difference written here is defined. Arguments on finite spaces need no extra measurability techniques; when generalizing to general spaces, the corresponding conditions should be retained.
 
 ## Reading guide: why Lecture 1 spends so much space defining the problem
 

@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import { projectDefinitions } from "./content/projects";
+import { collectionSection, notePostSlugs } from "./lib/content-sections";
 
 const deploymentId = [
   process.env.NEXT_DEPLOYMENT_ID,
@@ -10,6 +12,19 @@ const deploymentId = [
 const nextConfig: NextConfig = {
   ...(deploymentId ? { deploymentId: deploymentId.trim() } : {}),
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  async redirects() {
+    // Exact document paths keep existing course image URLs working unchanged.
+    const movedPaths = [
+      ...notePostSlugs.map(slug => ({ from: `/blog/${slug}`, to: `/notes/${slug}` })),
+      ...projectDefinitions.filter(project => project.status !== "draft" && collectionSection(project.slug) === "notes").flatMap(project =>
+        ["", "/updates", ...project.items.filter(item => item.status === "published").map(item => `/${item.slug}`)]
+          .map(suffix => ({ from: `/projects/${project.slug}${suffix}`, to: `/notes/${project.slug}${suffix}` }))
+      )
+    ];
+    return ["", "/zh"].flatMap(prefix => movedPaths.map(({ from, to }) => ({
+      source: `${prefix}${from}`, destination: `${prefix}${to}`, permanent: true
+    })));
+  },
   async headers() {
     return [
       {

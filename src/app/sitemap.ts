@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllPosts } from "../../lib/posts";
 import { getAllProjects } from "../../lib/projects";
+import { postPath } from "../../lib/content-sections";
 import {
   RESOURCE_SECTIONS,
   getPublicResources,
@@ -25,8 +26,8 @@ function toDate(date: string): Date {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
-  const posts = await getAllPosts();
-  const projects = await getAllProjects("en");
+  const posts = await getAllPosts("all");
+  const projects = await getAllProjects("en", "all");
   const publicResources = await getPublicResources();
 
   const latestPostDate = posts.length > 0 ? toDate(posts[0].date) : undefined;
@@ -65,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: toAbsoluteUrl(siteUrl, `/blog/${post.slug}`),
+    url: toAbsoluteUrl(siteUrl, postPath(post.slug)),
     lastModified: toDate(post.date),
     changeFrequency: "monthly",
     priority: 0.7
@@ -116,7 +117,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...resourceSectionEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
     ...resourceEntries.filter((entry) => entry.url.includes("/hub/skills/")).map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
     ...postEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/`, `${siteUrl}/zh/`) })),
-    ...projectEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/projects`, `${siteUrl}/zh/projects`) }))
+    ...projectEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/`, `${siteUrl}/zh/`) }))
   ];
 
   return [

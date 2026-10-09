@@ -49,25 +49,25 @@ test("loads the CALL-E tree with exact locale parity", async () => {
 test("Project index exposes only public Projects", async () => {
   assert.deepEqual((await getAllProjects("en")).map((project) => project.slug), [
     "ai-intelligence",
-    "csci678",
     "derek-hub",
     "call-e"
   ]);
 });
 
 test("renders the complete pager loop for every Project in both locales", async () => {
-  for (const definition of getProjectDefinitions()) {
+  for (const definition of getProjectDefinitions("all")) {
     if (definition.status === "draft") continue;
     for (const locale of ["en", "zh"] as const) {
       const project = await getProject(definition.slug, locale);
       assert.ok(project);
       const prefix = locale === "zh" ? "/zh" : "";
+      const section = definition.slug === "csci678" ? "notes" : "projects";
       const itemSlugs = project.sections.flatMap((section) =>
         section.items.map((item) => item.slug)
       );
       const hrefs = [
-        `${prefix}/projects/${definition.slug}`,
-        ...itemSlugs.map((slug) => `${prefix}/projects/${definition.slug}/${slug}`)
+        `${prefix}/${section}/${definition.slug}`,
+        ...itemSlugs.map((slug) => `${prefix}/${section}/${definition.slug}/${slug}`)
       ];
       const slugs: Array<string | null> = [null, ...itemSlugs];
 

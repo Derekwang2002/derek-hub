@@ -2,9 +2,11 @@ import type { Post } from "../../lib/posts";
 import { localePath, type ContentLocale } from "../../lib/locale";
 import { getPostMetadata } from "../../lib/post-metadata";
 import { ArticleHeader } from "./article-header";
+import { postSection } from "../../lib/content-sections";
 
 export async function BlogPostHeader({ post, locale }: { post: Post; locale: ContentLocale }) {
   const { minutes, updated } = await getPostMetadata(post);
+  const section = postSection(post.slug);
   return <ArticleHeader
     title={post.title}
     summary={post.summary}
@@ -12,6 +14,9 @@ export async function BlogPostHeader({ post, locale }: { post: Post; locale: Con
     updated={updated}
     minutes={minutes}
     locale={locale}
-    breadcrumbs={[{ label: locale === "zh" ? "博客" : "Blog", href: localePath(locale, "/blog") }]}
+    breadcrumbs={[{
+      label: section === "notes" ? (locale === "zh" ? "笔记" : "Notes") : (locale === "zh" ? "博客" : "Blog"),
+      href: localePath(locale, `/${section}`)
+    }]}
   />;
 }

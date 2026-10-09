@@ -5,7 +5,7 @@ summary: "Step-by-step derivations of fat-shattering, monotone-class rates, atom
 
 > Based on Haipeng Luo's nine-page Lecture 4, Fall 2026. This report covers Propositions 1–2, Theorems 1–4, Lemmas 1–2, and both figures, explaining motivation, definitions, derivations, and limitations. The scale-sensitive entropy theorem and the full multiclass margin theorem are explicitly identified as external inputs; the remaining key steps are expanded. Added results and corrections are distinguished from the handout.
 >
-> Original: lecture4.pdf (local source, not published online). Companion: [full handout reading edition](/projects/csci678/lecture-4-full-translation). Prerequisite: [Lecture 3](/projects/csci678/lecture-3-preview). Samples are iid, classes nonempty, and the required measurability and integrability are assumed. Regression functions take values in $[-1,1]$; networks here have no biases and use coordinatewise ReLU. Statistical guarantees do not guarantee efficient optimization.
+> Original: lecture4.pdf (local source, not published online). Companion: [full handout reading edition](/notes/csci678/lecture-4-full-translation). Prerequisite: [Lecture 3](/notes/csci678/lecture-3-preview). Samples are iid, classes nonempty, and the required measurability and integrability are assumed. Regression functions take values in $[-1,1]$; networks here have no biases and use coordinatewise ReLU. Statistical guarantees do not guarantee efficient optimization.
 
 ## Reading Map: Two Questions Joined by Scale
 

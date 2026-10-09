@@ -12,11 +12,11 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Writing, study notes, and engineering, organized by topic.",
+  description: "Technical articles and engineering practice, organized by topic.",
   alternates: { canonical: "/blog", languages: { en: "/blog", "zh-CN": "/zh/blog" } },
   openGraph: {
     title: "Blog | Derek Hub",
-    description: "Writing, study notes, and engineering, organized by topic.",
+    description: "Technical articles and engineering practice, organized by topic.",
     url: "/blog",
     images: [
       {

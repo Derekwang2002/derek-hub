@@ -3,8 +3,8 @@ import path from "node:path";
 import type { ContentLocale } from "./locale";
 import { getAllPosts, getPostBySlug, type Post } from "./posts";
 
-export async function getAllLocalizedPosts(locale: ContentLocale): Promise<Post[]> {
-  const posts = await getAllPosts();
+export async function getAllLocalizedPosts(locale: ContentLocale, section: "blog" | "notes" | "all" = "blog"): Promise<Post[]> {
+  const posts = await getAllPosts(section);
   const localized = await Promise.all(
     posts.map((post) => getLocalizedPostBySlug(post.slug, locale))
   );

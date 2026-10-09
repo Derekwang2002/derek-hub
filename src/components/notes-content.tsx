@@ -2,16 +2,17 @@ import Link from "next/link";
 import { getAllLocalizedPosts } from "../../lib/localized-posts";
 import { getAllProjects } from "../../lib/projects";
 import { localePath, type ContentLocale } from "../../lib/locale";
+import { postPath } from "../../lib/content-sections";
 import styles from "../app/blog/page.module.css";
 
 export async function NotesContent({ locale }: { locale: ContentLocale }) {
-  const [projects, posts] = await Promise.all([getAllProjects(locale), getAllLocalizedPosts(locale)]);
+  const [projects, posts] = await Promise.all([getAllProjects(locale, "notes"), getAllLocalizedPosts(locale, "notes")]);
   const notes = [
-    ...projects.filter(project => project.slug.startsWith("csci")).map(project => ({
+    ...projects.map(project => ({
       title: project.name, date: project.lastUpdated, href: project.href
     })),
-    ...posts.filter(post => post.slug.endsWith("-notes")).map(post => ({
-      title: post.title, date: post.date, href: localePath(locale, `/blog/${post.slug}`)
+    ...posts.map(post => ({
+      title: post.title, date: post.date, href: localePath(locale, postPath(post.slug))
     }))
   ].sort((a, b) => b.date.localeCompare(a.date));
 

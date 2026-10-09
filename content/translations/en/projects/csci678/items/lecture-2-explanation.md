@@ -5,7 +5,7 @@ summary: "A section-by-section expansion of Lecture 2: from the minimax upper bo
 
 > Expanded from Haipeng Luo's Lecture 2 (Fall 2026; the original slides are 8 pages). Following the format of the Lecture 3 explanation report, this covers Theorems 1 and 2, Lemmas 1-4, Propositions 1-7, and the auxiliary proofs omitted from the lecture notes. Every step states the conditions it uses and its role in the overall argument.
 >
-> Original slides: lecture2.pdf (not published online). Companion pages on this site: [full slide translation](/projects/csci678/lecture-2-full-translation); surrounding lectures: [Lecture 1](/projects/csci678/lecture-1-explanation), [Lecture 3](/projects/csci678/lecture-3-preview). The function class is assumed nonempty by default, with the necessary measurability and integrability conditions in place; boundedness conditions are stated explicitly whenever a bounded concentration bound is used. We do not assume that every optimization problem can be solved efficiently.
+> Original slides: lecture2.pdf (not published online). Companion pages on this site: [full slide translation](/notes/csci678/lecture-2-full-translation); surrounding lectures: [Lecture 1](/notes/csci678/lecture-1-explanation), [Lecture 3](/notes/csci678/lecture-3-preview). The function class is assumed nonempty by default, with the necessary measurability and integrability conditions in place; boundedness conditions are stated explicitly whenever a bounded concentration bound is used. We do not assume that every optimization problem can be solved efficiently.
 
 ## Reading guide: turning the intractable minimax value into a computable complexity, step by step
 

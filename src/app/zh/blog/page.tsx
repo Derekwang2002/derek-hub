@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "博客",
-  description: "按时间整理的写作、学习笔记与实现记录。",
+  description: "按时间整理的技术文章与工程实践。",
   alternates: { canonical: "/zh/blog", languages: { en: "/blog", "zh-CN": "/zh/blog" } }
 };
 

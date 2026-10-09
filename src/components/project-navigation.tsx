@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { ContentLocale } from "../../lib/locale";
+import { localePath, type ContentLocale } from "../../lib/locale";
+import { collectionSection } from "../../lib/content-sections";
 import type { Project } from "../../lib/projects";
 import styles from "../app/projects/projects.module.css";
 
@@ -7,10 +8,11 @@ export function ProjectNavigation({ activeHref, locale, project }: {
   activeHref: string; locale: ContentLocale; project: Project;
 }) {
   const zh = locale === "zh";
+  const notes = collectionSection(project.slug) === "notes";
   const items = project.sections.flatMap(section => section.items);
   const activeItem = items.find(item => item.href === activeHref);
-  return <nav className={styles.projectNav} aria-label={zh ? `${project.name} 项目导航` : `${project.name} navigation`}>
-    <Link href={zh ? "/zh/projects" : "/projects"} className={styles.projectName}>← {project.name}</Link>
+  return <nav className={styles.projectNav} aria-label={zh ? `${project.name} ${notes ? "笔记" : "项目"}导航` : `${project.name} navigation`}>
+    <Link href={localePath(locale, notes ? "/notes" : "/projects")} className={styles.projectName}>← {notes ? (zh ? "笔记" : "Notes") : project.name}</Link>
     <div className={styles.projectNavLinks}>
       <Link href={project.href} aria-current={activeHref === project.href ? "page" : undefined}>{zh ? "概览" : "Overview"}</Link>
       <details className={styles.documentMenu} key={activeHref}>

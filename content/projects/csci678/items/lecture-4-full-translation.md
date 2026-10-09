@@ -5,7 +5,7 @@ summary: "Lecture 4 九页课件的完整中文翻译：fat-shattering 维数、
 
 **2026 年秋季学期，授课教师：Haipeng Luo**
 
-> 依据本地 lecture4.pdf（9 页）逐节完整翻译。保留定理、命题、引理及公式 (1)–(4) 的原编号和证明结构；图 1、图 2 提取自原课件。少量原文的简写、笔误及常数约定另以“译注”标明，不混入原论证。配套：[详细讲解报告](/zh/projects/csci678/lecture-4-explanation)。
+> 依据本地 lecture4.pdf（9 页）逐节完整翻译。保留定理、命题、引理及公式 (1)–(4) 的原编号和证明结构；图 1、图 2 提取自原课件。少量原文的简写、笔误及常数约定另以“译注”标明，不混入原论证。配套：[详细讲解报告](/zh/notes/csci678/lecture-4-explanation)。
 
 ## 1 回归：Fat-shattering 维数
 

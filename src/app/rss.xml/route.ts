@@ -1,4 +1,5 @@
 import { getAllLocalizedPosts } from "../../../lib/localized-posts";
+import { postPath } from "../../../lib/content-sections";
 
 export const dynamic = "force-static";
 
@@ -22,11 +23,11 @@ function escapeXml(value: string): string {
 
 export async function GET(): Promise<Response> {
   const siteUrl = getSiteUrl();
-  const posts = await getAllLocalizedPosts("en");
+  const posts = await getAllLocalizedPosts("en", "all");
 
   const itemsXml = posts
     .map((post) => {
-      const link = `${siteUrl}/blog/${post.slug}`;
+      const link = `${siteUrl}${postPath(post.slug)}`;
       const pubDate = new Date(`${post.date}T00:00:00.000Z`).toUTCString();
 
       return [

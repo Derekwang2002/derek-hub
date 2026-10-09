@@ -5,7 +5,7 @@ summary: "逐节展开 Lecture 1：监督学习的形式化、i.i.d. 假设、�
 
 > 根据 Haipeng Luo 的 Lecture 1（2026 年秋季，原课件 8 页）展开。结构沿用 Lecture 3 讲解报告：说明问题的目的、解释量词与符号、逐步证明公式、讨论例子及结论边界。标为“补充”的内容用于解释原文，而不是声称课件已经证明了额外定理。
 >
-> 原课件：lecture1.pdf（未在线发布）。本站配套：[课件完整翻译](/zh/projects/csci678/lecture-1-full-translation)；后续讲解：[Lecture 2](/zh/projects/csci678/lecture-2-explanation)、[Lecture 3](/zh/projects/csci678/lecture-3-preview)。默认损失及随机变量可测，所写期望和差值有定义。有限空间上的论证不需要额外可测性技术；推广到一般空间时应保留相应条件。
+> 原课件：lecture1.pdf（未在线发布）。本站配套：[课件完整翻译](/zh/notes/csci678/lecture-1-full-translation)；后续讲解：[Lecture 2](/zh/notes/csci678/lecture-2-explanation)、[Lecture 3](/zh/notes/csci678/lecture-3-preview)。默认损失及随机变量可测，所写期望和差值有定义。有限空间上的论证不需要额外可测性技术；推广到一般空间时应保留相应条件。
 
 ## 阅读导航：第一讲为何花这么多篇幅定义问题
 
