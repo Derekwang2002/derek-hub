@@ -6,19 +6,18 @@
 }
 
 .hero {
-  margin: 0 0 1rem;
-  padding-bottom: 1.1rem;
+  margin: 0 0 1.1rem;
 }
 
 .title {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: clamp(1.9rem, 6vw, 2.8rem);
   line-height: 1.1;
 }
 
 .postList {
   list-style: none;
-  margin: 1.25rem auto 0;
+  margin: 1.5rem auto 0;
   max-width: none;
   padding: 0;
   display: grid;
@@ -26,7 +25,7 @@
   text-align: left;
 }
 
-.filterBar { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 2rem; }
+.filterBar { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .filterTag { align-items: center; background: var(--color-surface-muted); border: 0; border-radius: 999px; color: var(--color-text-muted); cursor: pointer; display: inline-flex; font: inherit; font-size: 0.8rem; gap: 0.45rem; padding: 0.4rem 0.85rem; transition: color 160ms ease, background 160ms ease; }
 .filterTag span { font-size: 0.7rem; opacity: 0.65; }
 .filterTag:hover { background: var(--color-surface-raised); color: var(--color-text); }
@@ -71,7 +70,7 @@
 }
 
 .emptyState {
-  margin: 1.2rem 0 0;
+  margin: 1.5rem 0 0;
   color: var(--color-text-muted);
   text-align: center;
 }
