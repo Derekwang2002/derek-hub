@@ -12,11 +12,11 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Chronological timeline of blog posts with all and selected filters.",
+  description: "Writing, study notes, and engineering, organized by topic.",
   alternates: { canonical: "/blog", languages: { en: "/blog", "zh-CN": "/zh/blog" } },
   openGraph: {
     title: "Blog | Derek Hub",
-    description: "Chronological timeline of blog posts with all and selected filters.",
+    description: "Writing, study notes, and engineering, organized by topic.",
     url: "/blog",
     images: [
       {
@@ -32,21 +32,13 @@ export const metadata: Metadata = {
 export default async function BlogPage() {
   const allPosts = await loadBlogData();
   const posts = allPosts.map(toExplorerPost);
-  const selectedCount = posts.filter((post) => post.selected).length;
   const tags = getTagsWithCounts(posts);
-  const latestPost = allPosts[0];
 
   return (
     <main className={`page-enter ${styles.blogPage}`}>
       <header className={styles.hero}>
         <h1 className={styles.title}>Blog</h1>
-        <p className={styles.description}>
-          Writing, study notes, and implementation records collected chronologically.
-        </p>
-        <p className={styles.heroMeta}>
-          {posts.length} posts · {selectedCount} selected
-          {latestPost ? ` · latest ${formatPostDate(latestPost.date)}` : ""}
-        </p>
+
       </header>
 
       <BlogExplorer posts={posts} tags={tags} />
@@ -65,23 +57,10 @@ async function loadBlogData(): Promise<Post[]> {
 function toExplorerPost(post: Post): BlogExplorerPost {
   return {
     date: post.date,
-    selected: post.selected,
     slug: post.slug,
-    summary: post.summary,
     tags: post.tags,
     title: post.title
   };
-}
-
-function formatPostDate(date: string): string {
-  const parsed = new Date(`${date}T00:00:00.000Z`);
-
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC"
-  }).format(parsed);
 }
 
 function getTagsWithCounts(posts: BlogExplorerPost[]): TagCount[] {

@@ -1,0 +1,23 @@
+.name { color: inherit; display: inline-block; position: relative; text-decoration: none; white-space: nowrap; }
+.name > span { position: relative; }
+.letter { color: inherit; transition: color 260ms ease-out; }
+.letter:nth-of-type(9n+1):hover { color: #e5484d; }
+.letter:nth-of-type(9n+2):hover { color: #f76b15; }
+.letter:nth-of-type(9n+3):hover { color: #d9930d; }
+.letter:nth-of-type(9n+4):hover { color: #30a46c; }
+.letter:nth-of-type(9n+5):hover { color: #12a594; }
+.letter:nth-of-type(9n+6):hover { color: #0091ff; }
+.letter:nth-of-type(9n+7):hover { color: #3e63dd; }
+.letter:nth-of-type(9n+8):hover { color: #8e4ec6; }
+.letter:nth-of-type(9n):hover { color: #d6409f; }
+.portrait {
+  border-radius: 50%; object-fit: cover; position: absolute;
+  width: 80px; height: 80px; left: calc(100% + 0.6rem); bottom: 70%;
+  opacity: 0; pointer-events: none;
+  transform: translate(-30px, 24px) rotate(-18deg) scale(0.4);
+  transition: opacity 180ms ease, transform 420ms cubic-bezier(.22,1.4,.36,1);
+}
+.name:focus-visible .portrait { opacity: 1; transform: translate(8px, -8px) rotate(8deg) scale(1); }
+@media (hover: hover) { .name:hover .portrait { opacity: 1; transform: translate(8px, -8px) rotate(8deg) scale(1); } }
+@media (max-width: 800px) { .portrait { width: 64px; height: 64px; } }
+@media (prefers-reduced-motion: reduce) { .portrait, .letter { transition: none; } }

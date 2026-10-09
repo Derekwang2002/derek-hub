@@ -4,6 +4,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   {
     slug: "call-e",
     name: { en: "CALL-E", zh: "CALL-E" },
+    summary: { en: "A voice agent for long-term goals.", zh: "面向长期目标的语音 Agent 运行时。" },
     status: "active",
     overview: {
       updated: "2026-08-21",
@@ -122,6 +123,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   {
     slug: "ai-intelligence",
     name: { en: "MATRIX", zh: "MATRIX" },
+    summary: { en: "AI developments and long-term trends.", zh: "追踪 AI 进展与长期趋势。" },
     status: "active",
     overview: {
       updated: "2026-09-27",
@@ -161,6 +163,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   {
     slug: "csci678",
     name: { en: "CSCI 678", zh: "CSCI 678" },
+    summary: { en: "Theoretical ML notes and translations.", zh: "理论机器学习笔记与讲义翻译。" },
     status: "active",
     overview: {
       updated: "2026-09-17",
@@ -239,6 +242,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   {
     slug: "derek-hub",
     name: { en: "Derek Hub", zh: "Derek Hub" },
+    summary: { en: "Bilingual writing, projects, and demos.", zh: "双语博客、项目文档与交互演示。" },
     status: "active",
     overview: {
       updated: "2026-09-01",

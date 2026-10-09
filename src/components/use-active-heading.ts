@@ -1,98 +1,44 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getVisibleSections, type HeadingPosition } from "../../lib/visible-sections";
 import type { TocItem } from "./post-toc";
 
-function readHashId(): string {
-  const hash = window.location.hash.slice(1);
-
-  if (!hash) {
-    return "";
-  }
-
-  try {
-    return decodeURIComponent(hash);
-  } catch {
-    return hash;
-  }
-}
-
-export function useActiveHeading(items: TocItem[]): string {
-  const [activeId, setActiveId] = useState(items[0]?.id ?? "");
-
+export function useActiveHeadings(items: TocItem[]) {
+  const [state, setState] = useState({ activeId: "", visibleIds: [] as string[] });
   useEffect(() => {
-    if (items.length === 0) {
-      setActiveId("");
-      return;
-    }
-
-    const headings = items
-      .map((item) => document.getElementById(item.id))
-      .filter((heading): heading is HTMLElement => Boolean(heading));
-
-    if (headings.length === 0) {
-      setActiveId(items[0]?.id ?? "");
-      return;
-    }
-
-    let animationFrame = 0;
-
-    function updateFromScroll() {
-      window.cancelAnimationFrame(animationFrame);
-      animationFrame = window.requestAnimationFrame(() => {
-        const activationLine = Math.max(96, window.innerHeight * 0.25);
-        let nextId = headings[0].id;
-
-        for (const heading of headings) {
-          if (heading.getBoundingClientRect().top > activationLine) {
-            break;
-          }
-
-          nextId = heading.id;
-        }
-
-        const pageBottom = window.scrollY + window.innerHeight;
-        const documentBottom = document.documentElement.scrollHeight;
-
-        if (pageBottom >= documentBottom - 2) {
-          nextId = headings[headings.length - 1].id;
-        }
-
-        setActiveId((currentId) => (currentId === nextId ? currentId : nextId));
+    const headings = items.flatMap((item) => {
+      const element = document.getElementById(item.id);
+      return element ? [{ ...item, element }] : [];
+    });
+    let frame = 0;
+    const article = headings[0]?.element.closest("article");
+    function update() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const top = (document.querySelector(".site-header")?.getBoundingClientRect().bottom ?? 0) + 24;
+        const positions: HeadingPosition[] = headings.map(({ id, level, element }) => ({
+          id, level, top: element.getBoundingClientRect().top
+        }));
+        const next = getVisibleSections(positions, top, window.innerHeight - 24,
+          article?.getBoundingClientRect().bottom ?? document.documentElement.scrollHeight - window.scrollY);
+        setState((previous) => previous.activeId === next.activeId &&
+          previous.visibleIds.join("\n") === next.visibleIds.join("\n") ? previous : next);
       });
     }
-
-    function updateFromLocation() {
-      const hashId = readHashId();
-
-      if (hashId && headings.some((heading) => heading.id === hashId)) {
-        setActiveId(hashId);
-      }
-
-      updateFromScroll();
-    }
-
-    const initialHashId = readHashId();
-
-    if (initialHashId && headings.some((heading) => heading.id === initialHashId)) {
-      setActiveId(initialHashId);
-    } else {
-      updateFromScroll();
-    }
-
-    window.addEventListener("scroll", updateFromScroll, { passive: true });
-    window.addEventListener("resize", updateFromScroll);
-    window.addEventListener("hashchange", updateFromLocation);
-    window.addEventListener("popstate", updateFromLocation);
-
+    const observer = new ResizeObserver(update);
+    if (article) observer.observe(article);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    window.addEventListener("hashchange", update);
     return () => {
-      window.cancelAnimationFrame(animationFrame);
-      window.removeEventListener("scroll", updateFromScroll);
-      window.removeEventListener("resize", updateFromScroll);
-      window.removeEventListener("hashchange", updateFromLocation);
-      window.removeEventListener("popstate", updateFromLocation);
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+      window.removeEventListener("hashchange", update);
     };
   }, [items]);
-
-  return activeId;
+  return state;
 }

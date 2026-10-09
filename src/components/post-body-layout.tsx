@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
-import { useActiveHeading } from "./use-active-heading";
+import { useActiveHeadings } from "./use-active-heading";
 import type { ContentLocale } from "../../lib/locale";
 import styles from "../app/blog/[slug]/page.module.css";
 
@@ -15,6 +15,7 @@ type ViewportMode = "pending" | "wide" | "medium" | "mobile";
 type PostBodyLayoutProps = {
   articleTitle: string;
   children: ReactNode;
+  header?: ReactNode;
   locale?: ContentLocale;
   tocItems: TocItem[];
 };
@@ -22,18 +23,17 @@ type PostBodyLayoutProps = {
 export function PostBodyLayout({
   articleTitle,
   children,
+  header,
   locale = "en",
   tocItems
 }: PostBodyLayoutProps) {
   const [viewportMode, setViewportMode] = useState<ViewportMode>("pending");
   const [wideOpen, setWideOpen] = useState(true);
   const [overlayOpen, setOverlayOpen] = useState(false);
-  const activeId = useActiveHeading(tocItems);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const flipRef = useRef<{ asideX: number; articleX: number } | null>(null);
+  const { activeId, visibleIds } = useActiveHeadings(tocItems);
 
   useEffect(() => {
-    const wideQuery = window.matchMedia("(min-width: 1280px)");
+    const wideQuery = window.matchMedia("(min-width: 1100px)");
     const mobileQuery = window.matchMedia("(max-width: 920px)");
 
     try {
@@ -73,25 +73,12 @@ export function PostBodyLayout({
     setOverlayOpen(false);
   }, [articleTitle]);
 
-  const tocOpen = viewportMode === "wide" ? wideOpen : overlayOpen;
+  const tocOpen = viewportMode === "wide" || viewportMode === "pending" ? wideOpen : overlayOpen;
   const tocOverlay = viewportMode === "medium" || viewportMode === "mobile";
 
   const setTocOpen = useCallback(
     (nextOpen: boolean) => {
       if (viewportMode === "wide") {
-        const layout = layoutRef.current;
-        const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (layout && !reduceMotion) {
-          const aside = layout.querySelector("aside");
-          const article = layout.querySelector("article");
-          if (aside && article) {
-            flipRef.current = {
-              asideX: aside.getBoundingClientRect().x,
-              articleX: article.getBoundingClientRect().x
-            };
-          }
-        }
-
         setWideOpen(nextOpen);
 
         try {
@@ -108,30 +95,12 @@ export function PostBodyLayout({
     [viewportMode]
   );
 
-  useLayoutEffect(() => {
-    const first = flipRef.current;
-    flipRef.current = null;
-    const layout = layoutRef.current;
-    if (!first || !layout) return;
-
-    for (const [selector, fromX] of [["aside", first.asideX], ["article", first.articleX]] as const) {
-      const el = layout.querySelector(selector);
-      if (!el) continue;
-      const dx = fromX - el.getBoundingClientRect().x;
-      if (Math.abs(dx) < 1) continue;
-      el.animate(
-        [{ transform: `translateX(${dx}px)` }, { transform: "none" }],
-        { duration: 300, easing: "cubic-bezier(0.22, 1, 0.36, 1)" }
-      );
-    }
-  }, [tocOpen]);
-
   return (
-    <div ref={layoutRef} className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
-      <div aria-hidden="true" className={styles.layoutRule} />
+    <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
+      {header ? <div className={styles.articleHeader}>{header}</div> : null}
       <PostToc
         activeId={activeId}
-        articleTitle={articleTitle}
+        visibleIds={visibleIds}
         items={tocItems}
         locale={locale}
         onOpenChange={setTocOpen}

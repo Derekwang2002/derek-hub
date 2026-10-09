@@ -2,254 +2,52 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import type { MouseEvent } from "react";
-import { BlogTagMenu } from "./blog-tag-menu";
-import { BlogTabs, type BlogTab } from "./blog-tabs";
-import type { BlogTag } from "./blog-tag-menu";
+import type { TagCount } from "../../lib/posts";
 import styles from "../app/blog/page.module.css";
 
 export type BlogExplorerPost = {
-  date: string;
-  selected?: boolean;
-  slug: string;
-  summary: string;
-  tags: string[];
-  title: string;
+  date: string; slug: string; tags: string[]; title: string;
 };
 
-type BlogExplorerProps = {
-  locale?: "en" | "zh";
-  posts: BlogExplorerPost[];
-  tags: BlogTag[];
-};
-
-type BlogFilters = {
-  activeTab: BlogTab;
-  activeTags: string[];
-};
-
-const DEFAULT_FILTERS: BlogFilters = {
-  activeTab: "all",
-  activeTags: []
-};
-
-export function BlogExplorer({ locale = "en", posts, tags }: BlogExplorerProps) {
-  const validTagSlugs = useMemo(() => new Set(tags.map((tag) => tag.slug)), [tags]);
-  const [filters, setFilters] = useState<BlogFilters>(DEFAULT_FILTERS);
-
-  useEffect(() => {
-    function syncFromLocation() {
-      setFilters(resolveFilters(new URLSearchParams(window.location.search), validTagSlugs));
-    }
-
-    syncFromLocation();
-    window.addEventListener("popstate", syncFromLocation);
-
-    return () => {
-      window.removeEventListener("popstate", syncFromLocation);
-    };
-  }, [validTagSlugs]);
-
-  const filteredPosts = useMemo(
-    () => filterPosts(posts, filters.activeTab, filters.activeTags),
-    [filters.activeTab, filters.activeTags, posts]
-  );
-
-  function navigate(href: string) {
-    const url = new URL(href, window.location.origin);
-    const nextFilters = resolveFilters(url.searchParams, validTagSlugs);
-
-    window.history.pushState(null, "", href);
-    setFilters(nextFilters);
-  }
-
-  return (
-    <>
-      <div className={styles.filterBar}>
-        <BlogTabs
-          activeTab={filters.activeTab}
-          activeTags={filters.activeTags}
-          locale={locale}
-          onNavigate={navigate}
-        />
-        <span aria-hidden="true" className={styles.filterDivider} />
-        <BlogTagMenu
-          activeTab={filters.activeTab}
-          locale={locale}
-          onNavigate={navigate}
-          selectedTags={filters.activeTags}
-          tags={tags}
-        />
-      </div>
-
-      <div className="list-swap" key={`${filters.activeTab}|${filters.activeTags.join(",")}`}>
-        {filteredPosts.length === 0 ? (
-        filters.activeTab === "selected" ? (
-          <>
-            <p className={styles.emptyState}>{locale === "zh" ? "暂无精选文章。" : "No selected posts yet."}</p>
-            <p className={styles.emptyState}>
-              <Link
-                href={`${locale === "zh" ? "/zh" : ""}/blog?tab=all`}
-                onClick={(event) => {
-                  if (isModifiedClick(event)) return;
-                  event.preventDefault();
-                  navigate(`${locale === "zh" ? "/zh" : ""}/blog?tab=all`);
-                }}
-                prefetch={false}
-                scroll={false}
-              >
-                {locale === "zh" ? "查看全部文章" : "View all posts"}
-              </Link>
-            </p>
-          </>
-        ) : (
-          <>
-            <p className={styles.emptyState}>{locale === "zh" ? "暂无已发布文章。" : "No posts published yet."}</p>
-            <p className={styles.emptyState}>
-              <Link href={locale === "zh" ? "/zh" : "/"}>{locale === "zh" ? "返回 Home" : "Back to Home"}</Link>
-            </p>
-          </>
-        )
-      ) : (
-        <ul className={styles.postList}>
-          {filteredPosts.map((post) => (
-            <li className={`row-highlight ${styles.postRow}`} key={post.slug}>
-              <div className={styles.postHeader}>
-                <Link className={styles.postLink} href={`${locale === "zh" ? "/zh" : ""}/blog/${post.slug}`}>
-                  {post.title}
-                </Link>
-                <time className={styles.postDate} dateTime={post.date}>
-                  {formatPostDate(post.date, locale)}
-                </time>
-              </div>
-              <p className={styles.postSummary}>{post.summary}</p>
-              <PostMeta activeTab={filters.activeTab} locale={locale} onNavigate={navigate} post={post} />
-            </li>
-          ))}
-        </ul>
-      )}
-      </div>
-    </>
-  );
-}
-
-function PostMeta({
-  activeTab,
-  locale,
-  onNavigate,
-  post
-}: {
-  activeTab: BlogTab;
-  locale: "en" | "zh";
-  onNavigate: (href: string) => void;
-  post: BlogExplorerPost;
+export function BlogExplorer({ locale = "en", posts, tags }: {
+  locale?: "en" | "zh"; posts: BlogExplorerPost[]; tags: TagCount[];
 }) {
-  return (
-    <div className={styles.postMeta}>
-      {post.selected ? (
-        <>
-          <span className={`meta-badge ${styles.selectedBadge}`}>{locale === "zh" ? "精选" : "Selected"}</span>
-          {post.tags.length > 0 ? (
-            <span aria-hidden="true" className={styles.metaSeparator}>
-              |
-            </span>
-          ) : null}
-        </>
-      ) : null}
+  const [activeTags, setActiveTags] = useState<string[]>([]);
+  const validTags = useMemo(() => new Set(tags.map(tag => tag.slug)), [tags]);
+  const basePath = `${locale === "zh" ? "/zh" : ""}/blog`;
+  useEffect(() => {
+    function sync() { setActiveTags([...new Set(new URLSearchParams(location.search).getAll("tag"))].filter(tag => validTags.has(tag))); }
+    sync();
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, [validTags]);
 
-      {post.tags.length > 0 ? (
-        <span aria-label="Tags" className={styles.tagList} role="group">
-          {post.tags.map((tag) => {
-            const slug = normalizeTagSlug(tag);
-            const href = buildBlogHref(activeTab, [slug], locale);
+  function filter(next: string[]) {
+    const params = new URLSearchParams();
+    next.forEach(tag => params.append("tag", tag));
+    window.history.pushState(null, "", next.length ? `${basePath}?${params}` : basePath);
+    setActiveTags(next);
+  }
+  const filtered = posts.filter(post => activeTags.every(tag => post.tags.some(value => normalize(value) === tag)));
 
-            return (
-              <Link
-                className={`tag-chip ${styles.postTag}`}
-                href={href}
-                key={slug}
-                onClick={(event) => {
-                  if (isModifiedClick(event)) return;
-                  event.preventDefault();
-                  onNavigate(href);
-                }}
-                prefetch={false}
-                scroll={false}
-              >
-                {tag}
-              </Link>
-            );
-          })}
-        </span>
-      ) : null}
+  return <>
+    <div className={styles.filterBar} aria-label={locale === "zh" ? "按标签筛选" : "Filter by tag"}>
+      {tags.map(tag => <button type="button" key={tag.slug} aria-pressed={activeTags.includes(tag.slug)} className={styles.filterTag}
+        onClick={() => filter(activeTags.includes(tag.slug) ? activeTags.filter(value => value !== tag.slug) : [...activeTags, tag.slug])}>
+        {tag.tag}<span>{tag.count}</span>
+      </button>)}
+      {activeTags.length ? <button type="button" className={styles.clearFilters} onClick={() => filter([])}>{locale === "zh" ? "清除筛选" : "Clear filters"}</button> : null}
     </div>
-  );
+    <div className="list-swap" key={activeTags.join(",")}>
+      {filtered.length ? <ul className={styles.postList}>{filtered.map(post => <li className={`row-highlight ${styles.postRow}`} key={post.slug}>
+        <div className={styles.postHeader}>
+          <Link className={styles.postLink} href={`${basePath}/${post.slug}`}>{post.title}</Link>
+          <time className={styles.postDate} dateTime={post.date}>{post.date}</time>
+        </div>
+
+      </li>)}</ul> : <p className={styles.emptyState} role="status">{locale === "zh" ? "没有符合这些标签的文章。" : "No posts match these tags."}</p>}
+    </div>
+  </>;
 }
 
-function resolveFilters(params: URLSearchParams, validTagSlugs: Set<string>): BlogFilters {
-  const tab = params.get("tab") === "selected" ? "selected" : "all";
-  const activeTags = Array.from(
-    new Set(
-      params
-        .getAll("tag")
-        .map((tag) => normalizeTagSlug(tag))
-        .filter((tag) => tag.length > 0 && validTagSlugs.has(tag))
-    )
-  );
-
-  return {
-    activeTab: tab,
-    activeTags
-  };
-}
-
-function filterPosts(
-  posts: BlogExplorerPost[],
-  activeTab: BlogTab,
-  activeTags: string[]
-): BlogExplorerPost[] {
-  const basePosts = activeTab === "selected" ? posts.filter((post) => post.selected) : posts;
-
-  if (activeTags.length === 0) {
-    return basePosts;
-  }
-
-  return basePosts.filter((post) =>
-    activeTags.every((tagSlug) =>
-      post.tags.some((postTag) => normalizeTagSlug(postTag) === tagSlug)
-    )
-  );
-}
-
-function buildBlogHref(tab: BlogTab, tags: string[], locale: "en" | "zh"): string {
-  const params = new URLSearchParams({ tab });
-
-  for (const tag of tags) {
-    params.append("tag", tag);
-  }
-
-  return `${locale === "zh" ? "/zh" : ""}/blog?${params.toString()}`;
-}
-
-function normalizeTagSlug(input: string): string {
-  return input
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function isModifiedClick(event: MouseEvent<HTMLAnchorElement>): boolean {
-  return event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
-}
-
-function formatPostDate(date: string, locale: "en" | "zh"): string {
-  const parsed = new Date(`${date}T00:00:00.000Z`);
-
-  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC"
-  }).format(parsed);
-}
+function normalize(tag: string) { return tag.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }

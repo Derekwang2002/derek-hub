@@ -29,6 +29,7 @@ export type ProjectItemDefinition = {
 export type ProjectDefinition = {
   slug: string;
   name: Record<ContentLocale, string>;
+  summary: Record<ContentLocale, string>;
   status: ProjectStatus;
   overview: {
     updated: string;
@@ -60,6 +61,7 @@ export type Project = {
   href: string;
   lastUpdated: string;
   name: string;
+  summary: string;
   overview: ProjectDocument;
   reviewedRevision?: string;
   sections: ProjectSection[];
@@ -290,6 +292,7 @@ async function loadProject(
     href: localePath(locale, `/projects/${definition.slug}`),
     lastUpdated,
     name: definition.name[locale],
+    summary: definition.summary[locale],
     overview,
     reviewedRevision: definition.overview.reviewedRevision,
     sections,

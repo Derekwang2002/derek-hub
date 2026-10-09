@@ -1,10 +1,9 @@
+import { BlogPostHeader } from "@/components/blog-post-header";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
-import { formatContentDate } from "../../../../../lib/locale";
-import { getAllPosts, normalizeTagSlug } from "../../../../../lib/posts";
+import { getAllPosts } from "../../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../../lib/localized-posts";
 import styles from "../../../blog/[slug]/page.module.css";
 
@@ -31,13 +30,8 @@ export default async function ChineseBlogPostPage({ params }: Props) {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
-      <p className={styles.backWrap}><Link className={styles.backLink} href="/zh/blog">返回 Blog</Link></p>
-      <header className={styles.header}>
-        <h1 className={styles.title}>{post.title}</h1>
-        <time className={styles.date} dateTime={post.date}>{formatContentDate(post.date, "zh")}</time>
-        <ul className={styles.tags}>{post.tags.map((tag) => <li key={tag}><Link className={styles.tagLink} href={`/zh/blog?tag=${normalizeTagSlug(tag)}`}>{tag}</Link></li>)}</ul>
-      </header>
       <PostBodyLayout
+        header={<BlogPostHeader post={post} locale="zh" />}
         articleTitle={post.title}
         locale="zh"
         tocItems={tocItems}

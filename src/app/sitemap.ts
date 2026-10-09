@@ -41,6 +41,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }, undefined) ?? latestPostDate;
 
   const staticEntries: MetadataRoute.Sitemap = [
+    { url: toAbsoluteUrl(siteUrl, "/notes"), changeFrequency: "weekly", priority: 0.8 },
+    { url: toAbsoluteUrl(siteUrl, "/about"), changeFrequency: "monthly", priority: 0.7 },
     {
       url: toAbsoluteUrl(siteUrl, "/"),
       lastModified: latestPostDate,
@@ -110,10 +112,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
   const chineseEntries: MetadataRoute.Sitemap = [
-    ...staticEntries.map((entry) => ({ ...entry, url: entry.url === `${siteUrl}/` ? `${siteUrl}/zh` : entry.url.replace(`${siteUrl}/blog`, `${siteUrl}/zh/blog`) })),
+    ...staticEntries.map((entry) => ({ ...entry, url: entry.url === `${siteUrl}/` ? `${siteUrl}/zh` : entry.url.replace(`${siteUrl}/`, `${siteUrl}/zh/`) })),
     ...resourceSectionEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
     ...resourceEntries.filter((entry) => entry.url.includes("/hub/skills/")).map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/hub`, `${siteUrl}/zh/hub`) })),
-    ...postEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/blog`, `${siteUrl}/zh/blog`) })),
+    ...postEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/`, `${siteUrl}/zh/`) })),
     ...projectEntries.map((entry) => ({ ...entry, url: entry.url.replace(`${siteUrl}/projects`, `${siteUrl}/zh/projects`) }))
   ];
 

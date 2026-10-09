@@ -21,7 +21,8 @@ export function ThemeToggle() {
   return (
     <button
       aria-label={mounted ? `Switch to ${nextTheme} mode` : "Toggle color theme"}
-      aria-pressed={mounted ? theme === "dark" : undefined}
+      role="switch"
+      aria-checked={mounted && theme === "dark"}
       className="theme-toggle"
       onClick={() => {
         setDocumentTheme(nextTheme);
@@ -30,7 +31,7 @@ export function ThemeToggle() {
       }}
       type="button"
     >
-      {mounted ? (theme === "dark" ? <SunIcon /> : <MoonIcon />) : <span aria-hidden="true" className="theme-toggle-icon" />}
+      <SunIcon /><MoonIcon />
     </button>
   );
 }

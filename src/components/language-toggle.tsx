@@ -27,6 +27,7 @@ export function LanguageToggle() {
     <Link
       aria-label={chinese ? "Switch content language to English" : "切换内容语言为中文"}
       className="language-toggle"
+      data-locale={chinese ? "zh" : "en"}
       href={href}
       onClick={() => {
         try {
@@ -36,7 +37,7 @@ export function LanguageToggle() {
         }
       }}
     >
-      {chinese ? "EN" : "中文"}
+      <span aria-hidden="true">中</span><span aria-hidden="true">EN</span>
     </Link>
   );
 }

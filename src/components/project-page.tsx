@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "./markdown-renderer";
+import { ProjectLayout } from "./project-layout";
+import { PostBodyLayout } from "./post-body-layout";
 import { ProjectNavigation } from "./project-navigation";
 import { ProjectPager } from "./project-pager";
+import { TitleNote } from "./title-note";
 import { formatContentDate, localePath, type ContentLocale } from "../../lib/locale";
 import {
   getAllProjects,
@@ -23,20 +26,20 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
   return (
     <main className={`page-enter ${styles.indexPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
       <header className={styles.indexHero}>
-        <h1>Projects</h1>
-        <p>
-          {locale === "zh"
-            ? "围绕一个长期目标组织稳定文档、源码导览与项目动态。"
-            : "Stable documentation, source guides, and updates organized around long-running work."}
-        </p>
+        <div className={styles.indexHeading}>
+          <h1>{locale === "zh" ? "项目" : "Projects"}</h1>
+          <TitleNote label={locale === "zh" ? "项目说明" : "About projects"}>
+            {locale === "zh" ? "项目文档、源码导览与进展记录。" : "Project documentation, source guides, and progress updates."}
+          </TitleNote>
+        </div>
       </header>
       <ul className={styles.projectList}>
         {projects.map((project) => (
           <li className="row-highlight" key={project.slug}>
             <Link href={project.href}>
-              <span>
+              <span className={styles.projectDescription}>
                 <strong>{project.overview.title}</strong>
-                <small>{project.overview.summary}</small>
+                <small>{project.summary}</small>
               </span>
               <span className={styles.projectMeta}>
                 {project.status === "archived"
@@ -69,27 +72,20 @@ export async function ProjectOverviewPage({
 
   return (
     <ProjectPageShell activeHref={project.href} locale={locale} project={project}>
-      <ProjectHeader
+      <PostBodyLayout articleTitle={project.overview.title} locale={locale} tocItems={tocItems} header={<ProjectHeader
         locale={locale}
         project={project}
-        sectionLabel={locale === "zh" ? "系统概览" : "System overview"}
         title={project.overview.title}
         summary={project.overview.summary}
-      />
-      <div className={styles.articleGrid}>
-        <article className={styles.article}>{rendered}</article>
-        <OnThisPage items={tocItems} locale={locale} />
-      </div>
+      />}>{rendered}</PostBodyLayout>
       <section aria-labelledby="project-map-title" className={styles.directory}>
         <div className={styles.sectionHeading}>
-          <p className={styles.eyebrow}>{locale === "zh" ? "稳定文档" : "Stable documentation"}</p>
-          <h2 id="project-map-title">{locale === "zh" ? "从这里继续" : "Continue from here"}</h2>
+          <h2 id="project-map-title">{locale === "zh" ? "文档" : "Documents"}</h2>
         </div>
         <ProjectDirectory project={project} />
       </section>
       <section aria-labelledby="latest-updates-title" className={styles.latestUpdates}>
         <div className={styles.sectionHeading}>
-          <p className={styles.eyebrow}>Updates</p>
           <h2 id="latest-updates-title">{locale === "zh" ? "最近动态" : "Latest updates"}</h2>
         </div>
         {updates.length > 0 ? (
@@ -129,22 +125,22 @@ export async function ProjectItemPage({
 
   return (
     <ProjectPageShell activeHref={item.href} locale={locale} project={project}>
-      <ProjectHeader
+      {item.kind === "interactive" ? <>
+        <ProjectHeader
         item={item}
         locale={locale}
         project={project}
-        sectionLabel={item.sectionLabel}
         summary={item.summary}
         title={item.title}
       />
-      {item.kind === "interactive" ? (
         <InteractiveProjectItem item={item} locale={locale} />
-      ) : (
-        <div className={styles.articleGrid}>
-          <article className={styles.article}>{rendered}</article>
-          <OnThisPage items={tocItems} locale={locale} />
-        </div>
-      )}
+      </> : <PostBodyLayout articleTitle={item.title} locale={locale} tocItems={tocItems} header={<ProjectHeader
+        item={item}
+        locale={locale}
+        project={project}
+        summary={item.summary}
+        title={item.title}
+      />}>{rendered}</PostBodyLayout>}
       <ProjectRevision locale={locale} revision={item.reviewedRevision} />
       <ProjectPager locale={locale} pager={pager} />
     </ProjectPageShell>
@@ -165,12 +161,6 @@ export async function ProjectUpdatesPage({
   return (
     <ProjectPageShell activeHref={href} locale={locale} project={project}>
       <header className={styles.updatesHero}>
-        <Breadcrumbs
-          current={locale === "zh" ? "项目动态" : "Updates"}
-          locale={locale}
-          project={project}
-        />
-        <p className={styles.eyebrow}>{project.name} / Updates</p>
         <h1>{locale === "zh" ? "项目动态" : "Project updates"}</h1>
         <p>
           {locale === "zh"
@@ -199,10 +189,9 @@ function ProjectPageShell({
   project: Project;
 }) {
   return (
-    <main className={`page-enter ${styles.projectPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
-      <ProjectNavigation activeHref={activeHref} locale={locale} project={project} />
-      <div className={styles.projectMain}>{children}</div>
-    </main>
+    <ProjectLayout locale={locale} navigation={<ProjectNavigation activeHref={activeHref} locale={locale} project={project} />}>
+      {children}
+    </ProjectLayout>
   );
 }
 
@@ -210,21 +199,17 @@ function ProjectHeader({
   item,
   locale,
   project,
-  sectionLabel,
   summary,
   title
 }: {
   item?: ProjectItem;
   locale: ContentLocale;
   project: Project;
-  sectionLabel: string;
   summary: string;
   title: string;
 }) {
   return (
     <header className={styles.projectHero}>
-      <Breadcrumbs current={title} locale={locale} project={project} section={item ? sectionLabel : undefined} />
-      <p className={styles.eyebrow}>{project.name} / {sectionLabel}</p>
       <h1>{title}</h1>
       <p>{summary}</p>
       <div className={styles.heroMeta}>
@@ -239,66 +224,10 @@ function ProjectHeader({
   );
 }
 
-function Breadcrumbs({
-  current,
-  locale,
-  project,
-  section
-}: {
-  current: string;
-  locale: ContentLocale;
-  project: Project;
-  section?: string;
-}) {
-  return (
-    <nav aria-label={locale === "zh" ? "面包屑" : "Breadcrumb"} className={styles.breadcrumbs}>
-      <Link href={localePath(locale, "/projects")}>Projects</Link>
-      <span aria-hidden="true">/</span>
-      <Link href={project.href}>{project.name}</Link>
-      {section ? <><span aria-hidden="true">/</span><span>{section}</span></> : null}
-      <span aria-hidden="true">/</span>
-      <span aria-current="page">{current}</span>
-    </nav>
-  );
-}
-
 function ProjectDirectory({ project }: { project: Project }) {
-  return (
-    <div className={styles.directoryGrid}>
-      {project.sections.map((section) => (
-        <section key={section.slug}>
-          <h3>{section.label}</h3>
-          <ol>
-            {section.items.map((item) => (
-              <li key={item.slug}><Link href={item.href}>{item.title}</Link></li>
-            ))}
-          </ol>
-        </section>
-      ))}
-    </div>
-  );
-}
-
-function OnThisPage({
-  items,
-  locale
-}: {
-  items: ReturnType<typeof getMarkdownHeadings>;
-  locale: ContentLocale;
-}) {
-  if (items.length === 0) return null;
-  return (
-    <aside aria-label={locale === "zh" ? "页内目录" : "On this page"} className={styles.onThisPage}>
-      <p>{locale === "zh" ? "本页目录" : "On this page"}</p>
-      <ul>
-        {items.filter((item) => item.level <= 3).map((item) => (
-          <li className={item.level === 3 ? styles.tocNested : undefined} key={item.id}>
-            <a href={`#${item.id}`}>{item.text}</a>
-          </li>
-        ))}
-      </ul>
-    </aside>
-  );
+  return <ul className={styles.documentList}>{project.sections.flatMap(section => section.items.map(item =>
+    <li key={item.slug}><Link href={item.href}><span>{item.title}</span><small>{section.label}</small></Link></li>
+  ))}</ul>;
 }
 
 function InteractiveProjectItem({ item, locale }: { item: ProjectItem; locale: ContentLocale }) {

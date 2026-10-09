@@ -36,8 +36,10 @@ export function ResourceList({
         <ul className={styles.list}>
           {resources.map((resource) => (
             <li className={`row-highlight ${styles.item}`} key={`${resource.type}-${resource.href}`}>
-              <ResourceLink locale={locale} resource={resource} />
-              <p className={styles.description}>{resource.description}</p>
+              <div className={styles.itemContent}>
+                <ResourceLink locale={locale} resource={resource} />
+                <p className={styles.description}>{resource.description}</p>
+              </div>
               <ResourceMeta locale={locale} resource={resource} />
             </li>
           ))}
@@ -81,42 +83,11 @@ function ResourceMeta({ locale, resource }: { locale: "en" | "zh"; resource: Res
     <div className={styles.meta}>
       <span className="meta-badge">{locale === "zh" && resource.type === "demo" ? "演示" : getResourceTypeLabel(resource.type)}</span>
 
-      {resource.tags.length > 0 ? (
-        <span aria-hidden="true" className={styles.metaSeparator}>
-          |
-        </span>
-      ) : null}
-
-      {resource.tags.length > 0 ? (
-        <span aria-label="Tags" className={styles.tagList} role="group">
-          {resource.tags.map((tag) => (
-            <span className="tag-chip" key={tag}>
-              {tag}
-            </span>
-          ))}
-        </span>
-      ) : null}
-
       {resource.date ? (
         <time className={styles.metaDate} dateTime={resource.date}>
-          {formatResourceDate(resource.date, locale)}
+          {resource.date}
         </time>
       ) : null}
     </div>
   );
-}
-
-function formatResourceDate(date: string, locale: "en" | "zh"): string {
-  const parsed = new Date(`${date}T00:00:00.000Z`);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return date;
-  }
-
-  return new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC"
-  }).format(parsed);
 }

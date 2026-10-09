@@ -1,9 +1,9 @@
+import { BlogPostHeader } from "@/components/blog-post-header";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
-import { getAllPosts, normalizeTagSlug } from "../../../../lib/posts";
+import { getAllPosts } from "../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../lib/localized-posts";
 import styles from "./page.module.css";
 
@@ -78,42 +78,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <main className={`page-enter ${styles.postPage}`}>
-      <p className={styles.backWrap}>
-        <Link className={styles.backLink} href="/blog">
-          Back to Blog
-        </Link>
-      </p>
-
-      <header className={styles.header}>
-        <h1 className={styles.title}>{post.title}</h1>
-        <time className={styles.date} dateTime={post.date}>
-          {formatPostDate(post.date)}
-        </time>
-        <ul className={styles.tags}>
-          {post.tags.map((tag) => (
-            <li key={tag}>
-              <Link className={styles.tagLink} href={`/blog?tag=${normalizeTagSlug(tag)}`}>
-                {tag}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </header>
-
-      <PostBodyLayout articleTitle={post.title} tocItems={tocItems}>
+      <PostBodyLayout header={<BlogPostHeader post={post} locale="en" />} articleTitle={post.title} tocItems={tocItems}>
         {renderedContent}
       </PostBodyLayout>
     </main>
   );
-}
-
-function formatPostDate(date: string): string {
-  const parsed = new Date(`${date}T00:00:00.000Z`);
-
-  return new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC"
-  }).format(parsed);
 }

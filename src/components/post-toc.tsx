@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import type { ContentLocale } from "../../lib/locale";
+import { getVisibleHeadingRange } from "../../lib/visible-sections";
 import styles from "../app/blog/[slug]/page.module.css";
 
 export type TocItem = {
@@ -13,7 +14,7 @@ export type TocItem = {
 
 type PostTocProps = {
   activeId: string;
-  articleTitle: string;
+  visibleIds: string[];
   items: TocItem[];
   locale?: ContentLocale;
   onOpenChange: (open: boolean) => void;
@@ -26,7 +27,7 @@ const FOCUSABLE_SELECTOR =
 
 export function PostToc({
   activeId,
-  articleTitle,
+  visibleIds,
   items,
   locale = "en",
   onOpenChange,
@@ -36,7 +37,26 @@ export function PostToc({
   const contentsRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const [indicator, setIndicator] = useState({ top: 0, height: 0 });
   const hasContents = items.length > 0;
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list || !open) return;
+    function measure() {
+      const range = getVisibleHeadingRange(items.map(item => item.id), visibleIds);
+      const first = range && list!.children[range.first];
+      const last = range && list!.children[range.last];
+      const top = first ? first.getBoundingClientRect().top - list!.getBoundingClientRect().top : 0;
+      const height = first && last ? last.getBoundingClientRect().bottom - first.getBoundingClientRect().top : 0;
+      setIndicator(previous => previous.top === top && previous.height === height ? previous : { top, height });
+    }
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [items, visibleIds, open]);
 
   useEffect(() => {
     if (!open || !activeId) {
@@ -246,9 +266,7 @@ export function PostToc({
             </span>
           </button>
 
-          <p className={styles.tocTitle} title={articleTitle}>
-            {articleTitle}
-          </p>
+          <p className={styles.tocTitle}>{locale === "zh" ? "目录" : "Contents"}</p>
         </div>
 
         <div
@@ -258,12 +276,11 @@ export function PostToc({
           id="post-toc-list"
           ref={contentsRef}
         >
-          <p className={styles.tocGroupLabel}>
-            {locale === "zh" ? "本页目录" : "On this page"}
-          </p>
-          <ol className={styles.tocList}>
+          <div className={styles.tocTrack}>
+          <span aria-hidden="true" className={styles.tocIndicator} style={{ transform: `translateY(${indicator.top}px)`, height: indicator.height, opacity: indicator.height ? 1 : 0 }} />
+          <ol className={styles.tocList} ref={listRef}>
             {items.map((item) => {
-              const active = item.id === activeId;
+              const active = visibleIds.includes(item.id);
               const levelClassName = styles[`tocLevel${Math.min(item.level, 4)}`];
 
               return (
@@ -272,7 +289,8 @@ export function PostToc({
                   key={item.id}
                 >
                   <a
-                    aria-current={active ? "location" : undefined}
+                    aria-current={item.id === activeId ? "location" : undefined}
+                    data-visible={active || undefined}
                     data-toc-id={item.id}
                     href={`#${item.id}`}
                     onClick={(event) => handleNavigate(event, item.id)}
@@ -284,6 +302,7 @@ export function PostToc({
               );
             })}
           </ol>
+          </div>
         </div>
       </aside>
     </div>
