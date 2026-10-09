@@ -1,4 +1,5 @@
 import { BlogPostHeader } from "@/components/blog-post-header";
+import { ContentNavigation } from "@/components/content-navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
@@ -78,6 +79,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <main className={`page-enter ${styles.postPage}`}>
+      <ContentNavigation section="blog" locale="en" />
       <PostBodyLayout header={<BlogPostHeader post={post} locale="en" />} articleTitle={post.title} tocItems={tocItems}>
         {renderedContent}
       </PostBodyLayout>

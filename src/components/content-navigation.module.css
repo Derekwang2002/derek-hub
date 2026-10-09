@@ -1,0 +1,51 @@
+.navigation {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 2rem;
+  margin: 0 auto 2rem;
+  max-width: 1068px;
+  position: relative;
+  z-index: 3;
+}
+
+.backLink {
+  align-items: center;
+  border-radius: 0.35rem;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  gap: 0.45rem;
+  line-height: 1.5;
+  min-height: 2.5rem;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.backLink svg {
+  height: 1rem;
+  width: 1rem;
+  transition: transform 160ms ease-out;
+}
+
+.backLink:focus-visible {
+  color: var(--color-text);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .backLink:hover { color: var(--color-text); }
+  .backLink:hover svg { transform: translateX(-3px); }
+}
+
+@media (max-width: 680px) {
+  .navigation { column-gap: 1.5rem; margin-bottom: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backLink, .backLink svg { transition: none; }
+  .backLink:hover svg { transform: none; }
+}

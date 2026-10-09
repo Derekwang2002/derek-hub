@@ -3,6 +3,7 @@ import { localePath, type ContentLocale } from "../../lib/locale";
 import { readingMinutes } from "../../lib/post-metadata";
 import type { SkillDoc } from "../../lib/skill-docs";
 import { ArticleHeader } from "./article-header";
+import { ContentNavigation } from "./content-navigation";
 import { getMarkdownHeadings, renderMarkdown } from "./markdown-renderer";
 import { PostBodyLayout } from "./post-body-layout";
 import styles from "../app/blog/[slug]/page.module.css";
@@ -19,6 +20,7 @@ export async function ResourceArticle({ resource, doc, locale }: {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
+      <ContentNavigation section="resources" locale={locale} />
       <PostBodyLayout
         articleTitle={resource.title}
         locale={locale}

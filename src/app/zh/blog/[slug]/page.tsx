@@ -1,4 +1,5 @@
 import { BlogPostHeader } from "@/components/blog-post-header";
+import { ContentNavigation } from "@/components/content-navigation";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
@@ -30,6 +31,7 @@ export default async function ChineseBlogPostPage({ params }: Props) {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
+      <ContentNavigation section="blog" locale="zh" />
       <PostBodyLayout
         header={<BlogPostHeader post={post} locale="zh" />}
         articleTitle={post.title}

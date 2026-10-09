@@ -6,6 +6,7 @@ import { getAllPosts } from "../../lib/posts";
 import { getLocalizedPostBySlug } from "../../lib/localized-posts";
 import { getProjectDefinitions } from "../../lib/projects";
 import { BlogPostHeader } from "./blog-post-header";
+import { ContentNavigation } from "./content-navigation";
 import { getMarkdownHeadings, renderMarkdown } from "./markdown-renderer";
 import { PostBodyLayout } from "./post-body-layout";
 import { ProjectOverviewPage, ProjectItemPage, ProjectUpdatesPage, getProjectMetadata } from "./project-page";
@@ -58,6 +59,7 @@ export async function NotePage({ slug, locale }: { slug: string[]; locale: Conte
   const tocItems = getMarkdownHeadings(post.content);
   const content = await renderMarkdown(post.content, tocItems);
   return <main className={`page-enter ${styles.postPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
+    <ContentNavigation section="notes" locale={locale} />
     <PostBodyLayout
       header={<BlogPostHeader post={post} locale={locale} />}
       articleTitle={post.title} locale={locale} tocItems={tocItems}
