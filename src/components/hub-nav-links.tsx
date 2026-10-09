@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { CSSProperties } from "react";
 import styles from "./hub-nav.module.css";
 
 type HubNavItem = {
@@ -19,18 +18,16 @@ type HubNavLinksProps = {
 export function HubNavLinks({ ariaLabel, items }: HubNavLinksProps) {
   const pathname = usePathname();
   const currentPath = pathname.replace(/\/+$/, "");
-  const activeIndex = Math.max(0, items.findIndex(item => currentPath === item.href));
 
   return (
-    <nav aria-label={ariaLabel} className={styles.nav} style={{ "--active-index": activeIndex, "--item-count": items.length } as CSSProperties}>
-      <span className={styles.thumb} aria-hidden="true" />
+    <nav aria-label={ariaLabel} className={styles.nav}>
       {items.map((item) => {
         const isActive = currentPath === item.href;
 
         return (
           <Link
             aria-current={isActive ? "page" : undefined}
-            className={isActive ? `${styles.link} ${styles.active}` : styles.link}
+            className={styles.link}
             href={item.href}
             key={item.slug}
           >
