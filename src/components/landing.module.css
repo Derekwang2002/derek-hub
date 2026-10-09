@@ -19,7 +19,7 @@
   min-width: 0;
   overflow: hidden;
   transform: perspective(1000px) rotateX(var(--code-x, 0deg)) rotateY(var(--code-y, 0deg));
-  transition: transform 240ms ease, box-shadow 240ms ease;
+  transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 240ms ease;
 }
 .windowBar {
   align-items: center;
@@ -47,7 +47,12 @@
 .terminalStack > div { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.5rem; }
 .terminalStack dt { color: var(--color-text-faint); }
 .terminalStack dd { margin: 0; }
-@media (hover: hover) { .terminal:hover { box-shadow: 0 0 0 1px var(--color-border), 0 18px 44px rgb(0 0 0 / 0.08); } }
+@media (hover: hover) and (pointer: fine) {
+  .terminal:hover {
+    box-shadow: 0 0 0 1px var(--color-border), 0 18px 44px rgb(0 0 0 / 0.08);
+    transition-duration: 180ms, 240ms;
+  }
+}
 @media (max-width: 800px) {
   .home { align-content: center; gap: 2.75rem; grid-template-columns: 1fr; max-width: 620px; padding-block: 3.5rem 4rem; }
   .intro h1 { margin-bottom: 1rem; }

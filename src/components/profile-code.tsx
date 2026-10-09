@@ -8,10 +8,10 @@ export function ProfileCode() {
   function move(event: PointerEvent<HTMLElement>) {
     if (event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    event.currentTarget.style.setProperty("--code-x", `${-y * 3}deg`);
-    event.currentTarget.style.setProperty("--code-y", `${x * 4}deg`);
+    const x = Math.max(-0.5, Math.min(0.5, (event.clientX - rect.left) / rect.width - 0.5));
+    const y = Math.max(-0.5, Math.min(0.5, (event.clientY - rect.top) / rect.height - 0.5));
+    event.currentTarget.style.setProperty("--code-x", `${-y * 8}deg`);
+    event.currentTarget.style.setProperty("--code-y", `${x * 12}deg`);
   }
   function reset() { frame.current?.style.removeProperty("--code-x"); frame.current?.style.removeProperty("--code-y"); }
   return <figure className={styles.terminal} ref={frame} onPointerMove={move} onPointerLeave={reset} lang="en">
