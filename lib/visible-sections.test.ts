@@ -8,22 +8,41 @@ const headings = [
   { id: "a2", level: 3, top: 300 },
   { id: "b", level: 2, top: 600 }
 ];
-test("the indicator bridges a parent and later visible children without split segments", () => {
-  assert.deepEqual(getVisibleHeadingRange(["parent", "earlier-child", "current-child", "next"], ["parent", "current-child"]), { first: 0, last: 2 });
+test("the indicator covers the visible reading range", () => {
+  assert.deepEqual(getVisibleHeadingRange(["parent", "earlier-child", "current-child", "next"], ["current-child", "next"]), { first: 2, last: 3 });
   assert.deepEqual(getVisibleHeadingRange(["parent", "earlier-child", "current-child", "next"], ["next"]), { first: 3, last: 3 });
 });
 test("the indicator disappears when no listed section is visible", () => {
   assert.equal(getVisibleHeadingRange(["a"], []), null);
   assert.equal(getVisibleHeadingRange(["a"], ["stale-id"]), null);
 });
-test("highlights visible sections and their parent with one current location", () => {
+test("highlights visible content without retaining an offscreen parent", () => {
   assert.deepEqual(getVisibleSections(headings, 88, 550, 1200), {
-    activeId: "a1", visibleIds: ["a", "a1", "a2"]
+    activeId: "a1", visibleIds: ["a1", "a2"]
   });
 });
-test("includes the next visible section and clears parents at their boundary", () => {
+test("includes the next visible section across a heading-level boundary", () => {
   assert.deepEqual(getVisibleSections(headings, 600, 900, 1200), { activeId: "b", visibleIds: ["b"] });
-  assert.deepEqual(getVisibleSections(headings, 500, 800, 1200).visibleIds, ["a", "a2", "b"]);
+  assert.deepEqual(getVisibleSections(headings, 500, 800, 1200).visibleIds, ["a2", "b"]);
+});
+test("MySQL's visible subsections do not extend the indicator back to Index", () => {
+  const positions = [
+    { id: "index", level: 1, top: -2400 },
+    { id: "classification", level: 2, top: -2300 },
+    { id: "summary", level: 2, top: 38 },
+    { id: "other", level: 2, top: 96 },
+    { id: "row-count", level: 3, top: 154 },
+    { id: "pagination", level: 3, top: 666 },
+    { id: "deep-pagination", level: 3, top: 887 },
+    { id: "transactions", level: 1, top: 1200 }
+  ];
+  const { activeId, visibleIds } = getVisibleSections(positions, 88, 976, 1800);
+  assert.equal(activeId, "other");
+  assert.deepEqual(visibleIds, ["other", "row-count", "pagination", "deep-pagination"]);
+  assert.deepEqual(getVisibleHeadingRange(positions.map(heading => heading.id), visibleIds), { first: 3, last: 6 });
+  assert.deepEqual(getVisibleSections(positions, 200, 600, 1800), {
+    activeId: "row-count", visibleIds: ["row-count"]
+  });
 });
 test("long sections stay highlighted without visible headings", () => {
   assert.equal(getVisibleSections(headings, 800, 1000, 1200).activeId, "b");
