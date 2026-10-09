@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "./hub-nav.module.css";
 
 type HubNavItem = {
@@ -12,29 +11,32 @@ type HubNavItem = {
 
 type HubNavLinksProps = {
   ariaLabel: string;
+  allHref: string;
   items: HubNavItem[];
 };
 
-export function HubNavLinks({ ariaLabel, items }: HubNavLinksProps) {
+export function HubNavLinks({ ariaLabel, allHref, items }: HubNavLinksProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const currentPath = pathname.replace(/\/+$/, "");
 
   return (
-    <nav aria-label={ariaLabel} className={styles.nav}>
+    <div role="group" aria-label={ariaLabel} className={styles.nav}>
       {items.map((item) => {
         const isActive = currentPath === item.href;
 
         return (
-          <Link
-            aria-current={isActive ? "page" : undefined}
-            className={styles.link}
-            href={item.href}
+          <button
+            type="button"
+            aria-pressed={isActive}
+            className={styles.filter}
+            onClick={() => router.push(isActive ? allHref : item.href, { scroll: false })}
             key={item.slug}
           >
             {item.label}
-          </Link>
+          </button>
         );
       })}
-    </nav>
+    </div>
   );
 }

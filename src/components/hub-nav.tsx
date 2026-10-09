@@ -7,7 +7,7 @@ type HubNavProps = {
 };
 
 export function HubNav({ locale = "en" }: HubNavProps) {
-  const items = RESOURCE_SECTIONS.map((section) => ({
+  const items = RESOURCE_SECTIONS.filter((section) => section.slug !== "all").map((section) => ({
     slug: section.slug,
     label: locale === "zh" ? ({ all: "全部", skills: "Skills", demos: "演示" } as const)[section.slug] : section.label,
     href: `${locale === "zh" ? "/zh" : ""}/hub/${section.slug}`
@@ -18,6 +18,7 @@ export function HubNav({ locale = "en" }: HubNavProps) {
       <RefreshOnPageRestore />
       <HubNavLinks
         ariaLabel={locale === "zh" ? "Hub 分类" : "Hub sections"}
+        allHref={`${locale === "zh" ? "/zh" : ""}/hub/all`}
         items={items}
       />
     </>
