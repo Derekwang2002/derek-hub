@@ -4,8 +4,8 @@ export const RESUME = {
     experienceTitle: "实习经历",
     skillsTitle: "专业技能",
     education: [
-      { school: "南加利福尼亚大学", logo: "/schools/usc-seal.svg", degree: "计算机科学（硕士）", gpa: "GPA: 3.6 / 4.0", period: "2025.1 — 2027.5", coursework: "主修课程：算法分析、操作系统、数据库系统、信息检索" },
-      { school: "西南财经大学", logo: "/schools/swufe-logo.svg", degree: "信息管理与信息系统（信息系统与数据管理方向）（学士）", gpa: "GPA: 3.9 / 4.0（6 / 60）", period: "2020.9 — 2024.6", coursework: "主修课程：数据结构、计算机网络、数据库原理、面向对象程序设计（Java）" }
+      { school: "南加利福尼亚大学", logo: "/schools/usc-seal.svg", degree: "计算机科学（硕士）", period: "2025 — 2027", coursework: "主修课程：算法分析、操作系统、数据库系统、信息检索、Web Technology 等" },
+      { school: "西南财经大学", logo: "/schools/swufe-logo.svg", degree: "信息管理与信息系统（信息系统与数据管理方向）（学士）", period: "2020 — 2024", coursework: "主修课程：数据结构、计算机网络、数据库原理、面向对象程序设计等" }
     ],
     experience: [
       {
@@ -18,7 +18,8 @@ export const RESUME = {
         achievements: [
           "**多角色 Agent 边界与副作用确认门：**MainAgent 持有用户会话（单 Foreground Turn 串行化），GoalAgent 经独立 goal-scoped session 持有长任务生命周期，两者仅通过 Runtime 的 typed event 通信，禁用 SDK handoff / agent-as-tool；外呼等真实副作用 100% 经结构化 Goal Confirmation 确认门（spec 级不变量），授权主体由服务端持有并重新校验，杜绝模型伪造授权。",
           "**Goal → RunSpec → Run 持久化执行模型：**Goal 持有不可变、版本单调递增的 RunSpec，Run 负责确定精确版本与输入快照；终态 Goal Status 与 Goal Result（summary + evidence_refs）在同一 PostgreSQL 事务（Durable Boundary）原子提交，commit 后才经 Redis Streams 做 SSE 实时投递，支撑 1w+ 用户的会话与结果投递，丢失或重复不影响正确性。",
-          "**Execution Lease fencing 与 Provider Reconciliation：**Taskiq worker 以带单调递增 fencing epoch 的 Execution Lease 认领任务，durable write 前精确比对 lease 身份，隔离僵尸 worker；外呼提交结果不确定时按稳定 provider task name 做 Provider Reconciliation 而非盲目重拨，worker 故障恢复路径的重复外呼降为 0（机制保证）。"
+          "**Execution Lease fencing 与 Provider Reconciliation：**Taskiq worker 以带单调递增 fencing epoch 的 Execution Lease 认领任务，durable write 前精确比对 lease 身份，隔离僵尸 worker；外呼提交结果不确定时按稳定 provider task name 做 Provider Reconciliation 而非盲目重拨，worker 故障恢复路径的重复外呼降为 0（机制保证）。",
+          "**开源集成与社区自动化：**开发 [n8n、Dify、HubSpot 外呼集成](https://github.com/CALLE-AI/awesome-phone-call-agents)，完善 Skill 生成器与 API 契约校验；基于 Python 构建内部运营 Agent，结合对话上下文和官方文档生成 Discord 回复草稿供人工审核，完成 Issue 分类去重、PR/Issue 通知与日报，以 SQLite 持久化队列和幂等键抑制重复处理。"
         ]
       },
       {
@@ -39,8 +40,8 @@ export const RESUME = {
     experienceTitle: "Experience",
     skillsTitle: "Technical Skills",
     education: [
-      { school: "University of Southern California", logo: "/schools/usc-seal.svg", degree: "M.S. in Computer Science", gpa: "GPA: 3.6 / 4.0", period: "Jan 2025 — May 2027", coursework: "Coursework: Analysis of Algorithms, Operating Systems, Database Systems, Information Retrieval" },
-      { school: "Southwestern University of Finance and Economics", logo: "/schools/swufe-logo.svg", degree: "B.S. in Information Management and Information Systems", gpa: "GPA: 3.9 / 4.0 (6 / 60)", period: "Sep 2020 — Jun 2024", coursework: "Coursework: Data Structures, Computer Networks, Database Principles, Object-Oriented Programming (Java)" }
+      { school: "University of Southern California", logo: "/schools/usc-seal.svg", degree: "M.S. in Computer Science", period: "2025 — 2027", coursework: "Coursework: Analysis of Algorithms, Operating Systems, Database Systems, Information Retrieval, Web Technology..." },
+      { school: "Southwestern University of Finance and Economics", logo: "/schools/swufe-logo.svg", degree: "B.S. in Information Management and Information Systems", period: "2020 — 2024", coursework: "Coursework: Data Structures, Computer Networks, Database Principles, Object-Oriented Programming..." }
     ],
     experience: [
       {
@@ -53,7 +54,8 @@ export const RESUME = {
         achievements: [
           "**Multi-role Agent boundaries and side-effect gates:** MainAgent owns the user chat session (serialized to a single Foreground Turn), while GoalAgent owns long-task lifecycles through an independent goal-scoped session; the two communicate only through Runtime typed events — no SDK handoff or agent-as-tool calls. 100% of real side effects such as outbound calls pass a structured Goal Confirmation gate (a spec-level invariant), with the authorization subject held and re-validated server-side, preventing model-forged authorization.",
           "**Goal → RunSpec → Run durable execution model:** Goals own immutable, monotonically versioned RunSpecs, and each Run determines the exact version and input snapshot. The terminal Goal Status and Goal Result (summary + evidence_refs) commit atomically in one PostgreSQL transaction (the Durable Boundary); SSE live delivery over Redis Streams happens only after commit, so lost or duplicated delivery never affects correctness for 10k+ users.",
-          "**Execution Lease fencing and Provider Reconciliation:** Taskiq workers claim work with leases carrying monotonically increasing fencing epochs, verified exactly on every durable write to fence off zombie workers. Uncertain call submissions are resolved through Provider Reconciliation against a stable provider task name instead of blind redial, driving duplicate calls on the worker-failure recovery path to zero (guaranteed by design)."
+          "**Execution Lease fencing and Provider Reconciliation:** Taskiq workers claim work with leases carrying monotonically increasing fencing epochs, verified exactly on every durable write to fence off zombie workers. Uncertain call submissions are resolved through Provider Reconciliation against a stable provider task name instead of blind redial, driving duplicate calls on the worker-failure recovery path to zero (guaranteed by design).",
+          "**Open-source integrations and community automation:** Built [n8n, Dify, and HubSpot calling integrations](https://github.com/CALLE-AI/awesome-phone-call-agents) and improved the Skill generator and API contract validation. Developed an internal Python operations agent that uses conversation context and official documentation to draft Discord replies for human review, triage and deduplicate Issues, and deliver PR/Issue notifications and daily digests; persisted work in SQLite with idempotency keys to suppress duplicate processing."
         ]
       },
       {

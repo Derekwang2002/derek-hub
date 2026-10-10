@@ -47,7 +47,6 @@ export function AboutContent({ locale }: { locale: ContentLocale }) {
             <div>
               <div className={styles.entryHeading}><h3>{item.school}</h3><time>{item.period}</time></div>
               <p>{item.degree}</p>
-              <p className={styles.educationMeta}>{item.gpa}</p>
               <p className={styles.coursework}>{item.coursework}</p>
             </div>
           </article>
