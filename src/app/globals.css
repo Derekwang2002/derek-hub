@@ -89,8 +89,8 @@ html[data-theme="dark"] ::selection {
   display: inline-flex;
   flex-shrink: 0;
   font-size: 1rem;
-  font-weight: 650;
-  letter-spacing: 0.06em;
+  font-weight: 800;
+  letter-spacing: 0.015em;
   line-height: 1.25;
   padding: 0.5rem 0;
   text-transform: uppercase;
