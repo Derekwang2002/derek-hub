@@ -88,11 +88,12 @@ html[data-theme="dark"] ::selection {
 .site-brand {
   display: inline-flex;
   flex-shrink: 0;
-  font-size: 1.15rem;
-  font-weight: 750;
-  letter-spacing: -0.04em;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
   line-height: 1.25;
   padding: 0.5rem 0;
+  text-transform: uppercase;
 }
 
 .site-primary {
