@@ -13,10 +13,10 @@ export function HomeContent({ locale }: { locale: ContentLocale }) {
           <span className={styles.greeting}><HoverLetters text={zh ? "你好，我是" : "Hi, I’m"} /></span>{" "}
           <ProfileName href={localePath(locale, "/about")} title={zh ? "关于我" : "About me"} />.
         </h1>
-        <p>
-          {zh ? "USC 计算机科学硕士在读。" : "Computer science master’s student at USC."}
+        <p lang="en">
+          <span className={styles.education}>MSCS@USC</span>
           <br />
-          {zh ? "专注 AI Agent 与后端工程。" : "Focused on AI agents and backend engineering."}
+          Agent/Backend Engineering
         </p>
         <ContactLinks locale={locale} about />
       </section>
