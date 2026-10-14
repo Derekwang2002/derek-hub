@@ -9,7 +9,7 @@
 .droppedHeader :global(.site-nav) { max-width: 1760px; }
 .droppedHeader :global(.site-brand),.droppedHeader :global(.site-controls),.droppedHeader :global(.site-nav-links a) { transform-origin: top left; }
 .droppedHeader :global(a),.droppedHeader :global(button) { pointer-events: auto; }
-.droppedHeader :global(.site-nav-links a) { white-space: nowrap; }
+.droppedHeader :global(.site-nav-links a) { white-space: nowrap; transition: none; }
 .droppedHeader :global(a:focus-visible),.droppedHeader :global(button:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 5px; }
 .dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a) { color: var(--color-text); }
 .dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a)::before { content: ""; position: absolute; top: var(--entry-hit-y); left: var(--entry-hit-x); width: var(--entry-hit-width); height: var(--entry-hit-height); }
@@ -72,3 +72,8 @@
 
 /* Keep the reading header opaque, including before the motion effect mounts. */
 .dropRoot[data-page="true"] .panel { width: 100%; height: var(--site-header-height); opacity: 1; }
+
+/* Full-size type replaces only the decorative raster at the settled endpoint. */
+.entryLabel { position: absolute; inset-block: 0; display: flex; align-items: center; color: var(--color-text); white-space: nowrap; visibility: hidden; }
+.dropRoot[data-crisp="true"] .entryLabel { visibility: visible; }
+.dropRoot[data-crisp="true"] .droppedHeader :global(.site-nav-links a) { color: transparent; transition: none; }

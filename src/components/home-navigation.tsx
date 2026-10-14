@@ -67,6 +67,8 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     };
     const paint = () => {
       const p = clamp(progress.value);
+      const crisp = host.dataset.moving === "false" && p === 1;
+      host.dataset.crisp = String(crisp);
       const drop = travel.value;
       const spread = clamp(opening.value);
       // A few pixels of stretch follow speed, then relax with the same spring.
@@ -74,7 +76,9 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       for (const [i, { el, start, x, y, scale }] of geometry.entries()) {
         const unfold = i < 2 ? spread : clamp(followers[i - 2].value);
         const localY = start.top + (y - card.y - start.top) * unfold;
-        el.style.transform = `translate3d(${(x - start.left) * unfold}px, ${card.y * drop + localY * stretch - start.top}px, 0) scale(${1 + (scale - 1) * unfold})`;
+        el.style.transform = crisp
+          ? `translate(${x - start.left}px, ${y - start.top}px) scale(${scale})`
+          : `translate3d(${(x - start.left) * unfold}px, ${card.y * drop + localY * stretch - start.top}px, 0) scale(${1 + (scale - 1) * unfold})`;
       }
       const sx = innerWidth / card.width + (1 - innerWidth / card.width) * spread;
       const sy = (card.headerHeight / card.height + (1 - card.headerHeight / card.height) * spread) * stretch;
@@ -83,11 +87,11 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       panel.style.opacity = hasContent ? "1" : `${clamp(p * 6)}`;
       // The surface contains the unfolding links, including during a quick reversal.
       bar.style.clipPath = `inset(${Math.max(0, card.y * drop - 6)}px ${Math.max(0, card.x * spread - 6)}px ${Math.max(0, innerHeight - card.y * drop - card.height * sy - 6)}px ${Math.max(0, card.x * spread - 6)}px round 2px)`;
-      directoryContent.style.transform = `translate3d(0,${card.y * (drop - 1)}px,0)`;
+      directoryContent.style.transform = crisp ? "none" : `translate3d(0,${card.y * (drop - 1)}px,0)`;
       blocks.forEach((block, i) => {
         const reveal = ease(clamp((followers[i].value - .55) / .45));
         block.style.opacity = `${reveal}`;
-        block.style.transform = `translate3d(0,${(1 - reveal) * 18}px,0)`;
+        block.style.transform = crisp ? "none" : `translate3d(0,${(1 - reveal) * 18}px,0)`;
       });
       heroContent.style.opacity = `${1 - ease(clamp(p / .65))}`;
       heroContent.style.transform = reduced.matches ? "" : `translate3d(0,${-p * 65}px,0) scale(${1 - p * .045})`;
@@ -232,6 +236,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
         host.style.setProperty("--page-pin-top", `${Math.min(hostTop, innerHeight - contentHeight)}px`);
       }
       scrollDistance = Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight - navStart);
+      host.dataset.crisp = "false";
       // Clear transforms before measuring their original navbar positions.
       [brand, controls, ...links].forEach(el => el.style.removeProperty("transform"));
       const width = innerWidth;
@@ -267,6 +272,17 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
           const titleLeft = inset;
           const titleTop = tile.y + (tile.h - start.height * scale) / 2;
           const block = blocks[i];
+          // At rest, paint a full-size label instead of enlarging the navbar glyph raster.
+          // The original anchor keeps its full-card hit area and accessible name.
+          const label = block.querySelector<HTMLElement>(`.${styles.entryLabel}`)!;
+          const type = getComputedStyle(el);
+          label.textContent = el.textContent;
+          Object.assign(label.style, {
+            left: `${inset}px`, fontSize: `${parseFloat(type.fontSize) * scale}px`,
+            lineHeight: `${parseFloat(type.lineHeight) * scale}px`, fontWeight: type.fontWeight,
+            fontFamily: type.fontFamily,
+            letterSpacing: type.letterSpacing === "normal" ? "normal" : `${parseFloat(type.letterSpacing) * scale}px`,
+          });
           Object.assign(block.style, { left: `${tile.x}px`, top: `${tile.y}px`, width: `${tile.w}px`, height: `${tile.h}px` });
           // The original anchor remains the only link; its hit area covers its whole block.
           el.style.setProperty("--entry-hit-x", `${-titleLeft / scale}px`);
@@ -373,7 +389,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     <div className={styles.panel} ref={surface} aria-hidden="true"/>
     <div className={styles.droppedHeader} ref={header}><SiteHeader/></div>
     <div className={styles.directory} ref={directory} aria-hidden="true">{sections.map(section =>
-      <div className={styles.entry} data-current={section.id === current} key={section.id}><div className={styles.art}><HomeNavigationPreview section={section} locale={locale}/></div></div>
+      <div className={styles.entry} data-current={section.id === current} key={section.id}><div className={styles.art}><HomeNavigationPreview section={section} locale={locale}/></div><span className={styles.entryLabel}/></div>
     )}</div>
   </div>;
 }
