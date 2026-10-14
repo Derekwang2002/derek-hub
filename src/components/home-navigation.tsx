@@ -330,9 +330,25 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
         schedule(); queueSnap();
       }
     };
+    const leaveDirectoryOnNavigate = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const link = event.currentTarget as HTMLAnchorElement;
+      const destination = new URL(link.href, window.location.href);
+      const samePage = destination.pathname === window.location.pathname && destination.search === window.location.search;
+      if (!samePage && host.dataset.expanded !== "true") return;
+      // Same routes do not navigate; resource subroutes also retain this layout.
+      // Reset the directory before either case can preserve its expanded scroll position.
+      if (samePage) event.preventDefault();
+      cancelSnap();
+      pointerHeld = false;
+      keyboardScroll = true;
+      window.scrollTo({ top: 0, behavior: "instant" });
+      settle();
+    };
     const clearPreview = () => { delete host.dataset.active; };
     const previewHandlers = links.map((link, i) => {
       const activate = (event: Event) => { if (event instanceof PointerEvent && event.pointerType !== "mouse") return; host.dataset.active = String(i); };
+      link.addEventListener("click", leaveDirectoryOnNavigate);
       link.addEventListener("pointerenter", activate);
       link.addEventListener("focus", activate);
       link.addEventListener("pointerleave", clearPreview);
@@ -363,6 +379,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       cancelSnap();
       cancelAnimationFrame(frame);
       links.forEach((link, i) => {
+        link.removeEventListener("click", leaveDirectoryOnNavigate);
         link.removeEventListener("pointerenter", previewHandlers[i]);
         link.removeEventListener("focus", previewHandlers[i]);
         link.removeEventListener("pointerleave", clearPreview);
