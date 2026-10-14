@@ -69,3 +69,6 @@
 .dropRoot[data-page="true"] .heroPin { height: auto; min-height: calc(100svh - var(--site-header-height)); top: var(--page-pin-top, var(--site-header-height)); }
 .dropRoot[data-expanded="true"] .entry[data-current="true"] { background: color-mix(in srgb,var(--color-text) 9%,var(--color-bg)); }
 .dropRoot[data-expanded="true"] .entry[data-current="true"] .art { opacity: .38; }
+
+/* Keep the reading header opaque, including before the motion effect mounts. */
+.dropRoot[data-page="true"] .panel { width: 100%; height: var(--site-header-height); opacity: 1; }

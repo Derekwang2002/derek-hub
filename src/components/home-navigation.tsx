@@ -79,7 +79,8 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       const sx = innerWidth / card.width + (1 - innerWidth / card.width) * spread;
       const sy = (card.headerHeight / card.height + (1 - card.headerHeight / card.height) * spread) * stretch;
       panel.style.transform = `translate3d(${card.x * spread}px,${card.y * drop}px,0) scale(${sx},${sy})`;
-      panel.style.opacity = `${clamp(p * 6)}`;
+      // Long section pages scroll behind this same surface before it unfolds.
+      panel.style.opacity = hasContent ? "1" : `${clamp(p * 6)}`;
       // The surface contains the unfolding links, including during a quick reversal.
       bar.style.clipPath = `inset(${Math.max(0, card.y * drop - 6)}px ${Math.max(0, card.x * spread - 6)}px ${Math.max(0, innerHeight - card.y * drop - card.height * sy - 6)}px ${Math.max(0, card.x * spread - 6)}px round 2px)`;
       directoryContent.style.transform = `translate3d(0,${card.y * (drop - 1)}px,0)`;
