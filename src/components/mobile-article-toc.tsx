@@ -15,7 +15,7 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
   const [open, setOpen] = useState(false);
   const [readingSnapshot, setReadingSnapshot] = useState({ activeId, visibleIds });
   const reading = open ? readingSnapshot : { activeId, visibleIds };
-  const openContents = (keyboard: boolean) => {
+  const openContents = useCallback((keyboard: boolean) => {
     // Capture the reading position synchronously, even if a scroll observer is still queued.
     const headings = items.flatMap(item => {
       const element = document.getElementById(item.id);
@@ -27,7 +27,7 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
       article?.getBoundingClientRect().bottom ?? document.documentElement.scrollHeight - scrollY));
     setKeyboardOpen(keyboard);
     setOpen(true);
-  };
+  }, [items]);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const suppressClick = useRef(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -94,6 +94,77 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
     window.addEventListener(SEARCH_CHANGE_EVENT, onSearch);
     return () => window.removeEventListener(SEARCH_CHANGE_EVENT, onSearch);
   }, [close]);
+
+  useEffect(() => {
+    if (!mounted || open) return;
+    const article = document.getElementById(items[0]?.id)?.closest("article");
+    if (!article) return;
+    let swipe: { x: number; y: number; horizontal: boolean } | null = null;
+    const begin = (x: number, y: number, target: EventTarget | null) => {
+      swipe = null;
+      if (isSearchOpen() || !(target instanceof Element) || window.getSelection()?.toString()) return;
+      // Leave browser edge gestures, interactive content, and horizontal scrollers alone.
+      if (x < 24 || x > innerWidth - 24 || target.closest("a,button,input,textarea,select,pre,table,[contenteditable=true]")) return;
+      for (let element: Element | null = target; element && article.contains(element); element = element.parentElement) {
+        if (element.scrollWidth > element.clientWidth + 1 && /auto|scroll/.test(getComputedStyle(element).overflowX)) return;
+      }
+      swipe = { x, y, horizontal: false };
+    };
+    const move = (x: number, y: number, event: Event) => {
+      if (!swipe) return;
+      const dx = swipe.x - x, dy = Math.abs(y - swipe.y);
+      if (!swipe.horizontal) {
+        if ((dy > 10 && dy > dx * .65) || dx < -10) { swipe = null; return; }
+        if (dx > 12 && dx > dy * 1.5) swipe.horizontal = true;
+      }
+      if (swipe?.horizontal && event.cancelable) event.preventDefault();
+    };
+    const end = (x: number, y: number, event: Event) => {
+      const start = swipe; swipe = null;
+      if (!start || isSearchOpen() || window.getSelection()?.toString()) return;
+      const dx = start.x - x;
+      if (dx >= 48 && dx > Math.abs(y - start.y) * 1.5) {
+        if (event.cancelable) event.preventDefault();
+        openContents(false);
+      }
+    };
+    const cancel = () => { swipe = null; };
+    const touchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) { cancel(); return; }
+      const touch = event.touches[0]; begin(touch.clientX, touch.clientY, event.target);
+    };
+    const touchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1) { cancel(); return; }
+      const touch = event.touches[0]; move(touch.clientX, touch.clientY, event);
+    };
+    const touchEnd = (event: TouchEvent) => {
+      const touch = event.changedTouches[0];
+      if (touch) end(touch.clientX, touch.clientY, event);
+    };
+    // Touch events retain native vertical scrolling; pointer events also support a stylus.
+    const pointerStart = (event: PointerEvent) => {
+      if (event.pointerType !== "pen") return;
+      begin(event.clientX, event.clientY, event.target);
+      if (swipe) event.preventDefault();
+    };
+    const pointerMove = (event: PointerEvent) => { if (event.pointerType === "pen") move(event.clientX, event.clientY, event); };
+    const pointerEnd = (event: PointerEvent) => { if (event.pointerType === "pen") end(event.clientX, event.clientY, event); };
+    const pointerCancel = (event: PointerEvent) => { if (event.pointerType === "pen") cancel(); };
+    article.addEventListener("touchstart", touchStart, { passive: true });
+    article.addEventListener("touchmove", touchMove, { passive: false });
+    article.addEventListener("touchend", touchEnd, { passive: false });
+    article.addEventListener("touchcancel", cancel);
+    article.addEventListener("pointerdown", pointerStart);
+    article.addEventListener("pointermove", pointerMove);
+    article.addEventListener("pointerup", pointerEnd);
+    article.addEventListener("pointercancel", pointerCancel);
+    return () => {
+      article.removeEventListener("touchstart", touchStart); article.removeEventListener("touchmove", touchMove);
+      article.removeEventListener("touchend", touchEnd); article.removeEventListener("touchcancel", cancel);
+      article.removeEventListener("pointerdown", pointerStart); article.removeEventListener("pointermove", pointerMove);
+      article.removeEventListener("pointerup", pointerEnd); article.removeEventListener("pointercancel", pointerCancel);
+    };
+  }, [mounted, open, items, openContents]);
 
   if (!mounted || !items.length) return null;
   return createPortal(<>
