@@ -47,7 +47,9 @@ export function LanguageToggle() {
         }
       }}
     >
-      <svg className="language-toggle-mobile" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 5h12M9 3v2M5 5c1 5 4 8 8 10M13 5c-1 5-4 8-9 11M13 21l4-11 4 11M14.5 17h5" strokeLinecap="round" strokeLinejoin="round" /></svg><span aria-hidden="true">中</span><span aria-hidden="true">EN</span>
+      <svg className="language-toggle-mobile" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+        <text x="12" y="12" dy=".35em" textAnchor="middle" fontSize={chinese ? 19 : 14} fontWeight="600" fontFamily="inherit">{chinese ? "中" : "EN"}</text>
+      </svg><span aria-hidden="true">中</span><span aria-hidden="true">EN</span>
     </Link>
   );
 }
