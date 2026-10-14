@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HomeContent } from "@/components/landing-content";
+import { HomeNavigation } from "@/components/home-navigation";
 
 export const metadata: Metadata = {
   title: "首页",
@@ -7,4 +7,4 @@ export const metadata: Metadata = {
   alternates: { canonical: "/zh", languages: { en: "/", "zh-CN": "/zh" } }
 };
 
-export default function ChineseHomePage() { return <HomeContent locale="zh" />; }
+export default function ChineseHomePage() { return <HomeNavigation locale="zh" />; }

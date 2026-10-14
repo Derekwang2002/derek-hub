@@ -16,7 +16,7 @@ export function HomeContent({ locale }: { locale: ContentLocale }) {
         <p lang="en">
           <span className={styles.education}>MSCS@USC</span>
           <br />
-          Agent/Backend Engineering
+          Agent &amp; Backend Engineering
         </p>
         <ContactLinks locale={locale} about />
       </section>

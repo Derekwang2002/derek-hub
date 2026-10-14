@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HomeContent } from "@/components/landing-content";
+import { HomeNavigation } from "@/components/home-navigation";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -8,4 +8,4 @@ export const metadata: Metadata = {
   openGraph: { title: "Home | Derek Hub", description: "Derek Wang's profile, resume, writing, and technical work.", url: "/", images: [{ url: "/og-default.svg", width: 1200, height: 630, alt: "Derek Hub Open Graph Image" }] }
 };
 
-export default function HomePage() { return <HomeContent locale="en" />; }
+export default function HomePage() { return <HomeNavigation locale="en" />; }
