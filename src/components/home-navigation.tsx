@@ -5,18 +5,21 @@ import { HomeContent } from "@/components/landing-content";
 import { SiteHeader } from "@/components/site-chrome";
 import type { ContentLocale } from "../../lib/locale";
 import styles from "./home-navigation.module.css";
+import { SEARCH_CHANGE_EVENT, isSearchOpen } from "./search-events";
 import { stepSpring, type Spring } from "./home-navigation-spring";
+
+import { HomeNavigationPreview } from "./home-navigation-preview";
+import type { NavigationPreviewSection } from "./home-navigation-data";
 
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
 
 /** The same navigation anchors move from the top bar into the section directory. */
-export function HomeNavigation({ locale }: { locale: ContentLocale }) {
+export function HomeNavigation({ locale, sections }: { locale: ContentLocale; sections: NavigationPreviewSection[] }) {
   const root = useRef<HTMLDivElement>(null);
   const header = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLDivElement>(null);
-  const hint = useRef<HTMLParagraphElement>(null);
   const directory = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -24,13 +27,14 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
     const bar = header.current!;
     const panel = surface.current!;
     const heroContent = hero.current!;
-    const scrollHint = hint.current!;
     const directoryContent = directory.current!;
     const blocks = [...directoryContent.children] as HTMLElement[];
     const brand = bar.querySelector<HTMLElement>(".site-brand")!;
     const controls = bar.querySelector<HTMLElement>(".site-controls")!;
     const links = [...bar.querySelectorAll<HTMLElement>(".site-nav-links a")];
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let searchPaused = isSearchOpen();
+    let needsMeasure = false;
     let frame = 0;
     let lastTime = 0;
     let keyboardScroll = false;
@@ -88,8 +92,6 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       heroContent.inert = hidden;
       heroContent.setAttribute("aria-hidden", String(hidden));
       host.dataset.expanded = String(spread > .98 && followers.every(s => s.value > .98));
-      scrollHint.style.opacity = `${1 - clamp(p * 3)}`;
-      scrollHint.setAttribute("aria-hidden", String(p > .34));
     };
     const settle = () => {
       cancelAnimationFrame(frame);
@@ -103,7 +105,8 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       paint();
     };
     const tick = (time: number) => {
-      const dt = (time - lastTime) / 1000;
+      if (searchPaused) { frame = 0; return; }
+      const dt = (time - lastTime) / 1000 * 1.55;
       lastTime = time;
       const { p, drop, spread } = targets();
       let moving = stepSpring(progress, p, dt, 300, 32);
@@ -118,6 +121,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       frame = moving ? requestAnimationFrame(tick) : 0;
     };
     const schedule = () => {
+      if (searchPaused) return;
       if (reduced.matches || keyboardScroll) { settle(); return; }
       if (!frame) {
         lastTime = performance.now();
@@ -152,14 +156,14 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       let elapsed = 0;
       const glide = (time: number) => {
         if (snapTarget === null) return;
-        const dt = Math.min((time - previousTime) / 1000, .064);
+        const dt = Math.min((time - previousTime) / 1000 * 1.4, .064);
         previousTime = time;
         elapsed += dt;
         const target = snapTarget / scrollDistance;
         const distance = Math.abs(target - snapMotion.value);
         // An explicit click starts promptly; passive scrolling retains its gentle handoff.
-        const attraction = intent === "dismiss" ? 220 : 22 + 28 * ease(clamp(1 - distance / .2));
-        const engagement = intent === "dismiss" ? 1 : .18 + .82 * ease(clamp(elapsed / .2));
+        const attraction = intent === "dismiss" ? 220 : 38 + 42 * ease(clamp(1 - distance / .2));
+        const engagement = intent === "dismiss" ? 1 : .18 + .82 * ease(clamp(elapsed / .16));
         const damping = intent === "dismiss" ? 26 : 2 * Math.sqrt(attraction);
         stepSpring(snapMotion, target, dt, attraction * engagement, damping);
         const atBoundary = target === 0 ? snapMotion.value <= 0 : snapMotion.value >= 1;
@@ -179,7 +183,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
     };
     const queueSnap = () => {
       window.clearTimeout(snapTimer);
-      if (pointerHeld || snapTarget !== null || document.hidden) return;
+      if (searchPaused || pointerHeld || snapTarget !== null || document.hidden) return;
       const p = clamp(window.scrollY / scrollDistance);
       if (window.scrollY < 1 || Math.abs(window.scrollY - scrollDistance) < 1) return;
       snapTimer = window.setTimeout(() => {
@@ -188,10 +192,10 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
         // Momentum helps choose the destination rather than reversing at the midpoint.
         const projected = position + velocity * .2;
         glideTo(projected < .5 ? 0 : scrollDistance, velocity);
-      }, p < .22 || p > .78 ? 140 : 300);
+      }, p < .22 || p > .78 ? 90 : 160);
     };
     const dismissFromBlank = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0 || host.dataset.expanded !== "true") return;
+      if (searchPaused || event.defaultPrevented || event.button !== 0 || host.dataset.expanded !== "true") return;
       if ((event.target as Element).closest("a,button,input,textarea,select,[contenteditable=true],.proto-picker")) return;
       if (window.getSelection()?.toString()) return;
       const bounds = directoryContent.getBoundingClientRect();
@@ -200,6 +204,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       if (outside) glideTo(0, Math.min(0, scrollVelocity), "dismiss");
     };
     const scroll = () => {
+      if (searchPaused) return;
       schedule();
       if (snapTarget !== null) return;
       const now = performance.now();
@@ -212,6 +217,8 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       queueSnap();
     };
     const measure = () => {
+      if (searchPaused) { needsMeasure = true; return; }
+      needsMeasure = false;
       cancelSnap();
       scrollDistance = Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight);
       // Clear transforms before measuring their original navbar positions.
@@ -219,7 +226,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       const width = innerWidth;
       const mobile = width <= 640;
       const gutter = mobile ? 20 : Math.max(28, width * .03);
-      const cardWidth = Math.min(1120, width - gutter * 2);
+      const cardWidth = Math.min(960, width - gutter * 2);
       const cardHeight = Math.min(mobile ? 530 : 510, Math.max(370, innerHeight - 150));
       const x = (width - cardWidth) / 2;
       const y = Math.max(28, (innerHeight - cardHeight - 70) / 2);
@@ -229,32 +236,16 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       const brandScale = width < 380 ? .78 : 1;
       const controlsScale = width < 380 ? .85 : 1;
       card = { x, y, width: cardWidth, height: cardHeight, headerHeight };
-      const gap = mobile ? 12 : 18;
+      const gap = 10;
       const top = 76;
-      const contentHeight = cardHeight - top;
-      // Fill the existing card with five equal-area destinations, without an empty grid cell.
-      const topWidth = (cardWidth - gap * 2) / 3;
-      const bottomWidth = (cardWidth - gap) / 2;
-      const topHeight = (contentHeight - gap) * bottomWidth / (topWidth + bottomWidth);
-      const bottomHeight = contentHeight - gap - topHeight;
-      const halfWidth = (cardWidth - gap) / 2;
-      const mobileHeight = (contentHeight - gap * 2) / (2 + halfWidth / cardWidth);
-      const mobileLastHeight = mobileHeight * halfWidth / cardWidth;
-      const tiles = mobile
-        ? [
-          ...[0, 1, 2, 3].map(i => ({ x: (i % 2) * (halfWidth + gap), y: top + Math.floor(i / 2) * (mobileHeight + gap), w: halfWidth, h: mobileHeight })),
-          { x: 0, y: top + 2 * (mobileHeight + gap), w: cardWidth, h: mobileLastHeight },
-        ]
-        : [
-          ...[0, 1, 2].map(i => ({ x: i * (topWidth + gap), y: top, w: topWidth, h: topHeight })),
-          ...[0, 1].map(i => ({ x: i * (bottomWidth + gap), y: top + topHeight + gap, w: bottomWidth, h: bottomHeight })),
-        ];
+      const rowHeight = (cardHeight - top - gap * 4) / 5;
+      const tiles = links.map((_, i) => ({ x: 0, y: top + i * (rowHeight + gap), w: cardWidth, h: rowHeight }));
       const starts = links.map(el => el.getBoundingClientRect());
-      const inset = mobile ? 16 : 28;
+      const inset = mobile ? 18 : 24;
       const scale = Math.min(
-        (mobile ? 28 : 40) / 16,
+        34 / 16,
         ...starts.map((start, i) => (tiles[i].w - inset * 2) / start.width),
-        ...tiles.map(tile => tile.h / 65),
+        ...tiles.map(tile => tile.h / 37),
       );
       geometry = [
         { el: brand, start: brandRect, x, y: y + 14, scale: brandScale },
@@ -262,7 +253,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
         ...links.map((el, i) => {
           const tile = tiles[i];
           const start = starts[i];
-          const titleLeft = (tile.w - start.width * scale) / 2;
+          const titleLeft = inset;
           const titleTop = tile.y + (tile.h - start.height * scale) / 2;
           const block = blocks[i];
           Object.assign(block.style, { left: `${tile.x}px`, top: `${tile.y}px`, width: `${tile.w}px`, height: `${tile.h}px` });
@@ -284,6 +275,7 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       queueSnap();
     };
     const key = (event: KeyboardEvent) => {
+      if (searchPaused) return;
       if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)
         && !(event.target as HTMLElement).closest("input,textarea,select,[contenteditable=true]")) {
         cancelSnap();
@@ -292,15 +284,38 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
       }
     };
     const pointer = (event: Event) => {
+      if (searchPaused) return;
       if (event instanceof WheelEvent && event.ctrlKey) return;
       cancelSnap();
       keyboardScroll = false;
       if (event.type === "pointerdown" || event.type === "touchstart") pointerHeld = true;
     };
     const release = () => { pointerHeld = false; queueSnap(); };
-    const visibility = () => { if (document.hidden) { cancelSnap(); settle(); } else queueSnap(); };
-    const motionPreference = () => { cancelSnap(); settle(); queueSnap(); };
+    const visibility = () => { if (searchPaused) return; if (document.hidden) { cancelSnap(); settle(); } else queueSnap(); };
+    const motionPreference = () => { if (searchPaused) return; cancelSnap(); settle(); queueSnap(); };
+    const searchChange = () => {
+      searchPaused = isSearchOpen();
+      if (searchPaused) {
+        cancelSnap(); cancelAnimationFrame(frame); frame = 0; pointerHeld = false;
+        host.dataset.moving = "false";
+      } else {
+        if (needsMeasure) measure();
+        schedule(); queueSnap();
+      }
+    };
+    const clearPreview = () => { delete host.dataset.active; };
+    const previewHandlers = links.map((link, i) => {
+      const activate = () => { host.dataset.active = String(i); };
+      link.addEventListener("pointerenter", activate);
+      link.addEventListener("focus", activate);
+      link.addEventListener("pointerleave", clearPreview);
+      link.addEventListener("blur", clearPreview);
+      return activate;
+    });
     measure();
+    const controlsObserver = new ResizeObserver(measure);
+    controlsObserver.observe(controls);
+    window.addEventListener(SEARCH_CHANGE_EVENT, searchChange);
     window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("resize", measure);
     window.addEventListener("click", dismissFromBlank);
@@ -315,8 +330,16 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
     document.addEventListener("visibilitychange", visibility);
     reduced.addEventListener("change", motionPreference);
     return () => {
+      controlsObserver.disconnect();
+      window.removeEventListener(SEARCH_CHANGE_EVENT, searchChange);
       cancelSnap();
       cancelAnimationFrame(frame);
+      links.forEach((link, i) => {
+        link.removeEventListener("pointerenter", previewHandlers[i]);
+        link.removeEventListener("focus", previewHandlers[i]);
+        link.removeEventListener("pointerleave", clearPreview);
+        link.removeEventListener("blur", clearPreview);
+      });
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("resize", measure);
       window.removeEventListener("click", dismissFromBlank);
@@ -337,9 +360,8 @@ export function HomeNavigation({ locale }: { locale: ContentLocale }) {
     <div className={styles.heroPin}><div ref={hero}><HomeContent locale={locale}/></div></div>
     <div className={styles.panel} ref={surface} aria-hidden="true"/>
     <div className={styles.droppedHeader} ref={header}><SiteHeader/></div>
-    <div className={styles.directory} ref={directory} aria-hidden="true">{["notes", "blog", "projects", "resources", "about"].map(section =>
-      <div className={styles.entry} key={section}/>
+    <div className={styles.directory} ref={directory} aria-hidden="true">{sections.map(section =>
+      <div className={styles.entry} key={section.id}><div className={styles.art}><HomeNavigationPreview section={section} locale={locale}/></div></div>
     )}</div>
-    <p className={styles.hint} ref={hint}>{locale === "zh" ? "向下滑动，让导航落下来" : "Scroll down to unfold the navigation"}<span aria-hidden="true">↓</span></p>
   </div>;
 }

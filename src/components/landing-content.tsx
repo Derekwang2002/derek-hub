@@ -20,7 +20,7 @@ export function HomeContent({ locale }: { locale: ContentLocale }) {
         </p>
         <ContactLinks locale={locale} about />
       </section>
-      <ProfileCode />
+      <ProfileCode locale={locale} />
     </main>
   );
 }

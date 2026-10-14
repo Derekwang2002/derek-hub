@@ -4,13 +4,10 @@ import React, { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { LanguageToggle } from "./language-toggle";
 import { PrimaryNavigation } from "./primary-navigation";
+import { SearchTrigger } from "./global-search";
 import { ThemeToggle } from "./theme-toggle";
 
-export function isSiteChromeVisible(pathname: string): boolean {
-  return !pathname.startsWith("/share/") &&
-    pathname !== "/private" &&
-    !pathname.startsWith("/private/");
-}
+import { isSiteChromeVisible } from "../../lib/site-chrome";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -21,6 +18,7 @@ export function SiteHeader() {
       <nav aria-label="Primary navigation" className="site-nav">
         <PrimaryNavigation />
         <div className="site-controls">
+          <SearchTrigger />
           <Suspense fallback={<span className="language-toggle" aria-hidden="true">Lang</span>}>
             <LanguageToggle />
           </Suspense>

@@ -59,7 +59,10 @@
 .experienceContent strong { color: var(--color-text-soft); font-weight: 600; }
 .experienceContent .techNote { font-size: 0.8rem; }
 .resumeLink { color: inherit; text-decoration-color: var(--color-border); text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: color 160ms ease, text-decoration-color 160ms ease; }
-.resumeLink:hover, .resumeLink:focus-visible { color: var(--color-text); text-decoration-color: currentColor; }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .resumeLink:hover { color: var(--color-text); text-decoration-color: currentColor; }
+}
+.resumeLink:focus-visible { color: var(--color-text); text-decoration-color: currentColor; }
 
 @media (max-width: 680px) {
   .about { padding-block: 2.5rem 4rem; }
@@ -72,6 +75,9 @@
 
 @media (hover: hover) {
   .stackGroup li { transition: background 160ms ease, transform 160ms ease; }
-  .stackGroup li:hover { background: var(--color-surface-raised); transform: translateY(-2px); }
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .stackGroup li:hover { background: var(--color-surface-raised); transform: translateY(-2px); }
+  }
 }
-@media (prefers-reduced-motion: reduce) { .stackGroup li:hover { transform: none; transition: none; } }
+@media (prefers-reduced-motion: reduce) { @media (hover: hover) and (pointer: fine) { :where(:global(html:not([data-input="touch"]))) .stackGroup li:hover { transform: none; transition: none; }
+  } }

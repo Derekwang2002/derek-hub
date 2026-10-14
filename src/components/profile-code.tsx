@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useDeviceTilt } from "./use-device-tilt";
 import styles from "./landing.module.css";
 
 const profileFields = [
@@ -27,8 +28,9 @@ const queryCharacters = queryTokens.flatMap(([text, className]) =>
 const queryChunkEnds = [...queryText.matchAll(/'[^']*'\s*|\S+\s*/g)]
   .map(match => match.index + match[0].length);
 
-export function ProfileCode() {
+export function ProfileCode({ locale = "en" }: { locale?: "en" | "zh" }) {
   const frame = useRef<HTMLElement>(null);
+  const { permission, enable } = useDeviceTilt(frame);
   const [typed, setTyped] = useState(0);
   const [complete, setComplete] = useState(false);
 
@@ -87,10 +89,11 @@ export function ProfileCode() {
     event.currentTarget.style.setProperty("--code-y", `${x * 12}deg`);
   }
   function reset() { frame.current?.style.removeProperty("--code-x"); frame.current?.style.removeProperty("--code-y"); }
-  return <figure className={styles.terminal} data-query-phase={complete ? "complete" : typed === queryCharacters.length ? "executing" : "typing"} ref={frame} onPointerMove={move} onPointerLeave={reset} lang="en">
+  return <figure className={styles.terminal} data-query-phase={complete ? "complete" : typed === queryCharacters.length ? "executing" : "typing"} ref={frame} onPointerMove={move} onPointerLeave={event => { if (event.pointerType === "mouse") reset(); }} lang="en">
     <figcaption className={styles.windowBar}>
       <span className={styles.windowDots} aria-hidden="true"><i /><i /><i /></span>
       <span>derek — psql</span>
+      {permission === "prompt" || permission === "denied" ? <button type="button" className={styles.motionButton} onClick={enable} disabled={permission === "denied"} aria-label={permission === "denied" ? (locale === "zh" ? "设备感应未获授权" : "Motion permission not granted") : (locale === "zh" ? "开启重力感应" : "Enable device tilt")} title={locale === "zh" ? "开启重力感应" : "Enable device tilt"}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="8" y="3" width="9" height="17" rx="2" transform="rotate(15 12 12)" /><path d="M3 8 1 11l3 2M21 16l2-3-3-2" /></svg></button> : null}
     </figcaption>
     <div className={styles.terminalBody}>
       <pre className={styles.profileQuery}><code>

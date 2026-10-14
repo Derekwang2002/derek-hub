@@ -34,9 +34,10 @@
 .tab span { display: block; }
 .tab strong { font-size: clamp(1rem, 2vw, 1.55rem); line-height: 1.2; }
 .tab span { margin-top: 0.3rem; font-size: clamp(0.75rem, 1.4vw, 1rem); }
-.tab:hover,
-.tab:focus-visible,
-.active { color: #abb2ff; }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .tab:hover { color: #abb2ff; }
+}
+.tab:focus-visible, .active { color: #abb2ff; }
 .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 
 .active::after {

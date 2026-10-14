@@ -15,6 +15,7 @@
     "test:projects": "node --import tsx --test lib/projects.test.tsx",
     "test:toc": "node --import tsx --test lib/visible-sections.test.ts",
     "test:notes": "node --import tsx --test lib/notes.test.ts",
+    "test:search": "node --import tsx --test lib/search.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

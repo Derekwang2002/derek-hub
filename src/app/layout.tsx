@@ -1,5 +1,7 @@
+import { InputModality } from "@/components/input-modality";
 import type { Metadata } from "next";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { GlobalSearchProvider } from "@/components/global-search";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 
@@ -75,13 +77,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <script dangerouslySetInnerHTML={{ __html: LANGUAGE_INIT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning>
-        <div className="site-shell">
-          <SiteHeader />
+        <InputModality />
+        <GlobalSearchProvider>
+          <div className="site-shell">
+            <SiteHeader />
 
-          <div className="site-content">{children}</div>
+            <div className="site-content">{children}</div>
 
-          <SiteFooter />
-        </div>
+            <SiteFooter />
+          </div>
+        </GlobalSearchProvider>
       </body>
     </html>
   );

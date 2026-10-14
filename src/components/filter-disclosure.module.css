@@ -1,0 +1,8 @@
+.filters { margin: 0 0 1.4rem; }
+.filters summary { display: flex; align-items: center; gap: .6rem; width: fit-content; min-height: 40px; cursor: pointer; list-style: none; font-size: .8rem; color: var(--color-text-muted); }
+.filters summary::-webkit-details-marker { display: none; }
+.filters summary svg { width: 16px; height: 16px; transition: transform 160ms ease; }
+.filters[open] summary svg { transform: rotate(180deg); }
+.count { border-radius: 5px; padding: 2px 6px; background: var(--color-surface-muted); color: var(--color-text); font-size: .7rem; }
+.content { padding-top: .5rem; }
+@media(prefers-reduced-motion:reduce) { .filters summary svg { transition: none; } }

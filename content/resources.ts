@@ -40,7 +40,7 @@ export const resources = [
   // https://gist.githubusercontent.com/Derekwang2002/8ea85042f886b464aa3562eb493c3c16/raw/8d2e2bcbcb237586bc1fea065aa277c574685d47/session.html
   {
     title: "dev -> test -> uat -> prod",
-    description: "以共享会话形式讲解 Dev、Test、UAT 与 Prod 环境及其发布流程。",
+    description: "开发、测试、验收与生产的发布流程。",
     type: "demo",
     href: "/dev-test-uat-prod/index.html",
     tags: ["devops", "environment", "deployment"],
@@ -49,7 +49,7 @@ export const resources = [
   },
   {
     title: "Docker 运行原理动态讲解",
-    description: "从 Dockerfile、Image 到 Container，配合构建、隔离、网络、Volume 与 Compose 动画，从头理解 Docker。",
+    description: "用动画理解 Docker 构建、隔离与网络。",
     type: "demo",
     href: "/docker-runtime/index.html",
     tags: ["docker", "container", "devops", "visualization"],
@@ -59,7 +59,7 @@ export const resources = [
   },
   {
     title: "Skip List 跳表讲解",
-    description: "交互式解释跳表的搜索、插入、层高和复杂度。",
+    description: "跳表的搜索、插入与复杂度。",
     type: "demo",
     href: "/leetcode-cookbook/skiplist-explained.html",
     tags: ["algorithm", "data-structure", "visualization"],
@@ -68,7 +68,7 @@ export const resources = [
   },
   {
     title: "LRU Cache 缓存讲解",
-    description: "交互式讲解 HashMap 与双向链表如何实现 O(1) 读写，并比较淘汰策略和并发方案。",
+    description: "用哈希表与双向链表实现 LRU 缓存。",
     type: "demo",
     href: "/leetcode-cookbook/lru-cache-explained.html",
     tags: ["algorithm", "data-structure", "cache", "visualization"],
@@ -97,7 +97,7 @@ export const resourceCollections = [
         tags: ["codex", "skill", "automation"]
       },
       "sync-post-localizations": {
-        description: "同步多语言 Markdown 文章，并校验相关发布入口。"
+        description: "同步多语言文章与发布入口。"
       }
     }
   }

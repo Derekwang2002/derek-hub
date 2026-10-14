@@ -18,9 +18,12 @@
   transition: color 160ms ease, background 160ms ease;
 }
 
-.filter:hover {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .filter:hover {
   background: var(--color-surface-raised);
   color: var(--color-text);
+}
 }
 
 .filter[aria-pressed="true"] {

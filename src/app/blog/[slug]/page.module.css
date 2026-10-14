@@ -81,9 +81,11 @@
   white-space: nowrap;
 }
 
-.table tbody tr:hover {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .table tbody tr:hover {
   background: var(--color-surface-raised);
-}
+} }
 
 .h1,
 .h2,
@@ -220,7 +222,8 @@
 .tocTitle { font-size: 0.85rem; font-weight: 500; margin: 0; }
 .tocCollapsed .tocTitle { display: none; }
 .tocToggle { align-items: center; background: transparent; border: 0; border-radius: 4px; color: inherit; cursor: pointer; display: flex; width: 2rem; height: 2rem; padding: 0.4rem; position: relative; }
-.tocToggle:hover { color: var(--color-text); background: var(--color-surface-muted); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .tocToggle:hover { color: var(--color-text); background: var(--color-surface-muted); } }
 .tocToggleIcon, .tocToggleIcon svg { display: block; height: 1.15rem; width: 1.15rem; }
 .tocToggleLabel { display: none; }
 .tocToggle:focus-visible, .tocList a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
@@ -231,7 +234,8 @@
 .tocList { list-style: none; margin: 0; padding: 0; }
 .tocList li { position: relative; margin: 0; padding: 0; }
 .tocList a { color: var(--color-text-faint); display: block; font-size: 0.82rem; font-weight: 400; line-height: 1.5; padding: 0.46rem 0 0.46rem 0.85rem; text-decoration: none; transition: color 160ms ease; }
-.tocList a:hover { color: var(--color-text); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .tocList a:hover { color: var(--color-text); } }
 
 .tocItemActive > a { color: var(--color-text); }
 .tocLevel3 > a { padding-left: 1.65rem; }
@@ -284,10 +288,12 @@
   width: 2.5rem;
 }
 
-.topButton:hover {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .topButton:hover {
   background: var(--color-surface-raised);
   color: var(--color-text);
-}
+} }
 
 .topButton:active {
   transform: translateY(1px);
@@ -330,10 +336,14 @@
   text-align: right;
 }
 
-.seriesPagerLink:hover,
-.seriesPagerLink:focus-visible,
-.seriesPagerLinkNext:hover,
-.seriesPagerLinkNext:focus-visible {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .seriesPagerLink:hover, :where(:global(html:not([data-input="touch"]))) .seriesPagerLinkNext:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+} }
+
+.seriesPagerLink:focus-visible, .seriesPagerLinkNext:focus-visible {
   color: var(--color-text);
   text-decoration: underline;
 }
@@ -358,7 +368,8 @@
   .toc { max-height: none; }
   .tocOverlay { max-height: 100dvh; }
   .toc:not(.tocOverlay) .tocContents { display: none; }
-  .readingRail { display: none; }
+  .readingRail { display: block; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .topButton { background: var(--color-surface); box-shadow: 0 3px 18px rgb(0 0 0 / .12); border-radius: 50%; width: 44px; height: 44px; }
 }
 
 @media (max-width: 640px) {

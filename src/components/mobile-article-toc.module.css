@@ -1,0 +1,25 @@
+.edge { position: fixed; right: 0; top: 48%; z-index: 7; width: 28px; height: 84px; display: grid; place-items: center; border: 0; border-radius: 14px 0 0 14px; background: var(--color-surface-muted); color: var(--color-text-faint); cursor: pointer; touch-action: pan-y; box-shadow: -2px 2px 12px rgb(0 0 0 / .06); }
+.edge span { height: 25px; width: 3px; border-radius: 3px; background: currentColor; }
+.dialog { position: fixed; inset: 0; margin: 0; padding: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; background: transparent; border: 0; color: var(--color-text); overflow: hidden; }
+.dialog::backdrop { background: rgb(0 0 0 / .26); backdrop-filter: blur(3px); }
+.panel { display: flex; flex-direction: column; position: absolute; inset: 0 0 0 auto; width: min(86vw,360px); background: var(--color-bg); border-radius: 22px 0 0 22px; padding: max(22px,env(safe-area-inset-top)) 18px max(22px,env(safe-area-inset-bottom)); box-shadow: -12px 0 50px rgb(0 0 0 / .15); touch-action: pan-y; }
+.dialog[open] .panel { animation: arrive 220ms cubic-bezier(.22,1,.36,1); }
+.panel header { display: flex; align-items: center; justify-content: space-between; padding: 0 4px 16px 12px; }
+.panel h2 { font-size: 16px; font-weight: 550; margin: 0; }
+.panel button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--color-surface-muted); color: var(--color-text-muted); cursor: pointer; }
+.panel button svg { width: 20px; height: 20px; }
+.panel nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.panel ol { list-style: none; padding: 0; margin: 0; }
+.panel a { display: block; padding: 12px; font-size: 14px; line-height: 1.6; border-radius: 10px; text-decoration: none; color: var(--color-text-muted); overflow-wrap: anywhere; }
+.panel [data-level="3"] a { padding-left: 24px; font-size: 13px; }
+.panel [data-level="4"] a { padding-left: 36px; font-size: 13px; }
+.panel a[data-visible="true"] { color: var(--color-text); }
+@keyframes arrive { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@media(prefers-reduced-motion:reduce) { .dialog[open] .panel { animation: none; } }
+
+.track { position: relative; }
+.track li { position: relative; }
+.indicator { position: absolute; inset: 0 0 auto; background: var(--color-surface-muted); border-radius: 10px; pointer-events: none; transition: transform 220ms cubic-bezier(.22,1,.36,1),height 220ms cubic-bezier(.22,1,.36,1),opacity 160ms ease; }
+@media(prefers-reduced-motion:reduce) { .indicator { transition: none; } }
+
+.dialog[open] .panel[data-keyboard="true"] { animation: none; }

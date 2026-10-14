@@ -6,6 +6,7 @@ import { ProjectLayout } from "./project-layout";
 import { PostBodyLayout } from "./post-body-layout";
 import { ProjectNavigation } from "./project-navigation";
 import { ProjectPager } from "./project-pager";
+import { ProjectStatusBadge } from "./project-status-badge";
 import { TitleNote } from "./title-note";
 import { ArticleHeader } from "./article-header";
 import { collectionPath, collectionSection } from "../../lib/content-sections";
@@ -45,11 +46,8 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
                 <small>{project.summary}</small>
               </span>
               <span className={styles.projectMeta}>
-                {project.status === "archived"
-                  ? locale === "zh" ? "已归档" : "Archived"
-                  : locale === "zh" ? "进行中" : "Active"}
-                {" · "}
-                {formatContentDate(project.lastUpdated, locale)}
+                <ProjectStatusBadge status={project.status} locale={locale} />
+                <time dateTime={project.lastUpdated}>{formatContentDate(project.lastUpdated, locale)}</time>
               </span>
             </Link>
           </li>
@@ -227,8 +225,7 @@ function ProjectHeader({
       <h1>{title}</h1>
       <p>{summary}</p>
       <div className={styles.heroMeta}>
-        <span>{project.status === "archived" ? (locale === "zh" ? "已归档" : "Archived") : (locale === "zh" ? "进行中" : "Active")}</span>
-        <span aria-hidden="true">·</span>
+        <ProjectStatusBadge status={project.status} locale={locale} />
         <time dateTime={item?.updated ?? project.lastUpdated}>
           {locale === "zh" ? "更新于 " : "Updated "}
           {formatContentDate(item?.updated ?? project.lastUpdated, locale)}

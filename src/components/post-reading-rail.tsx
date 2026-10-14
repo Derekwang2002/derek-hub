@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "../app/blog/[slug]/page.module.css";
 
-export function PostReadingRail() {
+export function PostReadingRail({ locale = "en" }: { locale?: "en" | "zh" }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -26,8 +26,8 @@ export function PostReadingRail() {
   }
 
   return (
-    <aside aria-label="Reading tools" className={`${styles.readingRail} ${visible ? styles.railVisible : ""}`}>
-      <button aria-label="Back to top" className={styles.topButton} onClick={scrollToTop} tabIndex={visible ? 0 : -1} type="button">
+    <aside aria-label={locale === "zh" ? "阅读工具" : "Reading tools"} className={`${styles.readingRail} ${visible ? styles.railVisible : ""}`}>
+      <button aria-label={locale === "zh" ? "回到顶部" : "Back to top"} className={styles.topButton} onClick={scrollToTop} tabIndex={visible ? 0 : -1} type="button">
         <svg aria-hidden="true" fill="none" focusable="false" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" viewBox="0 0 24 24">
           <path d="M12 19V5M5 12l7-7 7 7" />
         </svg>

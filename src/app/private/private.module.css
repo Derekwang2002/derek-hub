@@ -109,7 +109,14 @@
   padding: 0.5rem 1rem;
 }
 
-.primaryButton:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .primaryButton:hover {
+  background: var(--color-focus);
+  border-color: var(--color-focus);
+}
+}
+
 .primaryButton:focus-visible {
   background: var(--color-focus);
   border-color: var(--color-focus);
@@ -138,7 +145,14 @@
   text-underline-offset: 0.25rem;
 }
 
-.textButton:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .textButton:hover {
+  color: var(--color-text);
+  text-decoration-color: currentColor;
+}
+}
+
 .textButton:focus-visible {
   color: var(--color-text);
   text-decoration-color: currentColor;
@@ -189,8 +203,11 @@
   border-bottom: 1px solid var(--color-border-soft);
 }
 
-.documentRow:hover {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .documentRow:hover {
   background: linear-gradient(90deg, transparent, var(--color-surface-muted) 12%, transparent);
+}
 }
 
 .documentIdentity {
@@ -206,7 +223,14 @@
   text-decoration: none;
 }
 
-.documentLink:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .documentLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.24rem;
+}
+}
+
 .documentLink:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.24rem;
@@ -281,14 +305,24 @@
   color: var(--color-text-muted);
 }
 
-.viewerBackLink a:hover,
-.viewerBackLink a:focus-visible,
-.downloadLink:hover,
-.downloadLink:focus-visible {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .viewerBackLink a:hover, :where(:global(html:not([data-input="touch"]))) .downloadLink:hover {
+  color: var(--color-text);
+}
+}
+
+.viewerBackLink a:focus-visible, .downloadLink:focus-visible {
   color: var(--color-text);
 }
 
-.downloadLink:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .downloadLink:hover {
+  border-color: var(--color-text);
+}
+}
+
 .downloadLink:focus-visible {
   border-color: var(--color-text);
 }

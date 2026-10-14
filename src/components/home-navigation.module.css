@@ -1,4 +1,4 @@
-.dropRoot { position: relative; height: calc(190svh - var(--site-header-height)); }
+.dropRoot { position: relative; height: calc(150svh - var(--site-header-height)); }
 /* Hide only the normal shell header; its space preserves the original Hero. */
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-header) { visibility: hidden; pointer-events: none; }
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-footer) { display: none; }
@@ -23,17 +23,45 @@
 .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(4):focus-visible)) .entry:nth-child(4) { outline: 2px solid var(--color-text); outline-offset: 4px; }
 .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(5):focus-visible)) .entry:nth-child(5) { outline: 2px solid var(--color-text); outline-offset: 4px; }
 @media (hover: hover) and (pointer: fine) {
-.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(1):hover)) .entry:nth-child(1) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
-.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(2):hover)) .entry:nth-child(2) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
-.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(3):hover)) .entry:nth-child(3) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
-.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(4):hover)) .entry:nth-child(4) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
-.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(5):hover)) .entry:nth-child(5) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(1):hover)) .entry:nth-child(1) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); } }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(2):hover)) .entry:nth-child(2) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); } }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(3):hover)) .entry:nth-child(3) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); } }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(4):hover)) .entry:nth-child(4) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); } }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(5):hover)) .entry:nth-child(5) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); } }
 }
-.hint { position: fixed; bottom: 94px; left: 0; width: 100%; display: flex; justify-content: center; gap: 1rem; align-items: center; font-size: .72rem; color: var(--color-text-faint); margin: 0; pointer-events: none; }
-.hint > span { font-size: 1rem; }
 .dropRoot[data-moving="true"] .panel,
 .dropRoot[data-moving="true"] .heroPin > div,
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-brand),
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-controls),
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-nav-links a) { will-change: transform; }
 @media(prefers-reduced-motion:reduce) { .dropRoot *, .dropRoot *::before { transition: none!important; animation: none!important; } }
+
+.entry { overflow: hidden; background: color-mix(in srgb, var(--color-text) 4%, var(--color-bg)); }
+.entry::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg,transparent,color-mix(in srgb,var(--color-text) 3%,transparent)); pointer-events:none; }
+.art { position:absolute; inset:0 0 0 42%; opacity:.22; mask-image:linear-gradient(90deg,transparent,#000 24%); transition:opacity 180ms ease-out; }
+.previewContent { position:relative; height:100%; overflow:hidden; color:var(--color-text); }
+.previewContent strong { display:block; font-weight:500; letter-spacing:-.035em; }
+.paper { position:absolute; inset:-65px -35px -130px 30px; padding:26px; background:#d7d7d1; color:#272825; transform:rotate(-7deg); border-radius:3px; }
+.paper span { display:block; font:10px/1.5 ui-monospace,monospace; letter-spacing:.12em; }
+.paper strong { font:24px/1.3 Georgia,"Songti SC",serif; margin-top:4px; max-width:230px; }
+.paper .figure { object-fit:contain; object-position:bottom; padding:70px 24px 22px; filter:grayscale(1); mix-blend-mode:multiply; }
+.article { padding:8px 25px 8px 50px; }
+.article strong { font:20px/1.5 Georgia,"Songti SC",serif; margin:4px 0; }
+.projectImage { position:absolute; inset:-105px -20px -260px 30px; transform:rotate(-8deg); border-radius:12px; overflow:hidden; }
+.projectImage img { object-fit:cover; object-position:top left; filter:grayscale(1) brightness(1.6); }
+.resourcePrint { padding:16px 25px 0 50px; }
+.resourcePrint strong { margin:0 0 10px; font:22px/1.3 Georgia,"Songti SC",serif; }
+.resourcePrint strong:nth-of-type(even) { color:var(--color-text-muted); }
+.portrait { object-fit:cover; object-position:center 40%; filter:grayscale(1); opacity:.8; }
+
+.dropRoot[data-expanded="true"][data-active="0"] .entry:nth-child(1) .art,
+.dropRoot[data-expanded="true"][data-active="1"] .entry:nth-child(2) .art,
+.dropRoot[data-expanded="true"][data-active="2"] .entry:nth-child(3) .art,
+.dropRoot[data-expanded="true"][data-active="3"] .entry:nth-child(4) .art,
+.dropRoot[data-expanded="true"][data-active="4"] .entry:nth-child(5) .art { opacity:1; }
+@media(hover:none) { .art { opacity:.45; } }

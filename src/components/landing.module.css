@@ -82,9 +82,11 @@
 .resultValue { color: color-mix(in srgb, var(--sql-string) 70%, var(--color-text-soft)); }
 .resultSeparator { color: var(--color-text-faint); }
 @media (hover: hover) and (pointer: fine) {
-  .terminal:hover {
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .terminal:hover {
     box-shadow: 0 22px 48px rgb(0 0 0 / 0.16), 0 6px 16px rgb(0 0 0 / 0.06);
     transition-duration: 180ms, 240ms;
+  }
   }
 }
 @media (max-width: 800px) {
@@ -100,3 +102,7 @@
   .terminalStack > div + div { margin-top: 0.35rem; }
 }
 @media (prefers-reduced-motion: reduce) { .terminal { transform: none; transition: none; } }
+
+.motionButton { justify-self: end; display: grid; place-items: center; width: 40px; height: 40px; border: 0; padding: 8px; color: var(--color-text-muted); background: transparent; border-radius: 8px; cursor: pointer; }
+.motionButton svg { width: 20px; height: 20px; }
+.motionButton:disabled { opacity: .4; cursor: default; }

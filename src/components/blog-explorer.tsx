@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FilterDisclosure } from "./filter-disclosure";
 import { useEffect, useMemo, useState } from "react";
 import type { TagCount } from "../../lib/posts";
 import styles from "../app/blog/page.module.css";
@@ -31,13 +32,13 @@ export function BlogExplorer({ locale = "en", posts, tags }: {
   const filtered = posts.filter(post => activeTags.every(tag => post.tags.some(value => normalize(value) === tag)));
 
   return <>
-    <div className={styles.filterBar} aria-label={locale === "zh" ? "按标签筛选" : "Filter by tag"}>
+    <FilterDisclosure locale={locale} count={activeTags.length}><div className={styles.filterBar} aria-label={locale === "zh" ? "按标签筛选" : "Filter by tag"}>
       {tags.map(tag => <button type="button" key={tag.slug} aria-pressed={activeTags.includes(tag.slug)} className={styles.filterTag}
         onClick={() => filter(activeTags.includes(tag.slug) ? activeTags.filter(value => value !== tag.slug) : [...activeTags, tag.slug])}>
         {tag.tag}<span>{tag.count}</span>
       </button>)}
       {activeTags.length ? <button type="button" className={styles.clearFilters} onClick={() => filter([])}>{locale === "zh" ? "清除筛选" : "Clear filters"}</button> : null}
-    </div>
+    </div></FilterDisclosure>
     <div className="list-swap" key={activeTags.join(",")}>
       {filtered.length ? <ul className={styles.postList}>{filtered.map(post => <li className={`row-highlight ${styles.postRow}`} key={post.slug}>
         <div className={styles.postHeader}>

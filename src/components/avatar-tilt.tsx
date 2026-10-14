@@ -77,15 +77,15 @@ export function AvatarTilt({ children, className }: { children: ReactNode; class
     animationRef.current = requestAnimationFrame(step);
   }
 
-  function handlePointerEnter() {
-    if (!enabledRef.current) return;
+  function handlePointerEnter(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType !== "mouse" || !enabledRef.current) return;
     hoveringRef.current = true;
     startLoop();
   }
 
   function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
     const frame = frameRef.current;
-    if (!frame || !enabledRef.current) return;
+    if (event.pointerType !== "mouse" || !frame || !enabledRef.current) return;
     const rect = frame.getBoundingClientRect();
     const offsetX = (event.clientX - rect.left) / rect.width - 0.5;
     const offsetY = (event.clientY - rect.top) / rect.height - 0.5;

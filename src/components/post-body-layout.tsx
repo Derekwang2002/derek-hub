@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { MobileArticleToc } from "./mobile-article-toc";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
 import { useActiveHeadings } from "./use-active-heading";
@@ -98,17 +99,17 @@ export function PostBodyLayout({
   return (
     <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
       {header ? <div className={styles.articleHeader}>{header}</div> : null}
-      <PostToc
+      {tocOverlay ? <MobileArticleToc items={tocItems} activeId={activeId} visibleIds={visibleIds} locale={locale} /> : <PostToc
         activeId={activeId}
         visibleIds={visibleIds}
         items={tocItems}
         locale={locale}
         onOpenChange={setTocOpen}
         open={tocOpen}
-        overlay={tocOverlay}
-      />
+        overlay={false}
+      />}
       <article className={styles.content}>{children}</article>
-      <PostReadingRail />
+      <PostReadingRail locale={locale} />
     </div>
   );
 }

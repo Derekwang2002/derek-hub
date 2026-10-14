@@ -40,5 +40,8 @@ jobs:
       - name: Notes routing tests
         run: npm run test:notes
 
+      - name: Search tests
+        run: npm run test:search
+
       - name: Build
         run: npm run build

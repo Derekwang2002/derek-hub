@@ -28,7 +28,9 @@
 .filterBar { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .filterTag { align-items: center; background: var(--color-surface-muted); border: 0; border-radius: 999px; color: var(--color-text-muted); cursor: pointer; display: inline-flex; font: inherit; font-size: 0.8rem; gap: 0.45rem; padding: 0.4rem 0.85rem; transition: color 160ms ease, background 160ms ease; }
 .filterTag span { font-size: 0.7rem; opacity: 0.65; }
-.filterTag:hover { background: var(--color-surface-raised); color: var(--color-text); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .filterTag:hover { background: var(--color-surface-raised); color: var(--color-text); }
+}
 .filterTag[aria-pressed="true"] { background: var(--color-text); color: var(--color-bg); }
 .clearFilters { background: none; border: 0; color: var(--color-text-muted); cursor: pointer; font: inherit; font-size: 0.8rem; padding: 0.4rem; text-decoration: underline; text-underline-offset: 3px; }
 .filterTag:focus-visible, .clearFilters:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
