@@ -1,10 +1,6 @@
-.header { margin-bottom: 1.1rem; }
-/* Portal keeps the dock attached to the viewport outside the moving page surface. */
-.dock { position: fixed; z-index: 45; left: max(16px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); }
-:global(body:has([data-expanded="true"])) .dock,
-:global(body:has([data-moving="true"])) .dock,
-:global(html[data-search-open="true"]) .dock { display: none; }
-.toggle { position: relative; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px; background: var(--color-bg); color: var(--color-text-muted); cursor: pointer; transition: background-color 140ms ease,color 140ms ease,transform 120ms ease-out; }
+.filters { position: relative; margin-bottom: 1.1rem; }
+.header { display: flex; align-items: flex-end; gap: .5rem; }
+.toggle { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--color-text-muted); cursor: pointer; transition: background-color 140ms ease,color 140ms ease,transform 120ms ease-out; }
 .toggle svg { width: 20px; height: 20px; }
 .toggle[aria-expanded="true"] { color: var(--color-text); background: var(--color-surface-muted); }
 .toggle:active { transform: scale(.97); }
@@ -13,8 +9,12 @@
   :where(:global(html:not([data-input="touch"]))) .toggle:hover { color: var(--color-text); background: var(--color-surface-muted); }
 }
 .count { position: absolute; right: 0; top: 0; min-width: 16px; height: 16px; display: grid; place-items: center; padding-inline: 3px; border-radius: 5px; background: var(--color-text); color: var(--color-bg); font-size: 10px; font-weight: 600; }
-.body { position: absolute; left: 0; bottom: calc(100% + 8px); width: max-content; max-width: min(440px, calc(100vw - 32px)); opacity: 0; visibility: hidden; transform: translateY(6px) scale(.98); transform-origin: left bottom; transition: opacity 120ms ease-out, transform 160ms cubic-bezier(.22,1,.36,1), visibility 160ms; }
-.body[data-open="true"] { opacity: 1; visibility: visible; transform: none; }
-.content { padding: 16px; max-height: min(50dvh, 360px); overflow-y: auto; overscroll-behavior: contain; border-radius: 12px; background: var(--color-bg); box-shadow: 0 6px 30px rgb(0 0 0 / .18); }
-.body[data-keyboard="true"] { transition: none; }
-@media(prefers-reduced-motion:reduce) { .body,.toggle { transition: none; } .body { transform: none; } }
+.body { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 160ms cubic-bezier(.22,1,.36,1), opacity 120ms ease-out; }
+.body[data-open="true"] { grid-template-rows: 1fr; opacity: 1; }
+.clip { min-height: 0; overflow: hidden; }
+.content { padding: 12px 4px 4px; transform: translateY(-4px); transition: transform 160ms cubic-bezier(.22,1,.36,1); }
+.body[data-open="true"] .content { transform: none; }
+.body[data-keyboard="true"], .body[data-keyboard="true"] .content { transition: none; }
+@media(prefers-reduced-motion:reduce) { .body,.content,.toggle { transition: none; } .content { transform: none; } }
+
+@media(max-width:640px) { .toggle { width: 44px; height: 44px; margin-top: -8px; } }
