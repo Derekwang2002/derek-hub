@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+
+import { useSegmentedDrag } from "./use-segmented-drag";
 
 const STORAGE_KEY = "content-locale";
 
@@ -13,11 +15,17 @@ function toOtherLocalePath(pathname: string): string {
 }
 
 export function LanguageToggle() {
+  const router = useRouter();
   const pathname = usePathname() ?? "/";
   const searchParams = useSearchParams();
   const chinese = pathname === "/zh" || pathname.startsWith("/zh/");
   const query = searchParams.toString();
   const href = `${toOtherLocalePath(pathname)}${query ? `?${query}` : ""}`;
+
+  const drag = useSegmentedDrag<HTMLAnchorElement>(chinese ? 0 : 1, next => {
+    try { localStorage.setItem(STORAGE_KEY, next === 0 ? "zh" : "en"); } catch {}
+    router.push(href);
+  });
 
   useEffect(() => {
     document.documentElement.lang = chinese ? "zh-CN" : "en";
@@ -25,6 +33,8 @@ export function LanguageToggle() {
 
   return (
     <Link
+      {...drag}
+      draggable={false}
       aria-label={chinese ? "Switch content language to English" : "切换内容语言为中文"}
       className="language-toggle"
       data-locale={chinese ? "zh" : "en"}

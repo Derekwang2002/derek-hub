@@ -47,7 +47,7 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
               </span>
               <span className={styles.projectMeta}>
                 <ProjectStatusBadge status={project.status} locale={locale} />
-                <time dateTime={project.lastUpdated}>{formatContentDate(project.lastUpdated, locale)}</time>
+                <time dateTime={project.lastUpdated}>{project.lastUpdated}</time>
               </span>
             </Link>
           </li>

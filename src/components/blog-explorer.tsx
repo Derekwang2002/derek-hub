@@ -32,7 +32,7 @@ export function BlogExplorer({ locale = "en", posts, tags }: {
   const filtered = posts.filter(post => activeTags.every(tag => post.tags.some(value => normalize(value) === tag)));
 
   return <>
-    <FilterDisclosure locale={locale} count={activeTags.length}><div className={styles.filterBar} aria-label={locale === "zh" ? "按标签筛选" : "Filter by tag"}>
+    <FilterDisclosure locale={locale} count={activeTags.length} heading={<h1 className={styles.title}>{locale === "zh" ? "博客" : "Blog"}</h1>}><div className={styles.filterBar} aria-label={locale === "zh" ? "按标签筛选" : "Filter by tag"}>
       {tags.map(tag => <button type="button" key={tag.slug} aria-pressed={activeTags.includes(tag.slug)} className={styles.filterTag}
         onClick={() => filter(activeTags.includes(tag.slug) ? activeTags.filter(value => value !== tag.slug) : [...activeTags, tag.slug])}>
         {tag.tag}<span>{tag.count}</span>

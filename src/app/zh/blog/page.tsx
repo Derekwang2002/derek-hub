@@ -1,3 +1,4 @@
+import { PrimaryPageNavigation } from "@/components/primary-page-navigation";
 import type { Metadata } from "next";
 import { BlogExplorer, type BlogExplorerPost } from "@/components/blog-explorer";
 import { getAllLocalizedPosts } from "../../../../lib/localized-posts";
@@ -18,13 +19,10 @@ export default async function ChineseBlogPage() {
   const tags = getTagsWithCounts(posts);
 
   return (
-    <main className={`page-enter ${styles.blogPage}`} lang="zh-CN">
-      <header className={styles.hero}>
-        <h1 className={styles.title}>博客</h1>
+    <PrimaryPageNavigation locale="zh" current="blog"><main className={`page-enter ${styles.blogPage}`} lang="zh-CN">
 
-      </header>
       <BlogExplorer locale="zh" posts={posts} tags={tags} />
-    </main>
+    </main></PrimaryPageNavigation>
   );
 }
 

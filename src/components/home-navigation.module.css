@@ -65,3 +65,7 @@
 .dropRoot[data-expanded="true"][data-active="3"] .entry:nth-child(4) .art,
 .dropRoot[data-expanded="true"][data-active="4"] .entry:nth-child(5) .art { opacity:1; }
 @media(hover:none) { .art { opacity:.45; } }
+
+.dropRoot[data-page="true"] .heroPin { height: auto; min-height: calc(100svh - var(--site-header-height)); top: var(--page-pin-top, var(--site-header-height)); }
+.dropRoot[data-expanded="true"] .entry[data-current="true"] { background: color-mix(in srgb,var(--color-text) 9%,var(--color-bg)); }
+.dropRoot[data-expanded="true"] .entry[data-current="true"] .art { opacity: .38; }

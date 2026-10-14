@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { useSegmentedDrag } from "./use-segmented-drag";
+
 type Theme = "light" | "dark";
 
 const STORAGE_KEY = "theme";
@@ -10,6 +12,9 @@ export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
   const nextTheme: Theme = theme === "dark" ? "light" : "dark";
+
+  function changeTheme(next: Theme) { setDocumentTheme(next); storeTheme(next); setTheme(next); }
+  const drag = useSegmentedDrag<HTMLButtonElement>(theme === "dark" ? 1 : 0, next => changeTheme(next ? "dark" : "light"));
 
   useEffect(() => {
     const currentTheme = getCurrentTheme();
@@ -20,6 +25,7 @@ export function ThemeToggle() {
 
   return (
     <button
+      {...drag}
       aria-label={mounted ? `Switch to ${nextTheme} mode` : "Toggle color theme"}
       role="switch"
       aria-checked={mounted && theme === "dark"}

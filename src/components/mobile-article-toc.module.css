@@ -8,7 +8,7 @@
 .panel h2 { font-size: 16px; font-weight: 550; margin: 0; }
 .panel button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--color-surface-muted); color: var(--color-text-muted); cursor: pointer; }
 .panel button svg { width: 20px; height: 20px; }
-.panel nav { min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.panel nav { scroll-behavior: auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .panel ol { list-style: none; padding: 0; margin: 0; }
 .panel a { display: block; padding: 12px; font-size: 14px; line-height: 1.6; border-radius: 10px; text-decoration: none; color: var(--color-text-muted); overflow-wrap: anywhere; }
 .panel [data-level="3"] a { padding-left: 24px; font-size: 13px; }
@@ -23,3 +23,5 @@
 @media(prefers-reduced-motion:reduce) { .indicator { transition: none; } }
 
 .dialog[open] .panel[data-keyboard="true"] { animation: none; }
+
+.dialog[data-ready="false"] .indicator { transition: none; }

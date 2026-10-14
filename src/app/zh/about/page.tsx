@@ -1,3 +1,4 @@
+import { PrimaryPageNavigation } from "@/components/primary-page-navigation";
 import type { Metadata } from "next";
 import { AboutContent } from "@/components/home-content";
 
@@ -7,4 +8,4 @@ export const metadata: Metadata = {
   alternates: { canonical: "/zh/about", languages: { en: "/about", "zh-CN": "/zh/about" } }
 };
 
-export default function AboutPage() { return <AboutContent locale="zh" />; }
+export default function AboutPage() { return <PrimaryPageNavigation locale="zh" current="about"><AboutContent locale="zh" /></PrimaryPageNavigation>; }

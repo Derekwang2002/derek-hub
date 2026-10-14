@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { HomeContent } from "@/components/landing-content";
 import { SiteHeader } from "@/components/site-chrome";
 import type { ContentLocale } from "../../lib/locale";
@@ -15,7 +15,8 @@ const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
 
 /** The same navigation anchors move from the top bar into the section directory. */
-export function HomeNavigation({ locale, sections }: { locale: ContentLocale; sections: NavigationPreviewSection[] }) {
+export function HomeNavigation({ locale, sections, children, current }: { locale: ContentLocale; sections: NavigationPreviewSection[]; children?: ReactNode; current?: string }) {
+  const hasContent = children !== undefined;
   const root = useRef<HTMLDivElement>(null);
   const header = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
@@ -39,6 +40,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     let lastTime = 0;
     let keyboardScroll = false;
     let scrollDistance = 1;
+    let navStart = 0;
     let snapTimer = 0;
     let snapTarget: number | null = null;
     let pointerHeld = false;
@@ -55,7 +57,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     let card = { x: 0, y: 0, width: 0, height: 0, headerHeight: 64 };
 
     const targets = () => {
-      const raw = clamp(window.scrollY / scrollDistance);
+      const raw = clamp((window.scrollY - navStart) / scrollDistance);
       const p = reduced.matches ? (raw > .35 ? 1 : 0) : raw;
       return {
         p,
@@ -142,7 +144,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     const glideTo = (destination: number, velocity: number, intent: "scroll" | "dismiss" = "scroll") => {
       cancelSnap();
       const now = performance.now();
-      const position = clamp(window.scrollY / scrollDistance);
+      const position = clamp((window.scrollY - navStart) / scrollDistance);
       snapTarget = destination;
       if (reduced.matches || keyboardScroll) {
         window.scrollTo({ top: snapTarget, behavior: "instant" });
@@ -159,7 +161,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
         const dt = Math.min((time - previousTime) / 1000 * 1.4, .064);
         previousTime = time;
         elapsed += dt;
-        const target = snapTarget / scrollDistance;
+        const target = (snapTarget - navStart) / scrollDistance;
         const distance = Math.abs(target - snapMotion.value);
         // An explicit click starts promptly; passive scrolling retains its gentle handoff.
         const attraction = intent === "dismiss" ? 220 : 38 + 42 * ease(clamp(1 - distance / .2));
@@ -169,7 +171,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
         const atBoundary = target === 0 ? snapMotion.value <= 0 : snapMotion.value >= 1;
         const settled = Math.abs(target - snapMotion.value) * scrollDistance < .5
           && Math.abs(snapMotion.velocity) * scrollDistance < 5;
-        window.scrollTo({ top: (atBoundary || settled ? target : snapMotion.value) * scrollDistance, behavior: "instant" });
+        window.scrollTo({ top: navStart + (atBoundary || settled ? target : snapMotion.value) * scrollDistance, behavior: "instant" });
         if (atBoundary || settled) {
           snapTarget = null;
           scrollVelocity = 0;
@@ -184,14 +186,14 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     const queueSnap = () => {
       window.clearTimeout(snapTimer);
       if (searchPaused || pointerHeld || snapTarget !== null || document.hidden) return;
-      const p = clamp(window.scrollY / scrollDistance);
-      if (window.scrollY < 1 || Math.abs(window.scrollY - scrollDistance) < 1) return;
+      const p = clamp((window.scrollY - navStart) / scrollDistance);
+      if (window.scrollY < navStart + 1 || Math.abs(window.scrollY - navStart - scrollDistance) < 1) return;
       snapTimer = window.setTimeout(() => {
-        const position = clamp(window.scrollY / scrollDistance);
+        const position = clamp((window.scrollY - navStart) / scrollDistance);
         const velocity = scrollVelocity * Math.exp(-(performance.now() - previousScrollTime) / 180);
         // Momentum helps choose the destination rather than reversing at the midpoint.
         const projected = position + velocity * .2;
-        glideTo(projected < .5 ? 0 : scrollDistance, velocity);
+        glideTo(navStart + (projected < .5 ? 0 : scrollDistance), velocity);
       }, p < .22 || p > .78 ? 90 : 160);
     };
     const dismissFromBlank = (event: MouseEvent) => {
@@ -201,7 +203,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
       const bounds = directoryContent.getBoundingClientRect();
       const outside = event.clientX < bounds.left || event.clientX > bounds.right
         || event.clientY < bounds.top || event.clientY > bounds.bottom;
-      if (outside) glideTo(0, Math.min(0, scrollVelocity), "dismiss");
+      if (outside) glideTo(navStart, Math.min(0, scrollVelocity), "dismiss");
     };
     const scroll = () => {
       if (searchPaused) return;
@@ -220,7 +222,15 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
       if (searchPaused) { needsMeasure = true; return; }
       needsMeasure = false;
       cancelSnap();
-      scrollDistance = Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight);
+      if (hasContent) {
+        // Read long pages normally before using the same scroll-driven reveal as home.
+        const hostTop = host.getBoundingClientRect().top + window.scrollY;
+        const contentHeight = Math.max(heroContent.offsetHeight, innerHeight - hostTop);
+        navStart = Math.max(0, hostTop + contentHeight - innerHeight);
+        host.style.height = `${contentHeight + innerHeight * .5}px`;
+        host.style.setProperty("--page-pin-top", `${Math.min(hostTop, innerHeight - contentHeight)}px`);
+      }
+      scrollDistance = Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight - navStart);
       // Clear transforms before measuring their original navbar positions.
       [brand, controls, ...links].forEach(el => el.style.removeProperty("transform"));
       const width = innerWidth;
@@ -305,7 +315,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     };
     const clearPreview = () => { delete host.dataset.active; };
     const previewHandlers = links.map((link, i) => {
-      const activate = () => { host.dataset.active = String(i); };
+      const activate = (event: Event) => { if (event instanceof PointerEvent && event.pointerType !== "mouse") return; host.dataset.active = String(i); };
       link.addEventListener("pointerenter", activate);
       link.addEventListener("focus", activate);
       link.addEventListener("pointerleave", clearPreview);
@@ -315,6 +325,7 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
     measure();
     const controlsObserver = new ResizeObserver(measure);
     controlsObserver.observe(controls);
+    if (hasContent) controlsObserver.observe(heroContent);
     window.addEventListener(SEARCH_CHANGE_EVENT, searchChange);
     window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("resize", measure);
@@ -354,14 +365,14 @@ export function HomeNavigation({ locale, sections }: { locale: ContentLocale; se
       document.removeEventListener("visibilitychange", visibility);
       reduced.removeEventListener("change", motionPreference);
     };
-  }, []);
+  }, [hasContent]);
 
-  return <div className={styles.dropRoot} ref={root}>
-    <div className={styles.heroPin}><div ref={hero}><HomeContent locale={locale}/></div></div>
+  return <div className={styles.dropRoot} data-page={hasContent} ref={root}>
+    <div className={styles.heroPin}><div ref={hero}>{children ?? <HomeContent locale={locale}/>}</div></div>
     <div className={styles.panel} ref={surface} aria-hidden="true"/>
     <div className={styles.droppedHeader} ref={header}><SiteHeader/></div>
     <div className={styles.directory} ref={directory} aria-hidden="true">{sections.map(section =>
-      <div className={styles.entry} key={section.id}><div className={styles.art}><HomeNavigationPreview section={section} locale={locale}/></div></div>
+      <div className={styles.entry} data-current={section.id === current} key={section.id}><div className={styles.art}><HomeNavigationPreview section={section} locale={locale}/></div></div>
     )}</div>
   </div>;
 }

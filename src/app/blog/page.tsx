@@ -1,3 +1,4 @@
+import { PrimaryPageNavigation } from "@/components/primary-page-navigation";
 import type { Metadata } from "next";
 import { BlogExplorer, type BlogExplorerPost } from "@/components/blog-explorer";
 import {
@@ -35,14 +36,11 @@ export default async function BlogPage() {
   const tags = getTagsWithCounts(posts);
 
   return (
-    <main className={`page-enter ${styles.blogPage}`}>
-      <header className={styles.hero}>
-        <h1 className={styles.title}>Blog</h1>
+    <PrimaryPageNavigation locale="en" current="blog"><main className={`page-enter ${styles.blogPage}`}>
 
-      </header>
 
       <BlogExplorer posts={posts} tags={tags} />
-    </main>
+    </main></PrimaryPageNavigation>
   );
 }
 

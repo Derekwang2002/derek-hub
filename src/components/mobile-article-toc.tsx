@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { getVisibleHeadingRange } from "../../lib/visible-sections";
+import { getVisibleHeadingRange, getVisibleSections } from "../../lib/visible-sections";
 import type { TocItem } from "./post-toc";
 import { lockPageScroll } from "./scroll-lock";
 import { isSearchOpen, SEARCH_CHANGE_EVENT } from "./search-events";
@@ -13,6 +13,21 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
 }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const [readingSnapshot, setReadingSnapshot] = useState({ activeId, visibleIds });
+  const reading = open ? readingSnapshot : { activeId, visibleIds };
+  const openContents = (keyboard: boolean) => {
+    // Capture the reading position synchronously, even if a scroll observer is still queued.
+    const headings = items.flatMap(item => {
+      const element = document.getElementById(item.id);
+      return element ? [{ id: item.id, level: item.level, top: element.getBoundingClientRect().top }] : [];
+    });
+    const article = document.getElementById(items[0]?.id)?.closest("article");
+    const top = (document.querySelector(".site-header")?.getBoundingClientRect().bottom ?? 0) + 24;
+    setReadingSnapshot(getVisibleSections(headings, top, innerHeight - 24,
+      article?.getBoundingClientRect().bottom ?? document.documentElement.scrollHeight - scrollY));
+    setKeyboardOpen(keyboard);
+    setOpen(true);
+  };
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const suppressClick = useRef(false);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -24,10 +39,31 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
   const list = useRef<HTMLOListElement>(null);
   const [indicator, setIndicator] = useState({ top: 0, height: 0 });
   useLayoutEffect(() => {
+    if (!open || !dialog.current) return;
+    const element = dialog.current;
+    element.dataset.ready = "false";
+    unlock.current = lockPageScroll();
+    element.showModal();
+    const active = element.querySelector<HTMLElement>('[aria-current="location"]');
+    const contents = element.querySelector("nav");
+    // Resolve the active row after the dialog has layout, but before its first paint.
+    if (active && contents) {
+      contents.scrollTop += active.getBoundingClientRect().top - contents.getBoundingClientRect().top - contents.clientHeight * .3;
+    }
+    let readyFrame = 0;
+    const firstFrame = requestAnimationFrame(() => {
+      readyFrame = requestAnimationFrame(() => { element.dataset.ready = "true"; });
+    });
+    return () => {
+      cancelAnimationFrame(firstFrame); cancelAnimationFrame(readyFrame);
+      closing.current?.cancel(); element.close(); unlock.current?.(); unlock.current = null;
+    };
+  }, [open]);
+  useLayoutEffect(() => {
     if (!open || !list.current) return;
     const element = list.current;
     const measure = () => {
-      const range = getVisibleHeadingRange(items.map(item => item.id), visibleIds);
+      const range = getVisibleHeadingRange(items.map(item => item.id), reading.visibleIds);
       const first = range ? element.children[range.first] as HTMLElement : null;
       const last = range ? element.children[range.last] as HTMLElement : null;
       setIndicator({ top: first?.offsetTop ?? 0, height: first && last ? last.offsetTop + last.offsetHeight - first.offsetTop : 0 });
@@ -35,7 +71,7 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
     measure();
     const observer = new ResizeObserver(measure); observer.observe(element);
     return () => observer.disconnect();
-  }, [open, items, visibleIds]);
+  }, [open, items, reading.visibleIds]);
   const titleId = useId();
   const zh = locale === "zh";
   const close = useCallback((instant = false, restore = true) => {
@@ -54,16 +90,6 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
-    if (!open || !dialog.current) return;
-    const element = dialog.current;
-    unlock.current = lockPageScroll();
-    element.showModal();
-    const active = element.querySelector<HTMLElement>('[aria-current="location"]');
-    const contents = element.querySelector("nav");
-    if (active && contents) contents.scrollTop = Math.max(0, active.offsetTop - contents.clientHeight * .3);
-    return () => { closing.current?.cancel(); element.close(); unlock.current?.(); unlock.current = null; };
-  }, [open]);
-  useEffect(() => {
     const onSearch = () => { if (isSearchOpen()) close(true, false); };
     window.addEventListener(SEARCH_CHANGE_EVENT, onSearch);
     return () => window.removeEventListener(SEARCH_CHANGE_EVENT, onSearch);
@@ -72,13 +98,13 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
   if (!mounted || !items.length) return null;
   return createPortal(<>
     <button ref={trigger} type="button" className={styles.edge} aria-label={zh ? "展开目录，可向左滑动" : "Open contents, or swipe left"} aria-expanded={open} aria-controls={titleId + "-dialog"}
-      onClick={event => { setKeyboardOpen(event.detail === 0); setOpen(true); }} onPointerDown={event => {
+      onClick={event => { openContents(event.detail === 0); }} onPointerDown={event => {
         if (event.pointerType === "mouse") return;
         gesture.current = { x: event.clientX, y: event.clientY, horizontal: false, dx: 0 };
         event.currentTarget.setPointerCapture(event.pointerId);
       }} onPointerUp={event => {
         const start = gesture.current; gesture.current = null;
-        if (start && start.x - event.clientX > 24 && Math.abs(start.y - event.clientY) < Math.abs(start.x - event.clientX)) { setKeyboardOpen(false); setOpen(true); }
+        if (start && start.x - event.clientX > 24 && Math.abs(start.y - event.clientY) < Math.abs(start.x - event.clientX)) { openContents(false); }
       }} onPointerCancel={() => { gesture.current = null; }}><span aria-hidden="true" /></button>
     <dialog ref={dialog} id={titleId + "-dialog"} className={styles.dialog} aria-labelledby={titleId}
       onCancel={event => { event.preventDefault(); close(true); }}
@@ -105,7 +131,7 @@ export function MobileArticleToc({ items, activeId, visibleIds, locale }: {
         event.currentTarget.style.transform = "";
       }} onPointerCancel={event => { gesture.current = null; event.currentTarget.style.transform = ""; }}>
         <header><h2 id={titleId}>{zh ? "目录" : "Contents"}</h2><button type="button" aria-label={zh ? "收起目录" : "Close contents"} onClick={event => close(event.detail === 0)}><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m7 4 6 6-6 6" /></svg></button></header>
-        <nav aria-label={zh ? "文章目录" : "Article contents"}><div className={styles.track}><span className={styles.indicator} aria-hidden="true" style={{ transform: `translateY(${indicator.top}px)`, height: indicator.height, opacity: indicator.height ? 1 : 0 }} /><ol ref={list}>{items.map(item => <li key={item.id} data-level={Math.min(item.level, 4)}><a href={`#${item.id}`} aria-current={activeId === item.id ? "location" : undefined} data-visible={visibleIds.includes(item.id)} onClick={event => {
+        <nav aria-label={zh ? "文章目录" : "Article contents"}><div className={styles.track}><span className={styles.indicator} aria-hidden="true" style={{ transform: `translateY(${indicator.top}px)`, height: indicator.height, opacity: indicator.height ? 1 : 0 }} /><ol ref={list}>{items.map(item => <li key={item.id} data-level={Math.min(item.level, 4)}><a href={`#${item.id}`} aria-current={reading.activeId === item.id ? "location" : undefined} data-visible={reading.visibleIds.includes(item.id)} onClick={event => {
           if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
           close(true, false);
           requestAnimationFrame(() => {
