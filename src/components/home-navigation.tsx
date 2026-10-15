@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { HomeContent } from "@/components/landing-content";
 import { SiteHeader } from "@/components/site-chrome";
 import type { ContentLocale } from "../../lib/locale";
@@ -14,8 +14,24 @@ import type { NavigationPreviewSection } from "./home-navigation-data";
 const clamp = (n: number) => Math.max(0, Math.min(1, n));
 const ease = (n: number) => n * n * (3 - 2 * n);
 
+const mobileQuery = "(max-width: 800px)";
+const subscribeMobile = (notify: () => void) => {
+  const media = window.matchMedia(mobileQuery);
+  media.addEventListener("change", notify);
+  return () => media.removeEventListener("change", notify);
+};
+const getMobile = () => window.matchMedia(mobileQuery).matches;
+const getServerMobile = () => false;
+type HomeNavigationProps = { locale: ContentLocale; sections: NavigationPreviewSection[]; children?: ReactNode; current?: string };
+
+export function HomeNavigation(props: HomeNavigationProps) {
+  const mobile = useSyncExternalStore(subscribeMobile, getMobile, getServerMobile);
+  if (mobile && props.children !== undefined) return <>{props.children}</>;
+  return <AnimatedHomeNavigation {...props} />;
+}
+
 /** The same navigation anchors move from the top bar into the section directory. */
-export function HomeNavigation({ locale, sections, children, current }: { locale: ContentLocale; sections: NavigationPreviewSection[]; children?: ReactNode; current?: string }) {
+function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNavigationProps) {
   const hasContent = children !== undefined;
   const root = useRef<HTMLDivElement>(null);
   const header = useRef<HTMLDivElement>(null);
@@ -24,6 +40,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
   const directory = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (hasContent && getMobile()) return;
     const host = root.current!;
     const bar = header.current!;
     const panel = surface.current!;
@@ -41,6 +58,17 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     let keyboardScroll = false;
     let scrollDistance = 1;
     let navStart = 0;
+    let contentHeight = 0;
+    const readingGate = current === "about";
+    let directoryUnlocked = !readingGate;
+    let lastWheelTime = 0;
+    const updateRunway = () => {
+      host.style.height = `${contentHeight + innerHeight * .5}px`;
+    };
+    const unlockDirectory = () => {
+      if (!readingGate || directoryUnlocked || window.scrollY < navStart - 2) return;
+      directoryUnlocked = true;
+    };
     let snapTimer = 0;
     let snapTarget: number | null = null;
     let pointerHeld = false;
@@ -57,7 +85,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     let card = { x: 0, y: 0, width: 0, height: 0, headerHeight: 64 };
 
     const targets = () => {
-      const raw = clamp((window.scrollY - navStart) / scrollDistance);
+      const raw = directoryUnlocked ? clamp((window.scrollY - navStart) / scrollDistance) : 0;
       const p = reduced.matches ? (raw > .35 ? 1 : 0) : raw;
       return {
         p,
@@ -182,6 +210,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
           scrollVelocity = 0;
           previousScroll = window.scrollY;
           host.dataset.snapping = "false";
+          if (readingGate && target === 0) directoryUnlocked = false;
           return;
         }
         snapFrame = requestAnimationFrame(glide);
@@ -190,7 +219,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     };
     const queueSnap = () => {
       window.clearTimeout(snapTimer);
-      if (searchPaused || pointerHeld || snapTarget !== null || document.hidden) return;
+      if (searchPaused || !directoryUnlocked || pointerHeld || snapTarget !== null || document.hidden) return;
       const p = clamp((window.scrollY - navStart) / scrollDistance);
       if (window.scrollY < navStart + 1 || Math.abs(window.scrollY - navStart - scrollDistance) < 1) return;
       snapTimer = window.setTimeout(() => {
@@ -212,6 +241,12 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     };
     const scroll = () => {
       if (searchPaused) return;
+      if (readingGate && !directoryUnlocked && window.scrollY > navStart) {
+        window.scrollTo({ top: navStart, behavior: "instant" });
+        settle();
+        return;
+      }
+      if (readingGate && directoryUnlocked && window.scrollY < navStart - 1) directoryUnlocked = false;
       schedule();
       if (snapTarget !== null) return;
       const now = performance.now();
@@ -227,15 +262,20 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       if (searchPaused) { needsMeasure = true; return; }
       needsMeasure = false;
       cancelSnap();
-      if (hasContent) {
+      if (hasContent || getMobile()) {
         // Read long pages normally before using the same scroll-driven reveal as home.
         const hostTop = host.getBoundingClientRect().top + window.scrollY;
-        const contentHeight = Math.max(heroContent.offsetHeight, innerHeight - hostTop);
+        contentHeight = Math.max(heroContent.offsetHeight, innerHeight - hostTop);
         navStart = Math.max(0, hostTop + contentHeight - innerHeight);
-        host.style.height = `${contentHeight + innerHeight * .5}px`;
+        updateRunway();
         host.style.setProperty("--page-pin-top", `${Math.min(hostTop, innerHeight - contentHeight)}px`);
+      } else {
+        navStart = 0;
+        host.style.removeProperty("height");
+        host.style.removeProperty("--page-pin-top");
       }
-      scrollDistance = Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight - navStart);
+      scrollDistance = readingGate ? innerHeight * .5 : Math.max(1, host.getBoundingClientRect().bottom + window.scrollY - innerHeight - navStart);
+      if (readingGate && !directoryUnlocked && window.scrollY > navStart) window.scrollTo({ top: navStart, behavior: "instant" });
       host.dataset.crisp = "false";
       // Clear transforms before measuring their original navbar positions.
       [brand, controls, ...links].forEach(el => el.style.removeProperty("transform"));
@@ -305,6 +345,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       if (searchPaused) return;
       if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "].includes(event.key)
         && !(event.target as HTMLElement).closest("input,textarea,select,[contenteditable=true]")) {
+        if (!event.repeat && !event.shiftKey && ["ArrowDown", "PageDown", "End", " "].includes(event.key)) unlockDirectory();
         cancelSnap();
         keyboardScroll = true;
         settle();
@@ -312,7 +353,19 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     };
     const pointer = (event: Event) => {
       if (searchPaused) return;
-      if (event instanceof WheelEvent && event.ctrlKey) return;
+      if (event instanceof WheelEvent) {
+        if (event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+        const now = performance.now();
+        if (event.defaultPrevented) return;
+        if (event.deltaY > 0 && now - lastWheelTime > 260) unlockDirectory();
+        const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+        if (readingGate && !directoryUnlocked && event.deltaY > 0 && window.scrollY + event.deltaY * unit > navStart) {
+          event.preventDefault();
+          window.scrollTo({ top: navStart, behavior: "instant" });
+        }
+        lastWheelTime = now;
+      }
+      if (event.type === "touchstart") unlockDirectory();
       cancelSnap();
       keyboardScroll = false;
       if (event.type === "pointerdown" || event.type === "touchstart") pointerHeld = true;
@@ -358,13 +411,13 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
     measure();
     const controlsObserver = new ResizeObserver(measure);
     controlsObserver.observe(controls);
-    if (hasContent) controlsObserver.observe(heroContent);
+    controlsObserver.observe(heroContent);
     window.addEventListener(SEARCH_CHANGE_EVENT, searchChange);
     window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("resize", measure);
     window.addEventListener("click", dismissFromBlank);
     window.addEventListener("keydown", key);
-    window.addEventListener("wheel", pointer, { passive: true });
+    window.addEventListener("wheel", pointer, { passive: !readingGate });
     window.addEventListener("pointerdown", pointer, { passive: true });
     window.addEventListener("touchstart", pointer, { passive: true });
     window.addEventListener("pointerup", release);
@@ -399,7 +452,7 @@ export function HomeNavigation({ locale, sections, children, current }: { locale
       document.removeEventListener("visibilitychange", visibility);
       reduced.removeEventListener("change", motionPreference);
     };
-  }, [hasContent]);
+  }, [hasContent, current]);
 
   return <div className={styles.dropRoot} data-page={hasContent} ref={root}>
     <div className={styles.heroPin}><div ref={hero}>{children ?? <HomeContent locale={locale}/>}</div></div>

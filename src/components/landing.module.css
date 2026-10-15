@@ -106,3 +106,10 @@
 .motionButton { justify-self: end; display: grid; place-items: center; width: 40px; height: 40px; border: 0; padding: 8px; color: var(--color-text-muted); background: transparent; border-radius: 8px; cursor: pointer; }
 .motionButton svg { width: 20px; height: 20px; }
 .motionButton:disabled { opacity: .4; cursor: default; }
+
+@media (max-width: 800px) {
+  .home { min-height: calc(100svh - var(--site-header-height) + 96px); gap: 2rem; padding-block: 2.5rem max(7.5rem, env(safe-area-inset-bottom)); }
+  .terminal { width: calc(100% - 24px); max-width: 360px; justify-self: center; }
+  .terminalBody { font-size: .72rem; line-height: 1.7; padding: 1rem; }
+  .profileResult { line-height: 1.7; margin-top: 1rem; }
+}

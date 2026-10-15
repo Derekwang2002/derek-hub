@@ -1,4 +1,4 @@
-.dropRoot { position: relative; height: calc(150svh - var(--site-header-height)); }
+.dropRoot { overflow-anchor: none; position: relative; height: calc(150svh - var(--site-header-height)); }
 /* Hide only the normal shell header; its space preserves the original Hero. */
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-header) { visibility: hidden; pointer-events: none; }
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-footer) { display: none; }
@@ -77,3 +77,14 @@
 .entryLabel { position: absolute; inset-block: 0; display: flex; align-items: center; color: var(--color-text); white-space: nowrap; visibility: hidden; }
 .dropRoot[data-crisp="true"] .entryLabel { visibility: visible; }
 .dropRoot[data-crisp="true"] .droppedHeader :global(.site-nav-links a) { color: transparent; transition: none; }
+
+@media (max-width: 800px) {
+  /* Static content pages remain readable even before hydration. */
+  .dropRoot[data-page="true"] { height: auto !important; }
+  .dropRoot[data-page="true"] .heroPin { position: static; min-height: 0; }
+  .dropRoot[data-page="true"] .droppedHeader,
+  .dropRoot[data-page="true"] .panel,
+  .dropRoot[data-page="true"] .directory { display: none; }
+  :global(body):has(.dropRoot[data-page="true"]) > :global(.site-shell) > :global(.site-header) { visibility: visible; pointer-events: auto; }
+  .dropRoot[data-page="false"] .heroPin { height: auto; min-height: calc(100svh - var(--site-header-height)); top: var(--page-pin-top, var(--site-header-height)); }
+}
