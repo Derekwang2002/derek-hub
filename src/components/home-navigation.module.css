@@ -54,10 +54,21 @@
 .article strong { font:20px/1.5 Georgia,"Songti SC",serif; margin:4px 0; }
 .projectImage { position:absolute; inset:-105px -20px -260px 30px; transform:rotate(-8deg); border-radius:12px; overflow:hidden; }
 .projectImage img { object-fit:cover; object-position:top left; filter:grayscale(1) brightness(1.6); }
-.resourcePrint { padding:16px 25px 0 50px; }
-.resourcePrint strong { margin:0 0 10px; font:22px/1.3 Georgia,"Songti SC",serif; }
+.resourcePrint { padding:12px 25px 0 50px; }
+.resourcePrint strong { margin:0 0 6px; font:18px/1.35 Georgia,"Songti SC",serif; }
 .resourcePrint strong:nth-of-type(even) { color:var(--color-text-muted); }
-.portrait { object-fit:cover; object-position:center 40%; filter:grayscale(1); opacity:.8; }
+.schoolIdentity { height:100%; display:flex; align-items:center; justify-content:flex-end; gap:18px; padding:8px 32px; }
+.schoolIdentity img { height:100%; width:auto; max-width:80px; object-fit:contain; flex-shrink:0; filter:grayscale(1); }
+.schoolIdentity strong { font:30px/1 Georgia,serif; letter-spacing:.02em; }
+.schoolIdentity span { display:block; margin-top:5px; font-size:11px; white-space:nowrap; }
+:global(html[data-theme="dark"]) .schoolIdentity img { filter:grayscale(1) invert(1); }
+@media(max-width:640px) {
+  .resourcePrint { padding:12px 12px 0 34px; }
+  .resourcePrint strong { font-size:14px; }
+  .schoolIdentity { gap:10px; padding:10px 16px; }
+  .schoolIdentity strong { font-size:25px; }
+  .schoolIdentity span { display:none; }
+}
 
 .dropRoot[data-expanded="true"][data-active="0"] .entry:nth-child(1) .art,
 .dropRoot[data-expanded="true"][data-active="1"] .entry:nth-child(2) .art,

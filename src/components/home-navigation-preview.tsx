@@ -13,6 +13,9 @@ export function HomeNavigationPreview({ section, locale }: { section: Navigation
     {section.id === "blog" && <div className={styles.article}><strong>{section.entries[0]?.title}</strong></div>}
     {section.id === "projects" && <div className={styles.projectImage}><Image src="/projects/ai-intelligence/design/matrix-dark.png" alt="" fill sizes="800px"/></div>}
     {section.id === "resources" && <div className={styles.resourcePrint}>{section.entries.map((entry, i) => <strong key={i}>{entry.title}</strong>)}</div>}
-    {section.id === "about" && <Image src="/avatar.png" alt="" fill sizes="600px" className={styles.portrait}/>}
+    {section.id === "about" && <div className={styles.schoolIdentity}>
+      <Image src="/schools/usc-seal.svg" alt="" width={80} height={80}/>
+      <div><strong>USC</strong><span>{locale === "zh" ? "南加利福尼亚大学" : "University of Southern California"}</span></div>
+    </div>}
   </div>;
 }

@@ -7,7 +7,7 @@ export type NavigationPreviewSection = { id: string; entries: { title: string }[
 /** Only preview titles cross into the homepage client component. */
 export async function getHomeNavigationSections(locale: ContentLocale): Promise<NavigationPreviewSection[]> {
   const [posts, resources] = await Promise.all([
-    getAllLocalizedPosts(locale), getLocalizedResourcesBySection("all", locale),
+    getAllLocalizedPosts(locale), getLocalizedResourcesBySection("skills", locale),
   ]);
   return [
     { id: "notes", entries: [] },
