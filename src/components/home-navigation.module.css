@@ -58,19 +58,21 @@
 .resourcePrint { height:100%; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:12px 25px 12px 50px; }
 .resourcePrint strong { margin:0; font:18px/1.35 Georgia,"Songti SC",serif; }
 .resourcePrint strong:nth-of-type(even) { opacity:.78; }
-.schoolIdentity { height:100%; display:flex; align-items:center; justify-content:flex-end; gap:24px; padding:10px 32px; }
-.schoolMark { display:flex; align-items:center; gap:12px; height:100%; min-width:0; }
-.schoolMark img { height:100%; width:auto; max-width:64px; object-fit:contain; flex-shrink:0; filter:grayscale(1); mix-blend-mode:multiply; }
-.schoolMark strong { font:20px/1.35 Georgia,serif; letter-spacing:.02em; }
+/* Oversized seal fragments share the other previews' cropped, tonal treatment. */
+.schoolIdentity { position:absolute; inset:0; opacity:.5; }
+.schoolMark { position:absolute; top:50%; width:clamp(110px,16vw,190px); aspect-ratio:1; transform:translateY(-50%) rotate(-12deg); }
+.schoolMark:first-child { left:12%; }
+.schoolMark:last-child { right:-2%; transform:translateY(-42%) rotate(9deg); }
+.schoolMark img { display:block; width:100%; height:100%; object-fit:contain; filter:grayscale(1); mix-blend-mode:multiply; }
 :global(html[data-theme="dark"]) .schoolMark img,
 :global(html[data-theme="dark"]) .paper .figure { filter:grayscale(1) invert(1); mix-blend-mode:screen; }
 @media(max-width:640px) {
   .article,.resourcePrint { padding:10px 12px 10px 34px; }
   .article strong,.resourcePrint strong { font-size:14px; }
   .resourcePrint { gap:4px; }
-  .schoolIdentity { gap:18px; padding:12px 16px; }
-  .schoolMark img { max-width:56px; }
-  .schoolMark strong { display:none; }
+  .schoolMark { width:110px; }
+  .schoolMark:first-child { left:6%; }
+  .schoolMark:last-child { right:-12%; }
 }
 
 .dropRoot[data-expanded="true"][data-active="0"] .entry:nth-child(1) .art,
