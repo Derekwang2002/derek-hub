@@ -13,7 +13,7 @@
 .droppedHeader :global(a:focus-visible),.droppedHeader :global(button:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 5px; }
 .dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a) { color: var(--color-text); }
 .dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a)::before { content: ""; position: absolute; top: var(--entry-hit-y); left: var(--entry-hit-x); width: var(--entry-hit-width); height: var(--entry-hit-height); }
-.panel { position: fixed; top: 0; left: 0; z-index: 6; transform-origin: top left; pointer-events: none; background: var(--color-bg); opacity: 0; }
+.panel { position: fixed; top: 0; left: 0; z-index: 6; transform-origin: top left; pointer-events: none; background: var(--color-bg); opacity: 0; transition: background-color 180ms ease; }
 .directory { position: fixed; z-index: 6; pointer-events: none; }
 .entry { position: absolute; background: var(--color-surface); border-radius: 14px; opacity: 0; transition: background-color 220ms ease; }
 .dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a:focus-visible) { outline: none; }
@@ -39,7 +39,7 @@
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-brand),
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-controls),
 .dropRoot[data-moving="true"] .droppedHeader :global(.site-nav-links a) { will-change: transform; }
-@media(prefers-reduced-motion:reduce) { .dropRoot *, .dropRoot *::before { transition: none!important; animation: none!important; } }
+@media(prefers-reduced-motion:reduce) { :global(body):has(.dropRoot) { transition: none; } .dropRoot *, .dropRoot *::before { transition: none!important; animation: none!important; } }
 
 .entry { overflow: hidden; background: color-mix(in srgb, var(--color-text) 4%, var(--color-bg)); }
 .entry::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg,transparent,color-mix(in srgb,var(--color-text) 3%,transparent)); pointer-events:none; }

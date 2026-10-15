@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
+import { retainExpandedNavigation } from "./navigation-locale-state";
+
 import { useSegmentedDrag } from "./use-segmented-drag";
 
 const STORAGE_KEY = "content-locale";
@@ -24,7 +26,7 @@ export function LanguageToggle() {
 
   const drag = useSegmentedDrag<HTMLAnchorElement>(chinese ? 0 : 1, next => {
     try { localStorage.setItem(STORAGE_KEY, next === 0 ? "zh" : "en"); } catch {}
-    router.push(href);
+    router.push(href, { scroll: !retainExpandedNavigation(href) });
   });
 
   useEffect(() => {
@@ -39,11 +41,16 @@ export function LanguageToggle() {
       className="language-toggle"
       data-locale={chinese ? "zh" : "en"}
       href={href}
-      onClick={() => {
+      onClick={event => {
         try {
           localStorage.setItem(STORAGE_KEY, chinese ? "en" : "zh");
         } catch {
           // The URL remains the source of truth when storage is unavailable.
+        }
+        if (!event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+          && retainExpandedNavigation(href)) {
+          event.preventDefault();
+          router.push(href, { scroll: false });
         }
       }}
     >

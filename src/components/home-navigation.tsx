@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { consumeExpandedNavigation } from "./navigation-locale-state";
 import { HomeContent } from "@/components/landing-content";
 import { SiteHeader } from "@/components/site-chrome";
 import type { ContentLocale } from "../../lib/locale";
@@ -32,15 +34,20 @@ export function HomeNavigation(props: HomeNavigationProps) {
 
 /** The same navigation anchors move from the top bar into the section directory. */
 function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNavigationProps) {
+  const pathname = usePathname();
   const hasContent = children !== undefined;
   const root = useRef<HTMLDivElement>(null);
   const header = useRef<HTMLDivElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLDivElement>(null);
   const directory = useRef<HTMLDivElement>(null);
+  const restoredLocalePath = useRef<string | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (hasContent && getMobile()) return;
+    // Keep the consumed handoff through Strict Mode's setup/cleanup replay.
+    const restoreExpanded = consumeExpandedNavigation(pathname) || restoredLocalePath.current === pathname;
+    restoredLocalePath.current = restoreExpanded ? pathname : null;
     const host = root.current!;
     const bar = header.current!;
     const panel = surface.current!;
@@ -60,7 +67,7 @@ function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNav
     let navStart = 0;
     let contentHeight = 0;
     const readingGate = current === "about";
-    let directoryUnlocked = !readingGate;
+    let directoryUnlocked = restoreExpanded || !readingGate;
     let lastWheelTime = 0;
     const updateRunway = () => {
       host.style.height = `${contentHeight + innerHeight * .5}px`;
@@ -409,6 +416,12 @@ function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNav
       return activate;
     });
     measure();
+    if (restoreExpanded) {
+      cancelSnap();
+      window.scrollTo({ top: navStart + scrollDistance, behavior: "instant" });
+      previousScroll = window.scrollY;
+      settle();
+    }
     const controlsObserver = new ResizeObserver(measure);
     controlsObserver.observe(controls);
     controlsObserver.observe(heroContent);
@@ -452,9 +465,9 @@ function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNav
       document.removeEventListener("visibilitychange", visibility);
       reduced.removeEventListener("change", motionPreference);
     };
-  }, [hasContent, current]);
+  }, [hasContent, current, locale, pathname]);
 
-  return <div className={styles.dropRoot} data-page={hasContent} ref={root}>
+  return <div className={styles.dropRoot} data-navigation-root="" data-page={hasContent} ref={root}>
     <div className={styles.heroPin}><div ref={hero}>{children ?? <HomeContent locale={locale}/>}</div></div>
     <div className={styles.panel} ref={surface} aria-hidden="true"/>
     <div className={styles.droppedHeader} ref={header}><SiteHeader/></div>
