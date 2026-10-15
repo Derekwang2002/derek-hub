@@ -43,38 +43,41 @@
 
 .entry { overflow: hidden; background: color-mix(in srgb, var(--color-text) 4%, var(--color-bg)); }
 .entry::after { content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(110deg,transparent,color-mix(in srgb,var(--color-text) 3%,transparent)); pointer-events:none; }
-.art { position:absolute; inset:0 0 0 42%; opacity:.22; mask-image:linear-gradient(90deg,transparent,#000 24%); transition:opacity 180ms ease-out; }
+.art { position:absolute; inset:0 0 0 42%; opacity:.3; mask-image:linear-gradient(90deg,transparent,#000 24%); transition:opacity 180ms ease-out; }
 .previewContent { position:relative; height:100%; overflow:hidden; color:var(--color-text); }
 .previewContent strong { display:block; font-weight:500; letter-spacing:-.035em; }
-.paper { position:absolute; inset:-65px -35px -130px 30px; padding:26px; background:#d7d7d1; color:#272825; transform:rotate(-7deg); border-radius:3px; }
+.paper { position:absolute; inset:-65px -35px -130px 30px; padding:26px; background:transparent; color:inherit; transform:rotate(-7deg); border-radius:3px; }
 .paper span { display:block; font:10px/1.5 ui-monospace,monospace; letter-spacing:.12em; }
 .paper strong { font:24px/1.3 Georgia,"Songti SC",serif; margin-top:4px; max-width:230px; }
 .paper .figure { object-fit:contain; object-position:bottom; padding:70px 24px 22px; filter:grayscale(1); mix-blend-mode:multiply; }
-.article { padding:8px 25px 8px 50px; }
-.article strong { font:20px/1.5 Georgia,"Songti SC",serif; margin:4px 0; }
+.article { height:100%; display:flex; align-items:center; padding:12px 25px 12px 50px; }
+.article strong { font:18px/1.35 Georgia,"Songti SC",serif; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .projectImage { position:absolute; inset:-105px -20px -260px 30px; transform:rotate(-8deg); border-radius:12px; overflow:hidden; }
 .projectImage img { object-fit:cover; object-position:top left; filter:grayscale(1) brightness(1.6); }
-.resourcePrint { padding:12px 25px 0 50px; }
-.resourcePrint strong { margin:0 0 6px; font:18px/1.35 Georgia,"Songti SC",serif; }
-.resourcePrint strong:nth-of-type(even) { color:var(--color-text-muted); }
-.schoolIdentity { height:100%; display:flex; align-items:center; justify-content:flex-end; gap:18px; padding:8px 32px; }
-.schoolIdentity img { height:100%; width:auto; max-width:80px; object-fit:contain; flex-shrink:0; filter:grayscale(1); }
-.schoolIdentity strong { font:30px/1 Georgia,serif; letter-spacing:.02em; }
-.schoolIdentity span { display:block; margin-top:5px; font-size:11px; white-space:nowrap; }
-:global(html[data-theme="dark"]) .schoolIdentity img { filter:grayscale(1) invert(1); }
+:global(html[data-theme="light"]) .projectImage img { filter:grayscale(1) invert(1); }
+.resourcePrint { height:100%; display:flex; flex-direction:column; justify-content:center; gap:6px; padding:12px 25px 12px 50px; }
+.resourcePrint strong { margin:0; font:18px/1.35 Georgia,"Songti SC",serif; }
+.resourcePrint strong:nth-of-type(even) { opacity:.78; }
+.schoolIdentity { height:100%; display:flex; align-items:center; justify-content:flex-end; gap:24px; padding:10px 32px; }
+.schoolMark { display:flex; align-items:center; gap:12px; height:100%; min-width:0; }
+.schoolMark img { height:100%; width:auto; max-width:64px; object-fit:contain; flex-shrink:0; filter:grayscale(1); mix-blend-mode:multiply; }
+.schoolMark strong { font:20px/1.35 Georgia,serif; letter-spacing:.02em; }
+:global(html[data-theme="dark"]) .schoolMark img,
+:global(html[data-theme="dark"]) .paper .figure { filter:grayscale(1) invert(1); mix-blend-mode:screen; }
 @media(max-width:640px) {
-  .resourcePrint { padding:12px 12px 0 34px; }
-  .resourcePrint strong { font-size:14px; }
-  .schoolIdentity { gap:10px; padding:10px 16px; }
-  .schoolIdentity strong { font-size:25px; }
-  .schoolIdentity span { display:none; }
+  .article,.resourcePrint { padding:10px 12px 10px 34px; }
+  .article strong,.resourcePrint strong { font-size:14px; }
+  .resourcePrint { gap:4px; }
+  .schoolIdentity { gap:18px; padding:12px 16px; }
+  .schoolMark img { max-width:56px; }
+  .schoolMark strong { display:none; }
 }
 
 .dropRoot[data-expanded="true"][data-active="0"] .entry:nth-child(1) .art,
 .dropRoot[data-expanded="true"][data-active="1"] .entry:nth-child(2) .art,
 .dropRoot[data-expanded="true"][data-active="2"] .entry:nth-child(3) .art,
 .dropRoot[data-expanded="true"][data-active="3"] .entry:nth-child(4) .art,
-.dropRoot[data-expanded="true"][data-active="4"] .entry:nth-child(5) .art { opacity:1; }
+.dropRoot[data-expanded="true"][data-active="4"] .entry:nth-child(5) .art { opacity:.68; }
 @media(hover:none) { .art { opacity:.45; } }
 
 .dropRoot[data-page="true"] .heroPin { height: auto; min-height: calc(100svh - var(--site-header-height)); top: var(--page-pin-top, var(--site-header-height)); }
