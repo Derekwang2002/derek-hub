@@ -18,8 +18,8 @@ Each lecture has two companion documents: a detailed explanation report (section
 - Lecture 3: [Preview Report](/notes/csci678/lecture-3-preview) | [Full Translation](/notes/csci678/lecture-3-full-translation) — covering numbers, Dudley's entropy integral, and pseudo-dimension.
 - Lecture 4: [Detailed Explanation](/notes/csci678/lecture-4-explanation) | [Full Handout](/notes/csci678/lecture-4-full-translation) — fat-shattering dimension, neural-network covers, spectral complexity, and margin bounds, including the original experiment figures and step-by-step derivations.
 
-- Lecture 5: [Detailed Explanation](/projects/csci678/lecture-5-explanation) | [Full Handout](/projects/csci678/lecture-5-full-translation) — Derives tree symmetrization from minimax duality and martingale differences, explaining dependent data, binary relabeling, and contraction conditions.
-- Lecture 6: [Detailed Explanation](/projects/csci678/lecture-6-explanation) | [Full Handout](/projects/csci678/lecture-6-full-translation) — Develops sequential Sauer, threshold and monotone counterexamples, regression entropy integrals, and surrogate normalization.
-- Lecture 7: [Detailed Explanation](/projects/csci678/lecture-7-explanation) | [Full Handout](/projects/csci678/lecture-7-full-translation) — Derives the exponential-weights potential, mistake-indexed experts, and the Perceptron bound, with margin and dimension qualifications.
+- Lecture 5: [Detailed Explanation](/notes/csci678/lecture-5-explanation) | [Full Handout](/notes/csci678/lecture-5-full-translation) — Derives tree symmetrization from minimax duality and martingale differences, explaining dependent data, binary relabeling, and contraction conditions.
+- Lecture 6: [Detailed Explanation](/notes/csci678/lecture-6-explanation) | [Full Handout](/notes/csci678/lecture-6-full-translation) — Develops sequential Sauer, threshold and monotone counterexamples, regression entropy integrals, and surrogate normalization.
+- Lecture 7: [Detailed Explanation](/notes/csci678/lecture-7-explanation) | [Full Handout](/notes/csci678/lecture-7-full-translation) — Derives the exponential-weights potential, mistake-indexed experts, and the Perceptron bound, with margin and dimension qualifications.
 
 Notes for later lectures will be added over time. Note updates live under [Updates](/notes/csci678/updates).

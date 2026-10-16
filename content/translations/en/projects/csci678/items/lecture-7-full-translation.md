@@ -5,7 +5,7 @@ summary: "Complete reading edition preserving all sections, results, proofs, and
 
 **Fall 2026. Haipeng Luo.**
 
-> Reading edition of all eight pages, retaining all sections, Equations (1)–(4), Lemmas 1–2, Theorems 1–4, Algorithms 1–4, Assumption 1, and the original reference. Source: lecture7.pdf (local source, not published online). Companion: [detailed explanation](/projects/csci678/lecture-7-explanation). Editorial notes identify typos, endpoints, and conditions. The original has no figures or footnotes.
+> Reading edition of all eight pages, retaining all sections, Equations (1)–(4), Lemmas 1–2, Theorems 1–4, Algorithms 1–4, Assumption 1, and the original reference. Source: lecture7.pdf (local source, not published online). Companion: [detailed explanation](/notes/csci678/lecture-7-explanation). Editorial notes identify typos, endpoints, and conditions. The original has no figures or footnotes.
 
 ## 1 Online Algorithms for Finite Classes
 

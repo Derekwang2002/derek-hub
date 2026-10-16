@@ -3,7 +3,7 @@ title: "Lecture 6 Detailed Explanation"
 summary: "Finite-class concentration, zero-covers, Littlestone dimension, online regression, and sequential fat dimension, with step-by-step proofs, worked examples, assumptions, pitfalls, self-tests, and a reading route."
 ---
 
-> This lecture asks which classes can learn from adaptive data. We develop finite-class concentration, zero-covers, sequential Sauer, Littlestone upper and lower bounds, threshold and monotone counterexamples, regression covers, and surrogate losses. Source: lecture6.pdf (local source, not published online); companion: [full handout](/projects/csci678/lecture-6-full-translation); previous: [Lecture 5](/projects/csci678/lecture-5-explanation); next: [Lecture 7](/projects/csci678/lecture-7-explanation). The deep Dudley and sequential-fat covering proofs omitted by the handout remain explicitly external; their applications are worked through.
+> This lecture asks which classes can learn from adaptive data. We develop finite-class concentration, zero-covers, sequential Sauer, Littlestone upper and lower bounds, threshold and monotone counterexamples, regression covers, and surrogate losses. Source: lecture6.pdf (local source, not published online); companion: [full handout](/notes/csci678/lecture-6-full-translation); previous: [Lecture 5](/notes/csci678/lecture-5-explanation); next: [Lecture 7](/notes/csci678/lecture-7-explanation). The deep Dudley and sequential-fat covering proofs omitted by the handout remain explicitly external; their applications are worked through.
 
 ## 1 Roadmap and Conditions
 

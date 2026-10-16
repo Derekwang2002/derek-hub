@@ -3,7 +3,7 @@ title: "Lecture 7 Detailed Explanation"
 summary: "Halving, Hedge, partial-cover experts, margins, and Perceptron, with step-by-step proofs, worked examples, assumptions, pitfalls, self-tests, and a reading route."
 ---
 
-> This lecture turns learnability into algorithms: Halving converts mistakes into elimination, Hedge balances past performance through exponential weights, partial covers turn finite Littlestone dimension into an agnostic strategy, and Perceptron uses geometric margins for an efficient guarantee. Source: lecture7.pdf (local source, not published online); companion: [full handout](/projects/csci678/lecture-7-full-translation); previous: [Lecture 6](/projects/csci678/lecture-6-explanation). Expected regret, deterministic mistake bounds, realizability, and running time are kept distinct.
+> This lecture turns learnability into algorithms: Halving converts mistakes into elimination, Hedge balances past performance through exponential weights, partial covers turn finite Littlestone dimension into an agnostic strategy, and Perceptron uses geometric margins for an efficient guarantee. Source: lecture7.pdf (local source, not published online); companion: [full handout](/notes/csci678/lecture-7-full-translation); previous: [Lecture 6](/notes/csci678/lecture-6-explanation). Expected regret, deterministic mistake bounds, realizability, and running time are kept distinct.
 
 ## 1 What the Four Methods Solve
 

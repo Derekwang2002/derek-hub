@@ -5,7 +5,7 @@ summary: "Complete reading edition preserving all sections, results, proofs, and
 
 **Fall 2026. Haipeng Luo.**
 
-> Reading edition of all eight pages, retaining four sections, subsection 3.1, Lemma 1, Theorems 1–6, Corollary 1, Proposition 1, Equations (1)–(3), both regression examples, and the footnote. Source: lecture6.pdf (local source, not published online). Companion: [detailed explanation](/projects/csci678/lecture-6-explanation). Editorial notes are explicit. The original has no figures or bibliography.
+> Reading edition of all eight pages, retaining four sections, subsection 3.1, Lemma 1, Theorems 1–6, Corollary 1, Proposition 1, Equations (1)–(3), both regression examples, and the footnote. Source: lecture6.pdf (local source, not published online). Companion: [detailed explanation](/notes/csci678/lecture-6-explanation). Editorial notes are explicit. The original has no figures or bibliography.
 
 ## 1 Online Learning with a Finite Class
 

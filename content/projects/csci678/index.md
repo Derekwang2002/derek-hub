@@ -18,8 +18,8 @@ CSCI 678 是 USC 开设的理论机器学习课程（Fall 2026，Haipeng Luo）�
 - Lecture 3：[预习报告](/zh/notes/csci678/lecture-3-preview) ｜ [课件完整翻译](/zh/notes/csci678/lecture-3-full-translation)——覆盖数、Dudley 熵积分与伪维数。
 - Lecture 4：[详细讲解报告](/zh/notes/csci678/lecture-4-explanation) ｜ [课件完整翻译](/zh/notes/csci678/lecture-4-full-translation)——fat-shattering 维数、神经网络覆盖数、谱复杂度与 margin 泛化界，含原始实验图和逐步推导。
 
-- Lecture 5：[详细讲解报告](/zh/projects/csci678/lecture-5-explanation) ｜ [课件完整翻译](/zh/projects/csci678/lecture-5-full-translation)——从极小极大对偶与鞅差过程推导树上的对称化，解释依赖数据、二分类重标号与收缩条件。
-- Lecture 6：[详细讲解报告](/zh/projects/csci678/lecture-6-explanation) ｜ [课件完整翻译](/zh/projects/csci678/lecture-6-full-translation)——展开序列 Sauer 引理、阈值与单调函数反例、回归覆盖积分，并明确替代损失的归一化。
-- Lecture 7：[详细讲解报告](/zh/projects/csci678/lecture-7-explanation) ｜ [课件完整翻译](/zh/projects/csci678/lecture-7-full-translation)——完整推导指数权重势函数、按错误轮次构造专家和感知机错误界，补充 margin 与维度条件。
+- Lecture 5：[详细讲解报告](/zh/notes/csci678/lecture-5-explanation) ｜ [课件完整翻译](/zh/notes/csci678/lecture-5-full-translation)——从极小极大对偶与鞅差过程推导树上的对称化，解释依赖数据、二分类重标号与收缩条件。
+- Lecture 6：[详细讲解报告](/zh/notes/csci678/lecture-6-explanation) ｜ [课件完整翻译](/zh/notes/csci678/lecture-6-full-translation)——展开序列 Sauer 引理、阈值与单调函数反例、回归覆盖积分，并明确替代损失的归一化。
+- Lecture 7：[详细讲解报告](/zh/notes/csci678/lecture-7-explanation) ｜ [课件完整翻译](/zh/notes/csci678/lecture-7-full-translation)——完整推导指数权重势函数、按错误轮次构造专家和感知机错误界，补充 margin 与维度条件。
 
 后续讲次的笔记会持续加入。笔记更新集中在 [Updates](/zh/notes/csci678/updates)。

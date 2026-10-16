@@ -3,7 +3,7 @@ title: "Lecture 7 详细讲解报告"
 summary: "逐步讲解Halving、Hedge、部分覆盖专家、margin 与 Perceptron，补全关键证明、算例、条件与误区，并提供自测和阅读路线。"
 ---
 
-> 本讲从可学习性走向算法：Halving 将错误变成候选消除，Hedge 用指数权重平衡历史表现，部分覆盖将有限 Littlestone 维变成一般在线策略，Perceptron 则利用几何间隔获得高效保证。原课件：lecture7.pdf（本地原课件，未在线发布）；配套：[完整翻译](/zh/projects/csci678/lecture-7-full-translation)；前置：[Lecture 6](/zh/projects/csci678/lecture-6-explanation)。以下明确区分预期遗憾、确定性错误界、可实现条件与运行时间。
+> 本讲从可学习性走向算法：Halving 将错误变成候选消除，Hedge 用指数权重平衡历史表现，部分覆盖将有限 Littlestone 维变成一般在线策略，Perceptron 则利用几何间隔获得高效保证。原课件：lecture7.pdf（本地原课件，未在线发布）；配套：[完整翻译](/zh/notes/csci678/lecture-7-full-translation)；前置：[Lecture 6](/zh/notes/csci678/lecture-6-explanation)。以下明确区分预期遗憾、确定性错误界、可实现条件与运行时间。
 
 ## 1 四种算法各自解决什么问题
 

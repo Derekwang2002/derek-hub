@@ -3,7 +3,7 @@ title: "Lecture 5 详细讲解报告"
 summary: "逐步讲解序列博弈、对偶、鞅差、对称化与序列 Rademacher 复杂度，补全关键证明、算例、条件与误区，并提供自测和阅读路线。"
 ---
 
-> 本讲把“固定样本上的复杂度”换成“历史会影响未来的树上复杂度”。覆盖六页课件的全部内容，展开两条主要证明、树的量词和二分类重标号；极小极大与一般收缩作为外部定理使用，未伪装成已证明。原课件：lecture5.pdf（本地原课件，未在线发布）。配套：[完整翻译](/zh/projects/csci678/lecture-5-full-translation)。前置：[Lecture 4](/zh/projects/csci678/lecture-4-explanation)；后续：[Lecture 6](/zh/projects/csci678/lecture-6-explanation)。
+> 本讲把“固定样本上的复杂度”换成“历史会影响未来的树上复杂度”。覆盖六页课件的全部内容，展开两条主要证明、树的量词和二分类重标号；极小极大与一般收缩作为外部定理使用，未伪装成已证明。原课件：lecture5.pdf（本地原课件，未在线发布）。配套：[完整翻译](/zh/notes/csci678/lecture-5-full-translation)。前置：[Lecture 4](/zh/notes/csci678/lecture-4-explanation)；后续：[Lecture 6](/zh/notes/csci678/lecture-6-explanation)。
 
 ## 1 阅读地图与符号
 

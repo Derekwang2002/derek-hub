@@ -3,7 +3,7 @@ title: "Lecture 6 详细讲解报告"
 summary: "逐步讲解有限类集中、零覆盖、Littlestone 维数、在线回归和序列 fat 维数，补全关键证明、算例、条件与误区，并提供自测和阅读路线。"
 ---
 
-> 本讲回答“哪些类能在自适应数据上学习”。逐步展开有限类集中、零覆盖、序列 Sauer 引理、Littlestone 上下界、阈值与单调函数反例、回归覆盖和替代损失。原课件：lecture6.pdf（本地原课件，未在线发布）；配套：[完整翻译](/zh/projects/csci678/lecture-6-full-translation)；前置：[Lecture 5](/zh/projects/csci678/lecture-5-explanation)；后续：[Lecture 7](/zh/projects/csci678/lecture-7-explanation)。Dudley 与序列 fat 覆盖定理的深层证明在原文省略，本文说明应用过程与证明边界。
+> 本讲回答“哪些类能在自适应数据上学习”。逐步展开有限类集中、零覆盖、序列 Sauer 引理、Littlestone 上下界、阈值与单调函数反例、回归覆盖和替代损失。原课件：lecture6.pdf（本地原课件，未在线发布）；配套：[完整翻译](/zh/notes/csci678/lecture-6-full-translation)；前置：[Lecture 5](/zh/notes/csci678/lecture-5-explanation)；后续：[Lecture 7](/zh/notes/csci678/lecture-7-explanation)。Dudley 与序列 fat 覆盖定理的深层证明在原文省略，本文说明应用过程与证明边界。
 
 ## 1 全讲路线与条件
 

@@ -3,7 +3,7 @@ title: "Lecture 5 Detailed Explanation"
 summary: "Sequential games, duality, martingale differences, symmetrization, and sequential Rademacher complexity, with step-by-step proofs, worked examples, assumptions, pitfalls, self-tests, and a reading route."
 ---
 
-> This lecture replaces complexity on a fixed sample by complexity on a tree where history changes the future. This report covers all six source pages, expands the two main proofs, the tree quantifiers, and binary relabeling. Minimax and general contraction remain explicitly external theorems. Source: lecture5.pdf (local source, not published online). Companion: [full handout](/projects/csci678/lecture-5-full-translation). Previous: [Lecture 4](/projects/csci678/lecture-4-explanation); next: [Lecture 6](/projects/csci678/lecture-6-explanation).
+> This lecture replaces complexity on a fixed sample by complexity on a tree where history changes the future. This report covers all six source pages, expands the two main proofs, the tree quantifiers, and binary relabeling. Minimax and general contraction remain explicitly external theorems. Source: lecture5.pdf (local source, not published online). Companion: [full handout](/notes/csci678/lecture-5-full-translation). Previous: [Lecture 4](/notes/csci678/lecture-4-explanation); next: [Lecture 6](/notes/csci678/lecture-6-explanation).
 
 ## 1 Reading Map and Notation
 

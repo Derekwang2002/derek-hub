@@ -5,7 +5,7 @@ summary: "Complete reading edition preserving all sections, results, proofs, and
 
 **Fall 2026. Instructor: Haipeng Luo.**
 
-> English reading edition of the six-page handout, retaining all sections, Theorems 1–2, Lemmas 1–2, Equations (1)–(3), proofs, and both footnotes. Source: lecture5.pdf (local source, not published online). Companion: [detailed explanation](/projects/csci678/lecture-5-explanation). Editorial notes distinguish additions from the handout. The original contains no figures or bibliography.
+> English reading edition of the six-page handout, retaining all sections, Theorems 1–2, Lemmas 1–2, Equations (1)–(3), proofs, and both footnotes. Source: lecture5.pdf (local source, not published online). Companion: [detailed explanation](/notes/csci678/lecture-5-explanation). Editorial notes distinguish additions from the handout. The original contains no figures or bibliography.
 
 ## 1 From Statistical Learning to Online Learning
 
