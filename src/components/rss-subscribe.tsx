@@ -91,12 +91,7 @@ export function RssSubscribe({ locale }: { locale: ContentLocale }) {
 }
 
 export function BlogRssFooter({ locale }: { locale: ContentLocale }) {
-  const zh = locale === "zh";
-  const id = useId();
-  return <section className={styles.articleSubscribe} aria-labelledby={id}>
-    <span className={styles.eyebrow}>{zh ? "下一篇，在阅读器里见" : "UNTIL THE NEXT ONE"}</span>
-    <h2 id={id}>{zh ? "如果这篇对你有用，欢迎继续读。" : "If this helped, there’s more to come."}</h2>
-    <p>{zh ? "用 RSS 关注后续文章，按自己的节奏阅读。" : "Follow future articles with RSS, and read at your own pace."}</p>
+  return <div className={styles.articleSubscribe}>
     <RssSubscribe locale={locale} />
-  </section>;
+  </div>;
 }
