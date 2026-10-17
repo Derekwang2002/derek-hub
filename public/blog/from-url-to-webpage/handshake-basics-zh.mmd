@@ -1,0 +1,9 @@
+sequenceDiagram
+    accTitle: TCP 三次握手基础示意
+    accDescr: 客户端发送初始序号 100，服务器发送初始序号 500 并确认 101，客户端再确认 501，连接建立。
+    participant C as 客户端
+    participant S as 服务器
+    C->>S: SYN，SEQ=100
+    S->>C: SYN + ACK，SEQ=500，ACK=101
+    C->>S: ACK，SEQ=101，ACK=501
+    Note over C,S: 连接建立，可以双向传输数据

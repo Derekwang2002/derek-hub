@@ -1,0 +1,10 @@
+sequenceDiagram
+    accTitle: 商品页访问中的 TCP 三次握手
+    accDescr: 每条 TCP 消息都通过 IP、链路层与物理层传输。客户端初始序号为 1000，服务器为 8000。
+    participant C as 电脑的 TCP
+    participant S as 服务器的 TCP
+    Note over C,S: 每条消息都经过 IP、链路层和物理层传输
+    C->>S: SYN，SEQ=1000
+    S->>C: SYN + ACK，SEQ=8000，ACK=1001
+    C->>S: ACK，SEQ=1001，ACK=8001
+    Note over C,S: TCP 连接建立
