@@ -1,5 +1,5 @@
 // Explicit editorial ownership; filenames and tags do not determine a section.
-export const notePostSlugs: readonly string[] = ["mysql-notes", "leetcode-notes"];
+export const notePostSlugs: readonly string[] = ["computer-network-fundamentals", "mysql-notes", "leetcode-notes"];
 export const noteCollectionSlugs: readonly string[] = ["csci678"];
 
 export function postSection(slug: string): "blog" | "notes" {

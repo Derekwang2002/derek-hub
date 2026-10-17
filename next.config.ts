@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     // Exact document paths keep existing course image URLs working unchanged.
     const movedPaths = [
-      { from: "/blog/from-url-to-webpage", to: "/blog/computer-network-fundamentals" },
+      { from: "/blog/from-url-to-webpage", to: "/notes/computer-network-fundamentals" },
       ...notePostSlugs.map(slug => ({ from: `/blog/${slug}`, to: `/notes/${slug}` })),
       ...projectDefinitions.filter(project => project.status !== "draft" && collectionSection(project.slug) === "notes").flatMap(project =>
         ["", "/updates", ...project.items.filter(item => item.status === "published").map(item => `/${item.slug}`)]

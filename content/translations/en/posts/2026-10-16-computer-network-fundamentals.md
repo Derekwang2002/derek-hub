@@ -1,7 +1,7 @@
 ---
-title: "Computer networking fundamentals: from layers to DNS and HTTP"
+title: "Revisiting computer networking"
 date: 2026-10-16
-summary: "Follow the course's six sections through layering, physical transmission, framing and sliding windows, IP and routing, TCP/UDP, DNS, and HTTP. A supporting HTTPS example connects the layers, with the complete sequence diagram and every text illustration preserved."
+summary: "Review network layers, physical transmission, framing and sliding windows, IP and routing, TCP/UDP, DNS, and HTTP. Then follow an HTTPS request to see how the layers cooperate and how IP addresses, MAC addresses, and ports change."
 tags: [networking, web, computer-science]
 selected: false
 draft: false
@@ -9,18 +9,18 @@ draft: false
 
 Computer networking examines how application data travels as signals, crosses individual links and networks, and eventually reaches an application on another computer. Understanding that process starts with the responsibility of each layer, followed by its addresses, message formats, and control mechanisms.
 
-This article follows the six-part structure of the *19 - Computer Networks* course deck. The main sections explain the concepts and layers; a supporting HTTPS product-page example at the end places the protocols on one timeline. TLS and browser rendering extend that example to show how received network data becomes a page.
+The sections below start with basic concepts and work through each network layer. An HTTPS product-page example at the end places the protocols on one timeline, including TLS and browser rendering to show how received network data becomes a page.
 
-| Course section | Pages | Main questions |
-|---|---|---|
-| Basic concepts | 4–9 | Why use layers? How is data encapsulated? |
-| Physical layer | 11–14 | How do bits become signals? What limits capacity? |
-| Data link layer | 16–19 | How are frame boundaries, acknowledgments, and retransmissions handled? |
-| Network layer | 21–29 | How does IP addressing work? How do routers choose a next hop? |
-| Transport layer | 31–37 | How are connections distinguished, bytes ordered, and sending controlled? |
-| Application layer | 39–45 | How does DNS resolve names? How does HTTP express requests and responses? |
+| Topic | Main questions |
+|---|---|
+| Basic concepts | Why use layers? How is data encapsulated? |
+| Physical layer | How do bits become signals? What limits capacity? |
+| Data link layer | How are frame boundaries, acknowledgments, and retransmissions handled? |
+| Network layer | How does IP addressing work? How do routers choose a next hop? |
+| Transport layer | How are connections distinguished, bytes ordered, and sending controlled? |
+| Application layer | How does DNS resolve names? How does HTTP express requests and responses? |
 
-For a first reading, work through these six sections before the supporting example. Terms, formulas, and illustrations are explained where they appear. Historical material and potentially misleading details in the deck are identified along the way.
+For a first reading, work through these six sections before the supporting example. Terms, formulas, and illustrations are explained where they appear.
 
 ## 1. Basic concepts: layers and data flow
 
@@ -38,14 +38,14 @@ Layering separates those responsibilities:
 | Data link | Deliver frames across an individual link | Ethernet, Wi-Fi link functions |
 | Physical | Transmit signals representing bits through a medium | Electrical signals, light, radio waves |
 
-The deck also compares two other models:
+Other common layering models are:
 
 - The seven-layer OSI model adds presentation and session layers between application and transport.
 - The four-layer TCP/IP model uses application, transport, internet, and link layers.
 
 Presentation concerns include encoding and data representation; session concerns include establishing and managing sessions. TCP/IP does not give these functions separate layers, but that does not mean the functions disappear.
 
-The remaining course sections largely follow the five-layer teaching model above.
+The sections below follow the five-layer model above.
 
 Adding control information at each layer is called encapsulation; the receiver processes the layers in reverse. For unencrypted HTTP over TCP, the sender adds:
 
@@ -174,7 +174,7 @@ These methods divide the transmission resource by frequency, time, and optical w
 
 ### Framing: recognizing boundaries
 
-A receiver uses protocol conventions to recognize the beginning and end of each frame in an incoming bit stream. The deck introduces four methods:
+A receiver uses protocol conventions to recognize the beginning and end of each frame in an incoming bit stream. Four common framing methods are:
 
 | Method | Mechanism | Consideration |
 |---|---|---|
@@ -219,7 +219,7 @@ of data in flight. This is the bandwidth-delay product.
 
 ### Go-Back-N and selective repeat
 
-Pages 18 and 19 repeat the same comparison. Both titles say Go-Back-N, but the lower illustration, which buffers later frames and retransmits only the missing frame, shows the selective-repeat approach.
+The two approaches differ in how the receiver handles later frames and which frames the sender must retransmit.
 
 Suppose the sender transmits:
 
@@ -253,7 +253,7 @@ $$
 
 To reach $y$ from $x$, consider each neighbor $v$. Add the cost of reaching that neighbor to the neighbor's reported cost of reaching the destination, then choose the minimum.
 
-In the course example, router J has neighbors A, I, H, and K. Its candidate costs to C are:
+For example, router J has neighbors A, I, H, and K. Its candidate costs to C are:
 
 | Via neighbor | Cost from J to neighbor | Neighbor's reported cost to C | Total |
 |---|---:|---:|---:|
@@ -294,7 +294,7 @@ The two approaches differ as follows:
 
 ### Tunneling: adding an outer encapsulation
 
-The course example connects two IPv6 networks through an IPv4 network.
+For example, two IPv6 networks can connect through an IPv4 network.
 
 The packet changes as follows:
 
@@ -335,7 +335,7 @@ Among the fragmentation fields, DF means “do not fragment,” MF means “more
 
 ### IP addresses: from address classes to CIDR
 
-The deck includes historical address classes:
+IPv4 originally used these address classes:
 
 - Class A: default network prefix `/8`.
 - Class B: default network prefix `/16`.
@@ -372,7 +372,7 @@ $$
 \text{Network address}=\text{IP address}\ \&\ \text{Subnet mask}
 $$
 
-The course illustration focuses on route aggregation. These eight contiguous, aligned `/24` prefixes:
+Route aggregation can combine these eight contiguous, aligned `/24` prefixes:
 
 ```text
 192.168.8.0/24
@@ -381,7 +381,7 @@ The course illustration focuses on route aggregation. These eight contiguous, al
 192.168.15.0/24
 ```
 
-can be represented by:
+into a single prefix:
 
 ```text
 192.168.8.0/21
@@ -408,7 +408,7 @@ This aggregate covers `192.168.8.0` through `192.168.15.255`. Aggregating routes
 
 ### SNAT and DNAT
 
-The course's outbound translation example changes:
+When a private-network device accesses an external network, source address translation can change:
 
 ```text
 Source before translation: 10.0.0.1:5544
@@ -446,7 +446,7 @@ Discover → Offer → Request → ACK
 Find a server → offer settings → request selected settings → confirm assignment
 ```
 
-Addresses normally have a lease that must be renewed. The deck's description of obtaining an address after “logging in” is imprecise: DHCP does not require a user to log into a server first. [DHCP exchange](https://www.rfc-editor.org/rfc/rfc2131.html)
+Addresses normally have a lease that must be renewed. DHCP does not require a user to log into a server first. [DHCP exchange](https://www.rfc-editor.org/rfc/rfc2131.html)
 
 ### OSPF and BGP
 
@@ -514,7 +514,7 @@ Low protocol overhead does not mean that every application will be faster with U
 | 554 | RTSP |
 | 631 | IPP printing protocol |
 
-The deck lists RTSP as 543; that is a typo. The registered port is 554. [IANA port registry](https://www.iana.org/assignments/service-names-port-numbers?search=554)
+The standard RTSP port is 554. [IANA port registry](https://www.iana.org/assignments/service-names-port-numbers?search=554)
 
 These are conventional defaults. Services can be configured on different ports.
 
@@ -620,7 +620,7 @@ $$
 
 The amount of new data that can be sent also depends on how much is already outstanding. TCP's Window header field advertises the receive window; the congestion window is internal sender state.
 
-The deck presents classic congestion control:
+Classic TCP congestion control includes:
 
 | Phase | Approximate window behavior |
 |---|---|
@@ -644,7 +644,7 @@ Classic fast retransmit uses three duplicate ACKs as a loss signal, allowing ret
 
 ### DNS namespace
 
-Consider the domain from the deck:
+Consider this domain name:
 
 ```text
 robot.cs.washington.edu.
@@ -689,7 +689,7 @@ DNS resolves names; it does not interpret the application meaning of `/course?id
 
 CNAME points to another name; it is not another kind of IP address record.
 
-The deck also lists a separate SPF record type. That is historical: SPF policy is published in TXT records, and use of the separate SPF RR type has been discontinued. [SPF specification](https://www.rfc-editor.org/rfc/rfc7208.html#section-3.1)
+SPF policy is published in TXT records, and use of the separate SPF RR type has been discontinued. [SPF specification](https://www.rfc-editor.org/rfc/rfc7208.html#section-3.1)
 
 ### DNS queries and caching
 
@@ -712,7 +712,7 @@ Caching means later queries need not always begin at the root. A DNS record's TT
 
 ### How the layers cooperate when a link is clicked
 
-The deck uses an ordinary HTTP visit to illustrate protocol cooperation. Adding TLS for HTTPS gives the following overview; the product-page example at the end expands it:
+An HTTPS visit over TCP follows these steps; the product-page example at the end expands them:
 
 1. Parse the URL into scheme, hostname, port, and path.
 2. Check caches and resolve the hostname through DNS.
@@ -726,11 +726,11 @@ The deck uses an ordinary HTTP visit to illustrate protocol cooperation. Adding 
 
 These steps need not all repeat on every click: DNS answers, connections, and resources may be reusable. The actual order also has dependencies. For example, sending an external DNS query can already require ARP to resolve the gateway's MAC.
 
-The deck's TCP-first description applies to HTTP over TCP. HTTP/3 uses QUIC, which runs over UDP and provides reliable stream transport and other capabilities. [HTTP/3 specification](https://www.rfc-editor.org/rfc/rfc9114.html)
+HTTPS does not always use TCP. HTTP/3 uses QUIC, which runs over UDP and provides reliable stream transport and other capabilities. [HTTP/3 specification](https://www.rfc-editor.org/rfc/rfc9114.html)
 
 ### HTTP connection reuse
 
-The deck compares three ways to use connections:
+HTTP/1.x has three common ways to use connections:
 
 | Method | Sequence | Main effect |
 |---|---|---|
@@ -744,7 +744,7 @@ HTTP/2 introduces streams and frames so requests and responses can be interleave
 
 ### HTTP methods and status codes
 
-The deck's short method descriptions can be made more precise:
+HTTP methods express the operation a client wants to perform on a resource:
 
 | Method | Meaning |
 |---|---|
@@ -757,7 +757,7 @@ The deck's short method descriptions can be made more precise:
 | CONNECT | Establish a tunnel, commonly through a proxy |
 | TRACE | Request a diagnostic loopback |
 
-POST is not limited to appending to a web page, and PUT is not limited to storing one. HTTP also serves JSON APIs and many other resources. [HTTP method semantics](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3)
+These methods also apply to JSON APIs and many other resources. [HTTP method semantics](https://www.rfc-editor.org/rfc/rfc9110.html#section-9.3)
 
 Idempotence means that making the same request multiple times has the same intended effect as making it once, such as repeatedly PUTting the same resource representation. It does not require identical status codes on every attempt.
 
@@ -799,7 +799,7 @@ Read several fields as pairs:
 - Set-Cookie asks the client to store a cookie; Cookie carries stored cookies on later requests according to the applicable rules.
 - ETag identifies a version of a representation; If-None-Match supplies a previously obtained tag for a conditional request.
 
-The deck's Request/Response labels should not be treated as absolute restrictions. For example, a POST request can also carry Content-Type and Content-Length.
+Whether a header applies to requests, responses, or both depends on the field. For example, a POST request can also carry Content-Type and Content-Length.
 
 An HTTP/1.1 request can look like:
 
@@ -1059,7 +1059,7 @@ Browser                                      Server
 
 The browser checks the certificate's hostname, trust chain, validity period, and the server's signature proof. Both sides derive communication keys from the ephemeral key exchange. Subsequent data receives symmetric encryption and integrity protection; the certificate's public key is not used to directly encrypt the whole page.
 
-SNI identifies the requested server name. ALPN selects the application protocol, here `h2` for HTTP/2. These details extend the deck's HTTP example to HTTPS. [TLS 1.3 handshake](https://www.rfc-editor.org/rfc/rfc8446.html#section-2)
+SNI identifies the requested server name. ALPN selects the application protocol, here `h2` for HTTP/2. [TLS 1.3 handshake](https://www.rfc-editor.org/rfc/rfc8446.html#section-2)
 
 ### HTTP request, server processing, and response
 
