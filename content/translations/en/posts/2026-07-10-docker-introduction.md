@@ -1,5 +1,5 @@
 ---
-title: "Docker basics: build doesn't start your program, and deleting a Container doesn't always lose data"
+title: "Introduction to Docker"
 summary: "A fictional five-service shop walks from a Dockerfile to running processes: how Images differ from Containers, how Compose organizes services, when data is lost, and what containerd, runc, and the Linux kernel do behind docker run."
 ---
 

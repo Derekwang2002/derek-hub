@@ -1,5 +1,5 @@
 ---
-title: "It works, but it shouldn't exist: reviewing agent overengineering with ponytail-review"
+title: "Ponytail Review Skill: Streamlining Redundant Code"
 summary: "ponytail-review looks only for overengineering in the current diff and reports one-line deletion suggestions tagged delete, stdlib, native, yagni, or shrink. It belongs after a normal code review, not in place of one."
 ---
 

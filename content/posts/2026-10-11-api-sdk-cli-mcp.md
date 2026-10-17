@@ -1,5 +1,5 @@
 ---
-title: "API、SDK、CLI、MCP 有什么区别：用一次天气查询讲清四者分工"
+title: "分清 API SDK CLI MCP"
 date: 2026-10-11
 summary: "AI 工具的文档里总能碰到 API、SDK、CLI 和 MCP。借一个查天气的例子，看看它们各自负责什么，又怎样在同一次调用里配合。"
 tags: [ai, software-engineering, developer-tools]
