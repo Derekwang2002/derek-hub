@@ -3,6 +3,7 @@
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-header) { visibility: hidden; pointer-events: none; }
 :global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-footer) { display: none; }
 .heroPin { position: sticky; top: var(--site-header-height); height: calc(100svh - var(--site-header-height)); }
+.dropRoot[data-page="false"] .heroPin { z-index: 1; }
 .heroPin > div { transform-origin: center; }
 .droppedHeader { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
 .droppedHeader :global(.site-header) { background: transparent; }

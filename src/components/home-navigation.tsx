@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef, useSyncExternalStore, type ReactNode } from "r
 import { usePathname } from "next/navigation";
 import { consumeExpandedNavigation } from "./navigation-locale-state";
 import { HomeContent } from "@/components/landing-content";
+import { HomeRipple } from "./home-ripple";
 import { SiteHeader } from "@/components/site-chrome";
 import type { ContentLocale } from "../../lib/locale";
 import styles from "./home-navigation.module.css";
@@ -468,6 +469,7 @@ function AnimatedHomeNavigation({ locale, sections, children, current }: HomeNav
   }, [hasContent, current, locale, pathname]);
 
   return <div className={styles.dropRoot} data-navigation-root="" data-page={hasContent} ref={root}>
+    {!hasContent && <HomeRipple />}
     <div className={styles.heroPin}><div ref={hero}>{children ?? <HomeContent locale={locale}/>}</div></div>
     <div className={styles.panel} ref={surface} aria-hidden="true"/>
     <div className={styles.droppedHeader} ref={header}><SiteHeader/></div>
