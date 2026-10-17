@@ -1,5 +1,5 @@
 ---
-title: "CSCI 678: Theoretical Machine Learning"
+title: "Theoretical Machine Learning"
 summary: "USC CSCI 678（Theoretical Machine Learning，Fall 2026，Haipeng Luo）的课程学习笔记：完整讲义翻译、详细证明讲解与理论机器学习核心概念。"
 ---
 

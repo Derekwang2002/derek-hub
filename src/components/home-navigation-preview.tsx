@@ -7,7 +7,7 @@ import styles from "./home-navigation.module.css";
 export function HomeNavigationPreview({ section, locale }: { section: NavigationPreviewSection; locale: ContentLocale }) {
   return <div className={styles.previewContent}>
     {section.id === "notes" && <div className={styles.paper}>
-      <span>CSCI 678</span><strong>{locale === "zh" ? "学习的边界" : "The limits of learning"}</strong>
+      <span>Theoretical Machine Learning</span><strong>{locale === "zh" ? "学习的边界" : "The limits of learning"}</strong>
       <Image src="/projects/csci678/lecture-4/figure-2.png" alt="" fill sizes="640px" className={styles.figure}/>
     </div>}
     {section.id === "blog" && <div className={styles.article}><strong>{section.entries[0]?.title}</strong></div>}

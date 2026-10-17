@@ -59,8 +59,8 @@ export async function NotePage({ slug, locale }: { slug: string[]; locale: Conte
   const tocItems = getMarkdownHeadings(post.content);
   const content = await renderMarkdown(post.content, tocItems);
   return <main className={`page-enter ${styles.postPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
-    <ContentNavigation section="notes" locale={locale} />
     <PostBodyLayout
+      navigation={<ContentNavigation section="notes" locale={locale} />}
       header={<BlogPostHeader post={post} locale={locale} />}
       articleTitle={post.title} locale={locale} tocItems={tocItems}
     >{content}</PostBodyLayout>

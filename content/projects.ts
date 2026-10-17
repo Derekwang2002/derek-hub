@@ -162,7 +162,7 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "csci678",
-    name: { en: "CSCI 678", zh: "CSCI 678" },
+    name: { en: "Theoretical Machine Learning", zh: "Theoretical Machine Learning" },
     summary: { en: "Theoretical ML notes and translations.", zh: "理论机器学习笔记与讲义翻译。" },
     status: "active",
     overview: {

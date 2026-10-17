@@ -20,8 +20,8 @@ export async function ResourceArticle({ resource, doc, locale }: {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang={locale === "zh" ? "zh-CN" : "en"}>
-      <ContentNavigation section="resources" locale={locale} />
       <PostBodyLayout
+        navigation={<ContentNavigation section="resources" locale={locale} />}
         articleTitle={resource.title}
         locale={locale}
         tocItems={tocItems}

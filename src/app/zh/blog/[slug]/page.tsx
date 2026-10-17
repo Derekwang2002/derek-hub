@@ -31,8 +31,8 @@ export default async function ChineseBlogPostPage({ params }: Props) {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
-      <ContentNavigation section="blog" locale="zh" />
       <PostBodyLayout
+        navigation={<ContentNavigation section="blog" locale="zh" />}
         header={<BlogPostHeader post={post} locale="zh" />}
         articleTitle={post.title}
         locale="zh"

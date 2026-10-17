@@ -16,16 +16,20 @@ type ViewportMode = "pending" | "wide" | "medium" | "mobile";
 type PostBodyLayoutProps = {
   articleTitle: string;
   children: ReactNode;
+  footer?: ReactNode;
   header?: ReactNode;
   locale?: ContentLocale;
+  navigation?: ReactNode;
   tocItems: TocItem[];
 };
 
 export function PostBodyLayout({
   articleTitle,
   children,
+  footer,
   header,
   locale = "en",
+  navigation,
   tocItems
 }: PostBodyLayoutProps) {
   const [viewportMode, setViewportMode] = useState<ViewportMode>("pending");
@@ -98,6 +102,7 @@ export function PostBodyLayout({
 
   return (
     <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
+      {navigation ? <div className={styles.articleNavigation}>{navigation}</div> : null}
       {header ? <div className={styles.articleHeader}>{header}</div> : null}
       {tocOverlay ? <MobileArticleToc items={tocItems} activeId={activeId} visibleIds={visibleIds} locale={locale} /> : <PostToc
         activeId={activeId}
@@ -109,6 +114,7 @@ export function PostBodyLayout({
         overlay={false}
       />}
       <article className={styles.content}>{children}</article>
+      {footer ? <div className={styles.articleFooter}>{footer}</div> : null}
       <PostReadingRail locale={locale} />
     </div>
   );
