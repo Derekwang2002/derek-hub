@@ -1,5 +1,5 @@
 ---
-title: "Docker 入门：build 不会启动程序，删 Container 也不一定丢数据"
+title: "Docker 简介"
 date: 2026-07-10
 summary: "用一个虚构的五服务商店，从 Dockerfile 走到运行中的进程：Image 和 Container 的区别、Compose 怎样组织服务、数据什么时候会丢，以及 docker run 背后的 containerd、runc 和 Linux 内核。"
 tags: [docker, devops]

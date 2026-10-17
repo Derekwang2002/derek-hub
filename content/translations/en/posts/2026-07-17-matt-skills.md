@@ -1,5 +1,5 @@
 ---
-title: "Stop asking your agent to “implement and test” in one go: Matt Pocock's Skills split it into five steps"
+title: "Matt Pocock Skills Workflow"
 summary: "A single “implement this feature and test it” prompt tends to make coding agents misread requirements, expand scope, and write tests after the fact. Matt Pocock's Skills break development into grill, spec, tickets, TDD implementation, and code-review, stopping for human confirmation after each step. This post collects the prompts, completion criteria, and trade-offs for each step."
 ---
 

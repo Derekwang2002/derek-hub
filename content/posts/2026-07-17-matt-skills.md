@@ -1,5 +1,5 @@
 ---
-title: "别再让 Agent 一口气“实现并测试”：用 Matt Pocock Skills 把开发拆成五步"
+title: "Matt Pocock Skills 工作流"
 date: 2026-07-17
 summary: "一条“实现这个功能并测试”的大 Prompt，容易让编程 Agent 误解需求、扩大范围、事后补测试。Matt Pocock 的 Skills 把开发拆成 grill、spec、tickets、TDD 实现和 code-review 五步，每一步结束都停下来等人确认。本文整理每一步的 Prompt、完成标准和取舍。"
 tags: [ai-agent, software-engineering, tdd]

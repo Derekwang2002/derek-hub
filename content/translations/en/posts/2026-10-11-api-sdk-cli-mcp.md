@@ -1,5 +1,5 @@
 ---
-title: "API vs SDK vs CLI vs MCP: one weather lookup, four layers"
+title: "Making sense of API SDK CLI MCP"
 summary: "API, SDK, CLI, and MCP keep appearing in AI tool documentation. A weather lookup shows what each one does and how they can work together in a single request."
 ---
 
