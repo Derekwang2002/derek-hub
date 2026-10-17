@@ -37,8 +37,12 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .backLink:hover { color: var(--color-text); }
-  .backLink:hover svg { transform: translateX(-3px); }
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .backLink:hover { color: var(--color-text); }
+  }
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .backLink:hover svg { transform: translateX(-3px); }
+  }
 }
 
 @media (max-width: 680px) {
@@ -47,5 +51,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .backLink, .backLink svg { transition: none; }
-  .backLink:hover svg { transform: none; }
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .backLink:hover svg { transform: none; }
+  }
 }

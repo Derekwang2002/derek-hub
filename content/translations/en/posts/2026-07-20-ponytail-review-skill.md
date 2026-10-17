@@ -161,6 +161,76 @@ A diff usually has a clear requirement, author, and tests. Judging whether a new
 
 The [`ponytail-gain` I looked at](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-gain/SKILL.md) also still quotes the early single-turn experiment's "80–94% less code." The project's current [README](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md) acknowledges that the old baseline counted model explanations and alternatives, which inflated the gains. The updated real-agent experiments report averages of about 54% fewer lines of code, 20% lower cost, and 27% less time.
 
+```benchmark
+{
+  "title": "Ponytail: three metrics against the same baseline",
+  "locale": "en",
+  "basis": "published",
+  "note": "Fixed-revision experiment cited below: Haiku 4.5, 12 feature tasks, n=4 per arm. Approximate indices derived from the reported mean reductions; no-skill baseline = 100, lower is better. This measures Ponytail during coding, not a standalone ponytail-review pass.",
+  "scenarios": [
+    {
+      "id": "code",
+      "eyebrow": "Code",
+      "label": "Relative index",
+      "description": "About 54% fewer lines of code on average.",
+      "values": [
+        {
+          "label": "No-skill baseline",
+          "value": 100
+        },
+        {
+          "label": "With Ponytail",
+          "value": 46,
+          "emphasis": true,
+          "displayValue": "≈46"
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "cost",
+      "eyebrow": "Cost",
+      "label": "Relative index",
+      "description": "About 20% lower cost on average.",
+      "values": [
+        {
+          "label": "No-skill baseline",
+          "value": 100
+        },
+        {
+          "label": "With Ponytail",
+          "value": 80,
+          "emphasis": true,
+          "displayValue": "≈80"
+        }
+      ],
+      "theme": "aurora"
+    },
+    {
+      "id": "time",
+      "eyebrow": "Time",
+      "label": "Relative index",
+      "description": "About 27% less elapsed time on average.",
+      "values": [
+        {
+          "label": "No-skill baseline",
+          "value": 100
+        },
+        {
+          "label": "With Ponytail",
+          "value": 73,
+          "emphasis": true,
+          "displayValue": "≈73"
+        }
+      ],
+      "theme": "ocean"
+    }
+  ]
+}
+```
+
+Source: [Ponytail experiment summary at the cited revision](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md#numbers).
+
 The benchmark report is worth reading. Freezing numbers that keep changing into a Skill costs more to maintain than it gives back.
 
 That's the real difference between `ponytail-review` and the rest: it isn't a standing methodology, a governance protocol, a global scanner, or a promo page. It's a review tool with clear edges.

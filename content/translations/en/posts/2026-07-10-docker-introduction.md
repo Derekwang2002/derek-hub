@@ -176,6 +176,82 @@ Dockerfile steps that change the filesystem usually create new layers. Different
 
 If a step's inputs are unchanged, BuildKit can reuse its previous result. Put stable dependency installation early and frequently changing application code later to improve cache reuse.
 
+The earlier `app.jar` was compiled outside the Image. To isolate dependency caching, consider a separate frontend build inside an Image with two instruction orders:
+
+```text
+A: COPY . . → RUN npm ci → RUN npm run build
+B: COPY package*.json ./ → RUN npm ci → COPY . . → RUN npm run build
+```
+
+```benchmark
+{
+  "title": "What runs again after a cache miss?",
+  "locale": "en",
+  "basis": "illustrative",
+  "note": "Derived from the two instruction orders above. Count only executions of npm ci and npm run build. Assume an unchanged base image and commands, node_modules and dist excluded from the build context, and dependency installation independent of application source. Step counts are not timings or speedup factors.",
+  "scenarios": [
+    {
+      "id": "cold",
+      "eyebrow": "First build",
+      "label": "No cached results",
+      "description": "Both orders install dependencies and compile.",
+      "unit": "RUN steps",
+      "values": [
+        {
+          "label": "Copy everything first",
+          "value": 2
+        },
+        {
+          "label": "Copy manifests first",
+          "value": 2
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "source",
+      "eyebrow": "Source edit",
+      "label": "Dependencies unchanged",
+      "description": "Separating dependency manifests preserves the cached install.",
+      "unit": "RUN steps",
+      "values": [
+        {
+          "label": "Copy everything first",
+          "value": 2
+        },
+        {
+          "label": "Copy manifests first",
+          "value": 1,
+          "displayValue": "1 RUN step",
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    },
+    {
+      "id": "dependencies",
+      "eyebrow": "Dependency edit",
+      "label": "Lockfile changed",
+      "description": "The dependency layer is invalidated; both orders install and compile again.",
+      "unit": "RUN steps",
+      "values": [
+        {
+          "label": "Copy everything first",
+          "value": 2
+        },
+        {
+          "label": "Copy manifests first",
+          "value": 2
+        }
+      ],
+      "theme": "ocean"
+    }
+  ]
+}
+```
+
+Basis: [Docker cache invalidation rules](https://docs.docker.com/build/cache/invalidation/). A cache miss also invalidates subsequent steps.
+
 ### An Image normally has no independent kernel
 
 An Image may contain Linux user-space files and tools, but its Container shares the host Linux kernel at runtime. It is not a disk snapshot of a complete virtual machine.

@@ -260,6 +260,78 @@ task_id → run_id
 
 只有完成这一步，系统才能判断下一轮优化应该投入 Bot 预热、Worker 调度、外部 API，还是下游模型。
 
+在拿到 Trace 之前，可以先用明确写出的假设练习预算计算。切换下面的标签，分别看版本复用、并行预取和结果回传能影响哪一段等待。
+
+```benchmark
+{
+  "title": "延迟预算：把可省掉的等待算清楚",
+  "locale": "zh",
+  "basis": "illustrative",
+  "note": "以下均为假设输入，用来演示预算计算，不是 CALL-E 实测结果、P50/P95 或服务承诺。任务创建只算规划、Bot 准备与 Calling 创建，不含接通和通话；并行模型假设依赖相互独立且资源充足。实际收益需要同一工作负载下的 Trace 验证。",
+  "scenarios": [
+    {
+      "id": "reuse",
+      "eyebrow": "版本复用",
+      "label": "任务创建",
+      "description": "假设规划 1 s、冷准备 6 s、Calling 创建 1 s；复用把准备降到 0.5 s：8 s → 2.5 s。",
+      "unit": "s",
+      "values": [
+        {
+          "label": "每次冷准备",
+          "value": 8
+        },
+        {
+          "label": "复用已有 Bot",
+          "value": 2.5,
+          "emphasis": true
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "parallel",
+      "eyebrow": "并行预取",
+      "label": "独立依赖",
+      "description": "假设两个独立请求分别耗时 2 s 和 3 s：串行为 2 + 3，并行为 max(2, 3)。",
+      "unit": "s",
+      "values": [
+        {
+          "label": "串行请求",
+          "value": 5
+        },
+        {
+          "label": "并行请求",
+          "value": 3,
+          "emphasis": true
+        }
+      ],
+      "theme": "ocean"
+    },
+    {
+      "id": "feedback",
+      "eyebrow": "结果回传",
+      "label": "终态到可见",
+      "description": "假设每 2 s 轮询，终态相对轮询均匀到达，平均检测等待为 1 s；事件路径固定耗时假设为 0.1 s。",
+      "unit": "s",
+      "values": [
+        {
+          "label": "轮询平均等待",
+          "value": 1
+        },
+        {
+          "label": "假设事件路径",
+          "value": 0.1,
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    }
+  ]
+}
+```
+
+“结果回传”只比较检测路径的等待，省略两条路径共有的数据库和页面更新开销；事件路径失败时仍需轮询兜底。异步 UI 更早返回也不会自动缩短上述后台关键路径。
+
 ## 7. 如果慢的是通话中的单轮推理
 
 如果测量结果显示瓶颈确实位于 `call_connected → first_bot_audio`，Agentic 层的作用就会明显变小。此时只能进行间接优化：

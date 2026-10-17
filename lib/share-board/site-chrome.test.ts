@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { isSiteChromeVisible } from "../../src/components/site-chrome";
+import { isSiteChromeVisible } from "../site-chrome";
 
 test("site navigation and footer are absent from every Share route", () => {
   assert.equal(isSiteChromeVisible("/share/share-token"), false);

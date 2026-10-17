@@ -1,0 +1,39 @@
+.dropRoot { position: relative; height: calc(190svh - var(--site-header-height)); }
+/* Hide only the normal shell header; its space preserves the original Hero. */
+:global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-header) { visibility: hidden; pointer-events: none; }
+:global(body):has(.dropRoot) > :global(.site-shell) > :global(.site-footer) { display: none; }
+.heroPin { position: sticky; top: var(--site-header-height); height: calc(100svh - var(--site-header-height)); }
+.heroPin > div { transform-origin: center; }
+.droppedHeader { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
+.droppedHeader :global(.site-header) { background: transparent; }
+.droppedHeader :global(.site-nav) { max-width: 1760px; }
+.droppedHeader :global(.site-brand),.droppedHeader :global(.site-controls),.droppedHeader :global(.site-nav-links a) { transform-origin: top left; }
+.droppedHeader :global(a),.droppedHeader :global(button) { pointer-events: auto; }
+.droppedHeader :global(.site-nav-links a) { white-space: nowrap; }
+.droppedHeader :global(a:focus-visible),.droppedHeader :global(button:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 5px; }
+.dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a) { color: var(--color-text); }
+.dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a)::before { content: ""; position: absolute; top: var(--entry-hit-y); left: var(--entry-hit-x); width: var(--entry-hit-width); height: var(--entry-hit-height); }
+.panel { position: fixed; top: 0; left: 0; z-index: 6; transform-origin: top left; pointer-events: none; background: var(--color-bg); opacity: 0; }
+.directory { position: fixed; z-index: 6; pointer-events: none; }
+.entry { position: absolute; background: var(--color-surface); border-radius: 14px; opacity: 0; transition: background-color 220ms ease; }
+.dropRoot[data-expanded="true"] .droppedHeader :global(.site-nav-links a:focus-visible) { outline: none; }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(1):focus-visible)) .entry:nth-child(1) { outline: 2px solid var(--color-text); outline-offset: 4px; }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(2):focus-visible)) .entry:nth-child(2) { outline: 2px solid var(--color-text); outline-offset: 4px; }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(3):focus-visible)) .entry:nth-child(3) { outline: 2px solid var(--color-text); outline-offset: 4px; }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(4):focus-visible)) .entry:nth-child(4) { outline: 2px solid var(--color-text); outline-offset: 4px; }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(5):focus-visible)) .entry:nth-child(5) { outline: 2px solid var(--color-text); outline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) {
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(1):hover)) .entry:nth-child(1) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(2):hover)) .entry:nth-child(2) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(3):hover)) .entry:nth-child(3) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(4):hover)) .entry:nth-child(4) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+.dropRoot[data-expanded="true"]:has(.droppedHeader :global(.site-nav-links a:nth-child(5):hover)) .entry:nth-child(5) { background: color-mix(in srgb, var(--color-text) 13%, var(--color-bg)); }
+}
+.hint { position: fixed; bottom: 94px; left: 0; width: 100%; display: flex; justify-content: center; gap: 1rem; align-items: center; font-size: .72rem; color: var(--color-text-faint); margin: 0; pointer-events: none; }
+.hint > span { font-size: 1rem; }
+.dropRoot[data-moving="true"] .panel,
+.dropRoot[data-moving="true"] .heroPin > div,
+.dropRoot[data-moving="true"] .droppedHeader :global(.site-brand),
+.dropRoot[data-moving="true"] .droppedHeader :global(.site-controls),
+.dropRoot[data-moving="true"] .droppedHeader :global(.site-nav-links a) { will-change: transform; }
+@media(prefers-reduced-motion:reduce) { .dropRoot *, .dropRoot *::before { transition: none!important; animation: none!important; } }

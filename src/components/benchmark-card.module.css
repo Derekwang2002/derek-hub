@@ -1,4 +1,5 @@
 .panel {
+  --accent: #9299ff;
   width: 100%;
   overflow: hidden;
   padding: clamp(1.4rem, 3vw, 2.7rem) clamp(1rem, 3vw, 2.2rem) clamp(2rem, 4vw, 3.7rem);
@@ -13,7 +14,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
   border-bottom: 1px solid #485162;
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -34,15 +41,16 @@
 .tab span { display: block; }
 .tab strong { font-size: clamp(1rem, 2vw, 1.55rem); line-height: 1.2; }
 .tab span { margin-top: 0.3rem; font-size: clamp(0.75rem, 1.4vw, 1rem); }
-.tab:hover,
-.tab:focus-visible,
-.active { color: #abb2ff; }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .tab:hover { color: #abb2ff; }
+}
+.tab:focus-visible, .active { color: #abb2ff; }
 .tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 
 .active::after {
   position: absolute;
   right: 0;
-  bottom: -1px;
+  bottom: 0;
   left: 0;
   height: 3px;
   content: "";
@@ -69,3 +77,17 @@
 @media (prefers-reduced-motion: reduce) {
   .bar { transition: none; }
 }
+.figure { min-width: 0; margin: 2rem 0; }
+.caption { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.6rem 1rem; margin-bottom: 0.85rem; line-height: 1.5; }
+.caption > strong { font-size: 1.05rem; }
+.badge { color: var(--color-text-muted); font-size: 0.75rem; }
+.inline { padding: clamp(1rem, 3vw, 2rem); border-radius: 1rem; }
+.inline .panel { padding: 1rem clamp(0.8rem, 2vw, 1.5rem) 1.5rem; border-radius: 1rem; }
+.inline .chart { padding: 1.25rem 0.25rem 0; }
+.inline .tab strong { font-size: 1rem; }
+.inline .tab span { font-size: 0.8rem; }
+.inline .description { font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.25rem; }
+.inline .metricLabel { font-size: 0.95rem; }
+.inline .metrics { gap: 1.1rem; }
+.inline .track { height: 0.85rem; margin-top: 0.5rem; }
+.note { margin: 0.85rem 0 0; color: var(--color-text-muted); font-size: 0.85rem; line-height: 1.8; overflow-wrap: anywhere; }

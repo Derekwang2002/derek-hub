@@ -180,6 +180,81 @@ Dockerfile 中会改变文件系统的步骤通常会形成新的层。不同 Im
 
 如果某一步的输入没有变化，BuildKit 可以直接使用上次的结果。通常把变化较少的依赖安装放在前面，把经常变化的业务代码放在后面，会获得更好的缓存效果。
 
+上面的 `app.jar` 已在镜像外编译。为了观察依赖缓存，另取一个在镜像内构建前端的例子，对比两种指令顺序：
+
+```text
+A：COPY . . → RUN npm ci → RUN npm run build
+B：COPY package*.json ./ → RUN npm ci → COPY . . → RUN npm run build
+```
+
+```benchmark
+{
+  "title": "缓存失效后，哪些工作需要重做？",
+  "locale": "zh",
+  "basis": "illustrative",
+  "note": "按上面两种顺序推导，只统计 npm ci 与 npm run build 两条 RUN 是否执行。假设基础镜像和命令不变、node_modules 与 dist 已排除在构建上下文之外、依赖安装不读取应用源码。步骤数不是耗时，也不代表固定的提速倍数。",
+  "scenarios": [
+    {
+      "id": "cold",
+      "eyebrow": "首次构建",
+      "label": "无可用缓存",
+      "description": "两种顺序都要安装依赖并编译。",
+      "unit": "条 RUN",
+      "values": [
+        {
+          "label": "先复制全部文件",
+          "value": 2
+        },
+        {
+          "label": "先复制依赖清单",
+          "value": 2
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "source",
+      "eyebrow": "修改源码",
+      "label": "依赖不变",
+      "description": "分开复制依赖清单后，安装依赖的结果仍可复用。",
+      "unit": "条 RUN",
+      "values": [
+        {
+          "label": "先复制全部文件",
+          "value": 2
+        },
+        {
+          "label": "先复制依赖清单",
+          "value": 1,
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    },
+    {
+      "id": "dependencies",
+      "eyebrow": "修改依赖",
+      "label": "锁文件变化",
+      "description": "依赖层失效，两种顺序都要重新安装并编译。",
+      "unit": "条 RUN",
+      "values": [
+        {
+          "label": "先复制全部文件",
+          "value": 2
+        },
+        {
+          "label": "先复制依赖清单",
+          "value": 2
+        }
+      ],
+      "theme": "ocean"
+    }
+  ]
+}
+```
+
+推导依据：[Docker 缓存失效规则](https://docs.docker.com/build/cache/invalidation/)。某一步失效后，其后续步骤也需要重新构建。
+
 ### Image 通常不包含独立内核
 
 Image 可以包含 Linux 用户空间文件和工具，但 Container 运行时共享宿主 Linux 内核。它不是一台完整虚拟机的磁盘快照。

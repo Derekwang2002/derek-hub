@@ -22,7 +22,7 @@ export function TitleNote({ label, children }: { label: string; children: string
     };
   }, [open]);
 
-  return <span className={styles.note} ref={root} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}
+  return <span className={styles.note} ref={root} onPointerEnter={event => { if (event.pointerType === "mouse") setOpen(true); }} onPointerLeave={event => { if (event.pointerType === "mouse") setOpen(false); }}
     onFocus={() => setOpen(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
     <button type="button" className={styles.trigger} aria-label={label} aria-describedby={open ? id : undefined} onClick={() => setOpen(true)}>
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><circle cx="10" cy="10" r="7.5" /><path d="M10 9v5" /><circle cx="10" cy="6" r=".8" fill="currentColor" stroke="none" /></svg>

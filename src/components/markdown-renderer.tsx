@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { renderToString } from "katex";
 import { codeToHtml } from "shiki";
 import type { TocItem } from "./post-toc";
+import { parseBenchmark } from "../../lib/benchmark";
+import { BenchmarkCard } from "./benchmark-card";
 import styles from "../app/blog/[slug]/page.module.css";
 
 export async function renderMarkdown(
@@ -52,7 +54,9 @@ export async function renderMarkdown(
         i += 1;
       }
 
-      blocks.push(await renderCodeBlock(codeLines.join("\n"), language, `block-${key}`));
+      blocks.push(language === "benchmark"
+        ? <BenchmarkCard {...parseBenchmark(codeLines.join("\n"))} key={`block-${key}`} />
+        : await renderCodeBlock(codeLines.join("\n"), language, `block-${key}`));
       key += 1;
       continue;
     }

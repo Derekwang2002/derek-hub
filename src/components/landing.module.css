@@ -13,9 +13,9 @@
 .education { color: var(--color-text); font-weight: 550; letter-spacing: -0.015em; }
 
 .terminal {
-  background: var(--color-surface-muted);
+  background: color-mix(in srgb, var(--color-text) 4%, var(--color-surface-muted));
   border-radius: 0.85rem;
-  box-shadow: 0 0 0 1px var(--color-border-soft), 0 12px 32px rgb(0 0 0 / 0.035);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.12), 0 4px 12px rgb(0 0 0 / 0.05);
   margin: 0;
   min-width: 0;
   overflow: hidden;
@@ -24,7 +24,7 @@
 }
 .windowBar {
   align-items: center;
-  background: color-mix(in srgb, var(--color-text) 3%, transparent);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
   color: var(--color-text-faint);
   display: grid;
   font: 0.72rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -48,15 +48,54 @@
 .terminalStack > div { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 0.5rem; }
 .terminalStack dt { color: var(--color-text-faint); }
 .terminalStack dd { margin: 0; }
+.profileQuery, .profileResult { font: inherit; overflow-x: auto; margin: 0; }
+.terminalBody {
+  --sql-field: #175b9c;
+  --sql-keyword: #8436ac;
+  --sql-string: #23713d;
+  --sql-punctuation: #666666;
+}
+.profileQuery {
+  color: var(--sql-field);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+:global(html[data-theme="dark"]) .terminalBody {
+  --sql-field: #82c7f5;
+  --sql-keyword: #c792ea;
+  --sql-string: #a6d789;
+  --sql-punctuation: #b7bdc8;
+}
+.profileQuery code { font: inherit; }
+.sqlKeyword { color: var(--sql-keyword); font-weight: 650; }
+.sqlString { color: var(--sql-string); }
+.sqlPunctuation { color: var(--sql-punctuation); }
+.profileResult { margin-top: 1.25rem; line-height: 1.85; transition: opacity 200ms ease-out, transform 200ms cubic-bezier(0.23, 1, 0.32, 1); }
+.queryAccessible { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) {
+  .queryCharacter[data-visible="false"] { opacity: 0; }
+  .queryCharacter[data-cursor="true"] { box-shadow: 1.5px 0 var(--sql-field); }
+  .terminal:not([data-query-phase="complete"]) .profileResult { opacity: 0; transform: translateY(4px); }
+}
+@media (prefers-reduced-motion: reduce) { .profileResult { transition: none; } }
+.resultField { color: var(--sql-field); }
+.resultValue { color: color-mix(in srgb, var(--sql-string) 70%, var(--color-text-soft)); }
+.resultSeparator { color: var(--color-text-faint); }
 @media (hover: hover) and (pointer: fine) {
-  .terminal:hover {
-    box-shadow: 0 0 0 1px var(--color-border), 0 18px 44px rgb(0 0 0 / 0.08);
+  @media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .terminal:hover {
+    box-shadow: 0 22px 48px rgb(0 0 0 / 0.16), 0 6px 16px rgb(0 0 0 / 0.06);
     transition-duration: 180ms, 240ms;
+  }
   }
 }
 @media (max-width: 800px) {
   .home { align-content: center; gap: 2.75rem; grid-template-columns: 1fr; max-width: 620px; padding-block: 3.5rem 4rem; }
-  .intro h1 { margin-bottom: 1rem; }
+  .intro { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; column-gap: .5rem; }
+  .intro h1 { grid-column: 1 / -1; margin-bottom: 1rem; }
+  .educationRow { grid-column: 1; grid-row: 2; }
+  .focusRow { grid-column: 1 / -1; grid-row: 3; }
+  .contacts { grid-column: 2; grid-row: 2; justify-self: start; }
   .intro p { font-size: 1rem; }
   .terminalBody { font-size: 0.75rem; padding: 1.1rem 1.2rem 1.25rem; }
   .terminalStack > div { grid-template-columns: 5rem minmax(0, 1fr); }
@@ -67,3 +106,18 @@
   .terminalStack > div + div { margin-top: 0.35rem; }
 }
 @media (prefers-reduced-motion: reduce) { .terminal { transform: none; transition: none; } }
+
+.motionButton { justify-self: end; display: grid; place-items: center; width: 40px; height: 40px; border: 0; padding: 8px; color: var(--color-text-muted); background: transparent; border-radius: 8px; cursor: pointer; }
+.motionButton svg { width: 20px; height: 20px; }
+.motionButton:disabled { opacity: .4; cursor: default; }
+
+@media (max-width: 800px) {
+  .home { min-height: calc(100svh - var(--site-header-height) + 96px); gap: 2rem; padding-block: 2.5rem max(7.5rem, env(safe-area-inset-bottom)); }
+  .intro, .terminal { width: calc(100% - 24px); max-width: 360px; justify-self: center; }
+  .terminalBody { font-size: .72rem; line-height: 1.7; padding: 1rem; }
+  .profileResult { line-height: 1.7; margin-top: 1rem; }
+}
+
+@media (min-width: 441px) and (max-width: 800px) {
+  .intro, .terminal { max-width: clamp(360px, calc(100vw - 80px), 480px); }
+}

@@ -10,7 +10,13 @@
 
 ## CSCI 678 lecture additions
 
-- For new lecture material, follow `/Users/derek/Documents/USC/26Fall/Courses/CSCI678/AGENTS.md`: complete translation and detailed explanation, matching English pages, figures, project registration, both overview pages, and bilingual Updates.
+- For new lecture material, follow `/Users/derek/Desktop/Courses/CSCI678/AGENTS.md`: complete translation and detailed explanation, matching English pages, figures, project registration, both overview pages, and bilingual Updates.
 - Source documents live in that course directory. Its `scripts/sync_lecture.py` converts the reviewed source documents to site Markdown; catalog, overview, and Updates edits are separate required steps.
 - Preserve the existing `lecture-3-preview` route. New lectures use `lecture-N-explanation` and `lecture-N-full-translation` in both locales.
 - Verify math rendering, image paths, locale parity, and actual pager hrefs; run the existing Project tests, typecheck, and production build. State whether changes are local or deployed accurately.
+
+## Article benchmark comparisons
+
+- When writing or editing articles, notes, or project docs in this repository, use the project-local [article-benchmark skill](.agents/skills/article-benchmark/SKILL.md) when quantitative comparisons would materially help the reader, or when asked to use `mock-benchmark` / `BenchmarkCard`. The user does not need to name the skill explicitly.
+- Reuse the existing component and Markdown entry point. Follow the skill's data-evidence and bilingual rules, and adapt each chart to its surrounding article width, typography, spacing, theme, and narrow-screen layout; do not paste the standalone mock's presentation unchanged.
+- Plain conceptual explanations, flow diagrams, time trends, and isolated numbers do not automatically need this component. This routing rule and skill apply only to `derek-hub`.

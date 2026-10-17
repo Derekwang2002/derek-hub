@@ -147,6 +147,63 @@ InnoDB行格式
     - Using filesort 当查询语句中包含 group by 操作，而且无法利用索引完成排序操作的时候 效率低
     - Using temporary 使了用临时表保存中间结果，常见于排序 order by 和分组查询 group by 效率低
     - Using index 使用覆盖索引避免回表操作
+把“少扫描”和“少回表”分开看，可以更清楚地理解覆盖索引的作用：
+
+```benchmark
+{
+  "title": "索引减少扫描，覆盖索引减少回表",
+  "locale": "zh",
+  "basis": "illustrative",
+  "note": "假设 orders 有 1,000 行，其中 customer_id = 42 恰好匹配 100 行，查询 SELECT total FROM orders WHERE customer_id = 42。比较无索引、索引 (customer_id)、覆盖索引 (customer_id, total)，并假设优化器选择对应访问路径。只计顺序检查的记录和取 total 的回表次数，忽略树定位、页读取和 MVCC 可见性检查；不代表实测延迟。",
+  "scenarios": [
+    {
+      "id": "scan",
+      "eyebrow": "扫描",
+      "label": "候选记录",
+      "description": "全表扫描检查 1,000 行；两个索引路径各检查 100 条匹配索引记录。",
+      "unit": "条",
+      "values": [
+        {
+          "label": "全表扫描",
+          "value": 1000
+        },
+        {
+          "label": "普通二级索引",
+          "value": 100
+        },
+        {
+          "label": "覆盖索引",
+          "value": 100,
+          "emphasis": true
+        }
+      ],
+      "theme": "ocean"
+    },
+    {
+      "id": "lookup",
+      "eyebrow": "回表",
+      "label": "读取 total",
+      "description": "两种索引都找到 100 条记录，但只有普通二级索引需要额外按主键取 total。",
+      "unit": "次",
+      "values": [
+        {
+          "label": "普通二级索引",
+          "value": 100
+        },
+        {
+          "label": "覆盖索引",
+          "value": 0,
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    }
+  ]
+}
+```
+
+机制参考：[MySQL：优化 InnoDB 查询](https://dev.mysql.com/doc/refman/8.4/en/optimizing-innodb-queries.html)。实际查询应结合 `EXPLAIN ANALYZE` 和真实数据验证，不能把记录数量直接换算成毫秒。
+
 ## 总结
  
  

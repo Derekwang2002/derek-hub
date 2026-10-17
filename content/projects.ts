@@ -162,12 +162,12 @@ export const projectDefinitions: ProjectDefinition[] = [
   },
   {
     slug: "csci678",
-    name: { en: "CSCI 678", zh: "CSCI 678" },
+    name: { en: "Theoretical Machine Learning", zh: "Theoretical Machine Learning" },
     summary: { en: "Theoretical ML notes and translations.", zh: "理论机器学习笔记与讲义翻译。" },
     status: "active",
     overview: {
-      updated: "2026-09-17",
-      reviewedRevision: "lecture4-notes@2026-09-17"
+      updated: "2026-10-15",
+      reviewedRevision: "lecture5-7-notes@2026-10-15"
     },
     sections: [
       { slug: "lecture-notes", label: { en: "Lecture Notes", zh: "课程笔记" } }
@@ -236,6 +236,54 @@ export const projectDefinitions: ProjectDefinition[] = [
         status: "published",
         updated: "2026-09-17",
         reviewedRevision: "lecture4-full-translation@2026-09-17"
+      },
+      {
+        slug: "lecture-5-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture5-explanation@2026-10-15-c03aa2dfa0"
+      },
+      {
+        slug: "lecture-5-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture5-full-translation@2026-10-15-91657120d5"
+      },
+      {
+        slug: "lecture-6-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture6-explanation@2026-10-15-7cd6ebe5c4"
+      },
+      {
+        slug: "lecture-6-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture6-full-translation@2026-10-15-118f8ae805"
+      },
+      {
+        slug: "lecture-7-explanation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture7-explanation@2026-10-15-fc8ad5d63f"
+      },
+      {
+        slug: "lecture-7-full-translation",
+        sectionSlug: "lecture-notes",
+        kind: "document",
+        status: "published",
+        updated: "2026-10-15",
+        reviewedRevision: "lecture7-full-translation@2026-10-15-4f83240de9"
       }
     ]
   },

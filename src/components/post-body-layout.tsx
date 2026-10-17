@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { MobileArticleToc } from "./mobile-article-toc";
 import { PostReadingRail } from "./post-reading-rail";
 import { PostToc, type TocItem } from "./post-toc";
 import { useActiveHeadings } from "./use-active-heading";
@@ -15,16 +16,20 @@ type ViewportMode = "pending" | "wide" | "medium" | "mobile";
 type PostBodyLayoutProps = {
   articleTitle: string;
   children: ReactNode;
+  footer?: ReactNode;
   header?: ReactNode;
   locale?: ContentLocale;
+  navigation?: ReactNode;
   tocItems: TocItem[];
 };
 
 export function PostBodyLayout({
   articleTitle,
   children,
+  footer,
   header,
   locale = "en",
+  navigation,
   tocItems
 }: PostBodyLayoutProps) {
   const [viewportMode, setViewportMode] = useState<ViewportMode>("pending");
@@ -97,18 +102,20 @@ export function PostBodyLayout({
 
   return (
     <div className={tocOpen ? styles.bodyLayout : `${styles.bodyLayout} ${styles.bodyLayoutTocCollapsed}`}>
+      {navigation ? <div className={styles.articleNavigation}>{navigation}</div> : null}
       {header ? <div className={styles.articleHeader}>{header}</div> : null}
-      <PostToc
+      {tocOverlay ? <MobileArticleToc items={tocItems} activeId={activeId} visibleIds={visibleIds} locale={locale} /> : <PostToc
         activeId={activeId}
         visibleIds={visibleIds}
         items={tocItems}
         locale={locale}
         onOpenChange={setTocOpen}
         open={tocOpen}
-        overlay={tocOverlay}
-      />
+        overlay={false}
+      />}
       <article className={styles.content}>{children}</article>
-      <PostReadingRail />
+      {footer ? <div className={styles.articleFooter}>{footer}</div> : null}
+      <PostReadingRail locale={locale} />
     </div>
   );
 }

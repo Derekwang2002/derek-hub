@@ -5,27 +5,27 @@ import type { Resource } from "../content/resources";
 const ENGLISH_COPY: Record<string, Pick<Resource, "title" | "description">> = {
   "/dev-test-uat-prod/index.html": {
     title: "dev -> test -> uat -> prod",
-    description: "A shared session explaining Dev, Test, UAT, and Prod environments and their release flow."
+    description: "The release flow from development to production."
   },
   "/docker-runtime/index.html": {
     title: "Docker Runtime Visual Explainer",
-    description: "Follow Dockerfile, Image, and Container through animated build, isolation, networking, Volume, and Compose flows."
+    description: "Docker builds, isolation, and networking in motion."
   },
   "/leetcode-cookbook/skiplist-explained.html": {
     title: "Skip List Visual Explainer",
-    description: "An interactive explanation of Skip List search, insertion, level height, and complexity."
+    description: "Skip list search, insertion, and complexity."
   },
   "/leetcode-cookbook/lru-cache-explained.html": {
     title: "LRU Cache Visual Explainer",
-    description: "See how a HashMap and doubly linked list provide O(1) reads and writes, with eviction and concurrency comparisons."
+    description: "LRU caching with a hash map and linked list."
   },
   "/hub/skills/agent-eval": {
     title: "Agent Eval Skill",
-    description: "A Codex skill for reviewing changes and running bounded reviewer/fixer loops."
+    description: "Code review with bounded reviewer/fixer loops."
   },
   "/hub/skills/sync-post-localizations": {
     title: "Sync Post Localizations Skill",
-    description: "Sync localized Markdown posts and validate their publishing surfaces."
+    description: "Sync multilingual posts and publishing links."
   }
 };
 

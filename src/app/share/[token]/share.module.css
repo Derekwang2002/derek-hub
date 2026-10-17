@@ -49,7 +49,14 @@
   transition: border-color 160ms ease, color 160ms ease;
 }
 
-.downloadLink:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .downloadLink:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+}
+
 .downloadLink:focus-visible {
   border-color: var(--color-text);
   color: var(--color-text);

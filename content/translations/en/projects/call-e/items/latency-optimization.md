@@ -260,6 +260,78 @@ Prometheus Histograms can track P50, P95, and P99, while Langfuse Traces record 
 
 Only after this instrumentation exists can the system decide whether the next optimization belongs in Bot warming, Worker scheduling, an external API, or the downstream model.
 
+Before traces are available, explicit assumptions can illustrate budget calculations. Switch tabs to see which waits artifact reuse, parallel fetching, and result feedback can affect.
+
+```benchmark
+{
+  "title": "Latency budgets: calculate avoidable waits",
+  "locale": "en",
+  "basis": "illustrative",
+  "note": "All inputs are hypothetical, illustrating budget arithmetic rather than CALL-E measurements, P50/P95, or service guarantees. Task creation includes only planning, Bot preparation, and Calling creation, excluding connection and conversation. The parallel model assumes independent dependencies and sufficient resources. Validate gains with traces under the same workload.",
+  "scenarios": [
+    {
+      "id": "reuse",
+      "eyebrow": "Artifact reuse",
+      "label": "Task creation",
+      "description": "Assume 1 s planning, 6 s cold preparation, and 1 s Calling creation. Reuse reduces preparation to 0.5 s: 8 s → 2.5 s.",
+      "unit": "s",
+      "values": [
+        {
+          "label": "Cold preparation each time",
+          "value": 8
+        },
+        {
+          "label": "Reuse an existing Bot",
+          "value": 2.5,
+          "emphasis": true
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "parallel",
+      "eyebrow": "Parallel fetch",
+      "label": "Independent dependencies",
+      "description": "Assume two independent requests take 2 s and 3 s: serial = 2 + 3; parallel = max(2, 3).",
+      "unit": "s",
+      "values": [
+        {
+          "label": "Serial requests",
+          "value": 5
+        },
+        {
+          "label": "Parallel requests",
+          "value": 3,
+          "emphasis": true
+        }
+      ],
+      "theme": "ocean"
+    },
+    {
+      "id": "feedback",
+      "eyebrow": "Result feedback",
+      "label": "Terminal to visible",
+      "description": "Assume polling every 2 s with uniformly distributed completion times: mean detection wait = 1 s. Assume a fixed 0.1 s event-path delay.",
+      "unit": "s",
+      "values": [
+        {
+          "label": "Mean polling wait",
+          "value": 1
+        },
+        {
+          "label": "Hypothetical event path",
+          "value": 0.1,
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    }
+  ]
+}
+```
+
+The feedback comparison isolates detection delay and omits shared database and UI-update costs. Polling remains the fallback when the event path fails. Returning an asynchronous UI response earlier does not itself shorten the background critical path.
+
 ## 7. When the slow stage is per-turn inference
 
 If measurement shows that the bottleneck truly lies between `call_connected` and `first_bot_audio`, the Agentic layer's role becomes much smaller. It can only optimize indirectly:

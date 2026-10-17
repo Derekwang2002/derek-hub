@@ -1,12 +1,35 @@
 .links { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; margin-top: 1.7rem; }
 .links a { align-items: center; color: var(--color-text-muted); display: inline-flex; gap: 0.4rem; font-size: 0.9rem; line-height: 1.5; padding: 0.15rem 0; position: relative; text-decoration: none; transition: color 160ms ease; }
 .links a::after { background: currentColor; bottom: -0.12rem; content: ""; height: 1px; left: 0; position: absolute; transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; width: 100%; }
-.links a:hover, .links a:focus-visible { color: var(--color-text); }
-.links a:hover::after, .links a:focus-visible::after { transform: scaleX(1); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .links a:hover { color: var(--color-text); } }
+.links a:focus-visible { color: var(--color-text); }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .links a:hover::after { transform: scaleX(1); } }
+.links a:focus-visible::after { transform: scaleX(1); }
 .links svg { display: block; fill: currentColor; height: 1rem; width: 1rem; transition: fill 200ms ease; }
-.github:hover svg, .github:focus-visible svg { fill: #8957e5; }
-.email:hover svg, .email:focus-visible svg { fill: #ea4335; }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .github:hover svg { fill: #8957e5; } }
+.github:focus-visible svg { fill: #8957e5; }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .email:hover svg { fill: #ea4335; } }
+.email:focus-visible svg { fill: #ea4335; }
 .about span { transition: transform 180ms ease; }
-.about:hover span { transform: translate(2px, -2px); }
-:global(html[data-theme="dark"]) .github:hover svg { fill: #a371f7; }
-@media (prefers-reduced-motion: reduce) { .links a::after, .links svg, .about span { transition: none; } }
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .about:hover span { transform: translate(2px, -2px); } }
+@media (max-width: 800px) {
+  .compact { position: relative; flex-wrap: nowrap; gap: .25rem; margin: 0; }
+  .compact::before { content: ""; position: absolute; inset: .5rem 0; border-radius: 999px; background: color-mix(in srgb, var(--color-text) 3.5%, var(--color-bg)); pointer-events: none; }
+  .compact .label, .compact .about { display: none; }
+  .compact a { justify-content: center; flex-shrink: 0; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: color 120ms ease-out; }
+  .compact a::after { inset: .5rem 0; width: auto; height: auto; border-radius: 999px; background: transparent; transform: none; pointer-events: none; transition: background-color 120ms ease-out; }
+  .compact .email::before { content: ""; position: absolute; left: -.125rem; top: 50%; width: 1px; height: .625rem; background: var(--color-border-soft); opacity: .7; transform: translateY(-50%); pointer-events: none; }
+  .compact svg { position: relative; z-index: 1; width: 1.125rem; height: 1.125rem; }
+  .compact .email svg { width: 1.575rem; height: 1.575rem; }
+  .compact a:active { color: var(--color-text); }
+  .compact a:active::after { background: var(--color-surface-raised); }
+  .compact a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+}
+@media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))):global(html[data-theme="dark"]) .github:hover svg { fill: #a371f7; } }
+@media (prefers-reduced-motion: reduce) { .links a, .links a::after, .links svg, .about span { transition: none; } }

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
+import { BlogRssFooter } from "@/components/rss-subscribe";
 import { getAllPosts } from "../../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../../lib/localized-posts";
 import styles from "../../../blog/[slug]/page.module.css";
@@ -31,12 +32,13 @@ export default async function ChineseBlogPostPage({ params }: Props) {
 
   return (
     <main className={`page-enter ${styles.postPage}`} lang="zh-CN">
-      <ContentNavigation section="blog" locale="zh" />
       <PostBodyLayout
+        navigation={<ContentNavigation section="blog" locale="zh" />}
         header={<BlogPostHeader post={post} locale="zh" />}
         articleTitle={post.title}
         locale="zh"
         tocItems={tocItems}
+        footer={<BlogRssFooter locale="zh" />}
       >
         {renderedContent}
       </PostBodyLayout>

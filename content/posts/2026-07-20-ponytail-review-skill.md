@@ -7,13 +7,13 @@ selected: false
 draft: false
 ---
 
-AI 写出的代码，常见的问题不只是错，还有“对，但没必要”。一个日期输入框带进来一个组件库，一个只有一个实现的接口配了工厂，测试全过，常规 Review 也挑不出毛病。
+AI coding 已经渐渐成为几乎所有开发者的默认选项，当代码的产量成倍增长📈之后，code review 就成为了新的瓶颈。除了正确性，代码是否冗余也成为了 code review 的重点。比如一个日期输入框带进来一个组件库，一个只有一个实现的接口配了工厂，测试全过，常规 `/review` 命令也挑不出毛病。
 
-[ponytail-review](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) 专门处理这一类问题。它只问一个问题：
+[DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) 库中的 Agent Skill [ponytail-review](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) 为此而生，专门处理这一类问题：
 
 > 这个 Diff 里，有什么东西根本不需要存在？
 
-它是 [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) 项目里的一个 Agent Skill。它**不检查正确性、安全性或性能**，也不自动修改代码，只列出可以删除、内联或换成现成能力的代码，并且每条建议都要写出替代方案。Ponytail 一共有六个 Skills，我觉得 review 是最容易直接用起来的一个，后面会解释原因。
+它**不检查正确性、安全性或性能**，也不自动修改代码，只列出可以删除、内联或换成现成能力的代码，并且每条建议都要写出替代方案。Ponytail 下的六个 Skills之中，我觉得 ponytail-review 是开发过程中最实用的一个，后面会解释原因。
 
 ## 正确但多余的代码，常规 Review 看不出来
 
@@ -165,6 +165,76 @@ Ponytail 仓库目前提供六个 Skills。它们共享同一套理念，但用�
 
 而且，[本文查看的 `ponytail-gain`](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-gain/SKILL.md) 还在用早期单轮生成实验里“减少 80–94% 代码”的数字。项目当前的 [README](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md) 已经承认，旧基线把模型的解释和备选方案也算了进去，夸大了收益。更新后的真实 Agent 实验，平均结果是代码行数减少约 54%，成本减少约 20%，耗时减少约 27%。
 
+```benchmark
+{
+  "title": "Ponytail 实验：同一基线下的三项变化",
+  "locale": "zh",
+  "basis": "published",
+  "note": "来源为本文引用的固定版本实验：Haiku 4.5、12 项功能任务、每组 n=4。按报告的平均降幅换算，未使用 Skill 的基线 = 100，越低越好；数值为近似相对指数。这是编码时使用 Ponytail 的实验，不是单独运行 ponytail-review 的效果。",
+  "scenarios": [
+    {
+      "id": "code",
+      "eyebrow": "代码量",
+      "label": "相对指数",
+      "description": "平均代码量约减少 54%。",
+      "values": [
+        {
+          "label": "无 Skill 基线",
+          "value": 100
+        },
+        {
+          "label": "使用 Ponytail",
+          "value": 46,
+          "emphasis": true,
+          "displayValue": "约 46"
+        }
+      ],
+      "theme": "violet"
+    },
+    {
+      "id": "cost",
+      "eyebrow": "成本",
+      "label": "相对指数",
+      "description": "平均成本约减少 20%。",
+      "values": [
+        {
+          "label": "无 Skill 基线",
+          "value": 100
+        },
+        {
+          "label": "使用 Ponytail",
+          "value": 80,
+          "emphasis": true,
+          "displayValue": "约 80"
+        }
+      ],
+      "theme": "aurora"
+    },
+    {
+      "id": "time",
+      "eyebrow": "耗时",
+      "label": "相对指数",
+      "description": "平均耗时约减少 27%。",
+      "values": [
+        {
+          "label": "无 Skill 基线",
+          "value": 100
+        },
+        {
+          "label": "使用 Ponytail",
+          "value": 73,
+          "emphasis": true,
+          "displayValue": "约 73"
+        }
+      ],
+      "theme": "ocean"
+    }
+  ]
+}
+```
+
+数据来源：[Ponytail 固定版本实验汇总](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md#numbers)。
+
 Benchmark 报告值得看，但把会更新的数据固化进 Skill，维护成本比它带来的能力还高。
 
 这就是 `ponytail-review` 和其他几个文件的区别：它不是常驻方法论、仓库治理协议、全局扫描器或宣传页，只是一个边界清楚的审查工具。
@@ -199,11 +269,9 @@ ponytail-review：只寻找可以删除的复杂度
 只报告过度设计，不检查正确性，也不要修改代码。
 ```
 
-在 Codex 中安装完整插件后，可以用 `@ponytail-review` 调用；其他支持 Skill 的 Agent 一般用 `/ponytail-review`。如果只需要这一个能力，把对应的 `SKILL.md` 放进项目或用户的 Skills 目录就够了，不必同时启用 Ponytail 的常驻模式、Hooks 和其他辅助 Skills。
-
 ## 接受一条删除建议前，先问四个问题
 
-拿到 `ponytail-review` 的输出后，可以用四个问题快速复核：
+拿到 `ponytail-review` 的输出后，如果觉得有问题，可以用四个问题快速复核：
 
 1. 替代方案是否完整覆盖了当前明确的需求？
 2. 被删除的代码是否在保护安全、数据或无障碍方面的边界？
@@ -212,4 +280,4 @@ ponytail-review：只寻找可以删除的复杂度
 
 四个答案都支持简化，再应用建议。只要有一项取决于 Agent 不知道的业务背景，就该由人拍板，而不是看到输出里写着 `delete` 就照删。
 
-下次 Agent 交来一个功能正确、却大得出乎意料的 Diff，可以先跑完常规 Review，再拿 [SKILL.md](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) 跑第二遍。哪怕最后只得到一句 `Lean already. Ship.`，也比默认接受 Agent 写下的每一层抽象要踏实。
+总而言之，当你懒得仔细 code review 时， 得到一句 `Lean already. Ship.` 总会多一分踏实。😇

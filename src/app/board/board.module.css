@@ -189,7 +189,14 @@
   padding: 0.45rem 1rem;
 }
 
-.primaryButton:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .primaryButton:hover {
+  background: var(--color-focus);
+  border-color: var(--color-focus);
+}
+}
+
 .primaryButton:focus-visible {
   background: var(--color-focus);
   border-color: var(--color-focus);
@@ -212,15 +219,27 @@
   text-underline-offset: 0.25rem;
 }
 
-.secondaryButton:hover,
-.secondaryButton:focus-visible,
-.textButton:hover,
-.textButton:focus-visible {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .secondaryButton:hover, :where(:global(html:not([data-input="touch"]))) .textButton:hover {
+  color: var(--color-text);
+  text-decoration-color: currentColor;
+}
+}
+
+.secondaryButton:focus-visible, .textButton:focus-visible {
   color: var(--color-text);
   text-decoration-color: currentColor;
 }
 
-.dangerButton:hover,
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .dangerButton:hover {
+  color: #a43b2d;
+  text-decoration-color: currentColor;
+}
+}
+
 .dangerButton:focus-visible {
   color: #a43b2d;
   text-decoration-color: currentColor;
@@ -273,10 +292,15 @@
   text-decoration: none;
 }
 
-.documentLink:hover,
-.documentLink:focus-visible,
-.backLine a:hover,
-.backLine a:focus-visible {
+@media (hover: hover) and (pointer: fine) {
+
+:where(:global(html:not([data-input="touch"]))) .documentLink:hover, :where(:global(html:not([data-input="touch"]))) .backLine a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.22rem;
+}
+}
+
+.documentLink:focus-visible, .backLine a:focus-visible {
   text-decoration: underline;
   text-underline-offset: 0.22rem;
 }

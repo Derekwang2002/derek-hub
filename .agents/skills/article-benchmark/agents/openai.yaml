@@ -1,0 +1,6 @@
+interface:
+  display_name: "文章对比图表"
+  short_description: "仅在本项目为文章加入可信的交互对比图，并适配周围界面与移动端"
+  default_prompt: "使用 $article-benchmark 判断 derek-hub 的这篇文章适合在哪里加入对比图，核实数据，并让图表与周围 UI 协调。"
+policy:
+  allow_implicit_invocation: true

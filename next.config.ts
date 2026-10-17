@@ -12,6 +12,7 @@ const deploymentId = [
 const nextConfig: NextConfig = {
   ...(deploymentId ? { deploymentId: deploymentId.trim() } : {}),
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  devIndicators: { position: "bottom-right" },
   async redirects() {
     // Exact document paths keep existing course image URLs working unchanged.
     const movedPaths = [

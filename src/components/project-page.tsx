@@ -6,6 +6,7 @@ import { ProjectLayout } from "./project-layout";
 import { PostBodyLayout } from "./post-body-layout";
 import { ProjectNavigation } from "./project-navigation";
 import { ProjectPager } from "./project-pager";
+import { ProjectStatusBadge } from "./project-status-badge";
 import { TitleNote } from "./title-note";
 import { ArticleHeader } from "./article-header";
 import { collectionPath, collectionSection } from "../../lib/content-sections";
@@ -45,11 +46,8 @@ export async function ProjectsIndex({ locale }: { locale: ContentLocale }) {
                 <small>{project.summary}</small>
               </span>
               <span className={styles.projectMeta}>
-                {project.status === "archived"
-                  ? locale === "zh" ? "已归档" : "Archived"
-                  : locale === "zh" ? "进行中" : "Active"}
-                {" · "}
-                {formatContentDate(project.lastUpdated, locale)}
+                <ProjectStatusBadge status={project.status} locale={locale} />
+                <time dateTime={project.lastUpdated}>{project.lastUpdated}</time>
               </span>
             </Link>
           </li>
@@ -69,42 +67,34 @@ export async function ProjectOverviewPage({
   const project = await getProject(projectSlug, locale);
   if (!project) notFound();
   const pager = await getProjectPager(projectSlug, null, locale);
-  const updates = (await getProjectUpdates(projectSlug, locale)).slice(0, 3);
   const tocItems = getMarkdownHeadings(project.overview.content);
   const rendered = await renderMarkdown(project.overview.content, tocItems);
 
   return (
-    <ProjectPageShell activeHref={project.href} locale={locale} project={project}>
-      <PostBodyLayout articleTitle={project.overview.title} locale={locale} tocItems={tocItems} header={<ProjectHeader
+    <ProjectLayout locale={locale}>
+      <PostBodyLayout
+        articleTitle={project.overview.title}
         locale={locale}
-        project={project}
-        title={project.overview.title}
-        summary={project.overview.summary}
-      />}>{rendered}</PostBodyLayout>
-      <section aria-labelledby="project-map-title" className={styles.directory}>
-        <div className={styles.sectionHeading}>
-          <h2 id="project-map-title">{locale === "zh" ? "文档" : "Documents"}</h2>
-        </div>
-        <ProjectDirectory project={project} />
-      </section>
-      <section aria-labelledby="latest-updates-title" className={styles.latestUpdates}>
-        <div className={styles.sectionHeading}>
-          <h2 id="latest-updates-title">{locale === "zh" ? "最近动态" : "Latest updates"}</h2>
-        </div>
-        {updates.length > 0 ? (
-          <UpdateList locale={locale} updates={updates} />
-        ) : (
-          <p className={styles.emptyUpdates}>
-            {locale === "zh" ? "暂无动态。" : "No updates yet."}
-          </p>
-        )}
-        <Link className={styles.textLink} href={`${project.href}/updates`}>
-          {locale === "zh" ? "查看全部动态 →" : "View all updates →"}
-        </Link>
-      </section>
-      {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={project.reviewedRevision} /> : null}
-      <ProjectPager locale={locale} pager={pager} />
-    </ProjectPageShell>
+        tocItems={tocItems}
+        navigation={<ProjectNavigation activeHref={project.href} locale={locale} project={project} />}
+        header={<ProjectHeader
+          locale={locale}
+          project={project}
+          title={project.overview.title}
+          summary={project.overview.summary}
+        />}
+        footer={<>
+          <section aria-labelledby="project-map-title" className={styles.directory}>
+            <div className={styles.sectionHeading}>
+              <h2 id="project-map-title">{locale === "zh" ? "文档" : "Documents"}</h2>
+            </div>
+            <ProjectDirectory project={project} />
+          </section>
+          {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={project.reviewedRevision} /> : null}
+          <ProjectPager locale={locale} pager={pager} />
+        </>}
+      >{rendered}</PostBodyLayout>
+    </ProjectLayout>
   );
 }
 
@@ -125,9 +115,14 @@ export async function ProjectItemPage({
   if (!project || !item) notFound();
   const tocItems = getMarkdownHeadings(item.content);
   const rendered = await renderMarkdown(item.content, tocItems);
+  const navigation = <ProjectNavigation activeHref={item.href} locale={locale} project={project} />;
+  const footer = <>
+    {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={item.reviewedRevision} /> : null}
+    <ProjectPager locale={locale} pager={pager} />
+  </>;
 
   return (
-    <ProjectPageShell activeHref={item.href} locale={locale} project={project}>
+    <ProjectLayout locale={locale} navigation={item.kind === "interactive" ? navigation : undefined}>
       {item.kind === "interactive" ? <>
         <ProjectHeader
         item={item}
@@ -137,16 +132,15 @@ export async function ProjectItemPage({
         title={item.title}
       />
         <InteractiveProjectItem item={item} locale={locale} />
-      </> : <PostBodyLayout articleTitle={item.title} locale={locale} tocItems={tocItems} header={<ProjectHeader
+        {footer}
+      </> : <PostBodyLayout navigation={navigation} footer={footer} articleTitle={item.title} locale={locale} tocItems={tocItems} header={<ProjectHeader
         item={item}
         locale={locale}
         project={project}
         summary={item.summary}
         title={item.title}
       />}>{rendered}</PostBodyLayout>}
-      {collectionSection(project.slug) === "projects" ? <ProjectRevision locale={locale} revision={item.reviewedRevision} /> : null}
-      <ProjectPager locale={locale} pager={pager} />
-    </ProjectPageShell>
+    </ProjectLayout>
   );
 }
 
@@ -163,7 +157,7 @@ export async function ProjectUpdatesPage({
   const href = `${project.href}/updates`;
   const notes = collectionSection(project.slug) === "notes";
   return (
-    <ProjectPageShell activeHref={href} locale={locale} project={project}>
+    <ProjectLayout locale={locale} navigation={<ProjectNavigation activeHref={href} locale={locale} project={project} />}>
       <header className={styles.updatesHero}>
         <h1>{notes ? (locale === "zh" ? "笔记更新" : "Note updates") : (locale === "zh" ? "项目动态" : "Project updates")}</h1>
         <p>
@@ -177,24 +171,6 @@ export async function ProjectUpdatesPage({
       ) : (
         <p className={styles.emptyUpdates}>{locale === "zh" ? "暂无动态。" : "No updates yet."}</p>
       )}
-    </ProjectPageShell>
-  );
-}
-
-function ProjectPageShell({
-  activeHref,
-  children,
-  locale,
-  project
-}: {
-  activeHref: string;
-  children: React.ReactNode;
-  locale: ContentLocale;
-  project: Project;
-}) {
-  return (
-    <ProjectLayout locale={locale} navigation={<ProjectNavigation activeHref={activeHref} locale={locale} project={project} />}>
-      {children}
     </ProjectLayout>
   );
 }
@@ -227,8 +203,7 @@ function ProjectHeader({
       <h1>{title}</h1>
       <p>{summary}</p>
       <div className={styles.heroMeta}>
-        <span>{project.status === "archived" ? (locale === "zh" ? "已归档" : "Archived") : (locale === "zh" ? "进行中" : "Active")}</span>
-        <span aria-hidden="true">·</span>
+        <ProjectStatusBadge status={project.status} locale={locale} />
         <time dateTime={item?.updated ?? project.lastUpdated}>
           {locale === "zh" ? "更新于 " : "Updated "}
           {formatContentDate(item?.updated ?? project.lastUpdated, locale)}

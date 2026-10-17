@@ -159,6 +159,63 @@ InnoDB row formats:
     - `Using temporary`: an intermediate temporary table is used, often for `ORDER BY` or `GROUP BY`; inefficient.
     - `Using index`: a covering index avoids a table lookup.
 
+Separating scan work from table lookups makes the role of a covering index clearer:
+
+```benchmark
+{
+  "title": "Indexes reduce scans; covering indexes avoid lookups",
+  "locale": "en",
+  "basis": "illustrative",
+  "note": "Assume 1,000 orders, exactly 100 with customer_id = 42, queried with SELECT total FROM orders WHERE customer_id = 42. Compare no index, (customer_id), and covering (customer_id, total), assuming the optimizer chooses each corresponding path. Count sequentially examined records and lookups needed to fetch total; omit tree positioning, page reads, and MVCC visibility checks. These are not measured latencies.",
+  "scenarios": [
+    {
+      "id": "scan",
+      "eyebrow": "Scan",
+      "label": "Candidate records",
+      "description": "The full scan examines 1,000 rows; each indexed path examines 100 matching index records.",
+      "unit": "records",
+      "values": [
+        {
+          "label": "Full-table scan",
+          "value": 1000
+        },
+        {
+          "label": "Secondary index",
+          "value": 100
+        },
+        {
+          "label": "Covering index",
+          "value": 100,
+          "emphasis": true
+        }
+      ],
+      "theme": "ocean"
+    },
+    {
+      "id": "lookup",
+      "eyebrow": "Lookups",
+      "label": "Fetching total",
+      "description": "Both indexes find 100 records; only the non-covering index needs primary-key lookups to fetch total.",
+      "unit": "lookups",
+      "values": [
+        {
+          "label": "Secondary index",
+          "value": 100
+        },
+        {
+          "label": "Covering index",
+          "value": 0,
+          "emphasis": true
+        }
+      ],
+      "theme": "aurora"
+    }
+  ]
+}
+```
+
+Mechanism: [MySQL: Optimizing InnoDB queries](https://dev.mysql.com/doc/refman/8.4/en/optimizing-innodb-queries.html). Verify real queries with EXPLAIN ANALYZE and representative data; record counts do not convert directly into milliseconds.
+
 ## Summary
 
 ## Other notes

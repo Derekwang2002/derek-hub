@@ -1,0 +1,71 @@
+.surface { position: relative; padding-bottom: 6rem; }
+.instructions { align-items: center; display: flex; justify-content: center; gap: 1rem; max-width: 800px; margin: -3rem auto 0; padding: 0 1.25rem; color: var(--color-text-faint); font-size: .72rem; text-align: center; position: relative; z-index: 2; }
+.instructions p { margin: 0; }
+.instructions button { background: none; border: 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); cursor: pointer; font: inherit; padding: .35rem 0; flex-shrink: 0; }
+.surface button:focus-visible,.surface input:focus-visible,.consoleOutput:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 5px; }
+.replay > * { animation: appear 260ms cubic-bezier(.23,1,.32,1); }
+@keyframes appear { from { opacity: .2; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@font-face { font-family: "Hero JetBrains Mono"; src: url("/prototypes/hero-motion/assets/JetBrainsMono-Regular.woff2") format("woff2"); font-style: normal; font-weight: 400; font-display: swap; }
+/* Sense: a single graphite/silver surface under a soft studio light. */
+.pointer { position: relative; isolation: isolate; overflow: clip; }
+.pointer > main { position: relative; }
+.terminalScene { position: relative; min-width: 0; isolation: isolate; }
+.ambientLight { position: absolute; pointer-events: none; z-index: -2; inset: -180px -170px -140px; background: radial-gradient(ellipse at 48% 43%, rgb(255 255 255 / .95), rgb(220 220 220 / .2) 35%, transparent 67%); }
+.contactShadow { position: absolute; pointer-events: none; z-index: -1; left: -8%; right: -8%; height: 140px; bottom: -78px; background: radial-gradient(ellipse at center, rgb(0 0 0 / .13), transparent 64%); }
+.pointer .senseTerminal { position: relative; isolation: isolate; border: 1px solid rgb(0 0 0 / .13); background: linear-gradient(145deg,#f9f9f9 0%,#eee 52%,#e6e6e6 100%); box-shadow: inset 0 1px 0 #fff, inset 1px 0 0 rgb(255 255 255 / .9), inset 0 -1px 0 rgb(0 0 0 / .04), 0 2px 3px rgb(0 0 0 / .025), 0 16px 38px -20px rgb(0 0 0 / .24); transform: none; transition: none; }
+.pointer .senseTerminal::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; border: 1px solid transparent; background: linear-gradient(125deg, #fff, rgb(255 255 255 / .12) 35%, transparent 55%, rgb(255 255 255 / .5)) border-box; mask: linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0); mask-composite: exclude; z-index: 3; }
+.surfaceGrain { position: absolute; inset: 0; pointer-events: none; background: url("/prototypes/hero-motion/assets/surface-grain.svg"); opacity: .035; mix-blend-mode: multiply; }
+.surfaceReflection { position: absolute; pointer-events: none; width: 80%; height: 200%; left: -10%; top: -65%; transform: rotate(-24deg); background: linear-gradient(90deg,transparent,rgb(255 255 255 / .5) 48%,rgb(255 255 255 / .08) 70%,transparent); }
+.pointer .senseTerminal figcaption { position: relative; z-index: 1; background: linear-gradient(180deg,rgb(255 255 255 / .4),rgb(255 255 255 / .05)); border-bottom: 1px solid rgb(0 0 0 / .065); box-shadow: 0 1px 0 rgb(255 255 255 / .4); font-family: "Hero JetBrains Mono",monospace; font-size: .65rem; }
+.pointer .senseBody { position: relative; z-index: 1; font-family: "Hero JetBrains Mono",ui-monospace,monospace; font-size: .76rem; line-height: 1.95; }
+:global(html[data-theme="dark"]) .ambientLight { background: radial-gradient(ellipse at 49% 40%,rgb(255 255 255 / .11),rgb(255 255 255 / .028) 38%,transparent 67%); }
+:global(html[data-theme="dark"]) .contactShadow { background: radial-gradient(ellipse at center,rgb(0 0 0 / .65),transparent 64%); }
+:global(html[data-theme="dark"]) .pointer .senseTerminal { border-color: rgb(255 255 255 / .13); background: linear-gradient(140deg,#303030 0%,#222 45%,#191919 100%); box-shadow: inset 0 1px 0 rgb(255 255 255 / .08),inset 1px 0 0 rgb(255 255 255 / .03),inset 0 -1px 0 rgb(0 0 0 / .5),0 2px 4px rgb(0 0 0 / .2),0 22px 48px -20px rgb(0 0 0 / .65); }
+:global(html[data-theme="dark"]) .pointer .senseTerminal::after { opacity: .28; }
+:global(html[data-theme="dark"]) .surfaceGrain { mix-blend-mode: screen; opacity: .035; }
+:global(html[data-theme="dark"]) .surfaceReflection { opacity: .13; }
+:global(html[data-theme="dark"]) .pointer .senseTerminal figcaption { background: linear-gradient(180deg,rgb(255 255 255 / .045),transparent); border-bottom-color: rgb(0 0 0 / .3); box-shadow: 0 1px 0 rgb(255 255 255 / .035); }
+.windowStatus { justify-self: end; display: flex; align-items: center; }
+.liveDot { width: 5px; height: 5px; border-radius: 50%; background: var(--color-focus); opacity: .7; }
+.consoleTerminal { transform: none; }
+.consoleOutput { height: 270px; overflow-y: auto; overscroll-behavior: contain; padding-right: .3rem; scrollbar-width: thin; scrollbar-color: var(--color-border) transparent; }
+.outputEntry { margin-top: 1.2rem; animation: output 220ms cubic-bezier(.23,1,.32,1); }
+@keyframes output { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.outputEntry a { text-underline-offset: 3px; }
+.projectOutput { display: grid; gap: .55rem; }
+.projectOutput a { display: grid; grid-template-columns: 4.3rem 1fr; text-decoration: none; gap: .4rem; }
+.projectOutput a:hover { text-decoration: underline; }
+.projectOutput a > span:first-child { color: var(--color-text); }
+.prompt { border-top: 1px solid var(--color-border-soft); display: flex; gap: .65rem; align-items: center; margin-top: 1rem; padding-top: .7rem; }
+.prompt > span { color: var(--color-focus); font-weight: 700; }
+.prompt input { font: inherit; background: none; border: 0; border-radius: 0; color: var(--color-text); min-width: 0; width: 100%; padding: .4rem 0; caret-color: var(--color-focus); }
+.prompt input::placeholder { font-size: .68rem; color: var(--color-text-faint); }
+.prompt button { border: 0; background: none; color: var(--color-text-muted); font: inherit; cursor: pointer; padding: .4rem; }
+.suggestions { display: flex; gap: 1rem; margin-top: .4rem; padding-left: 1.15rem; }
+.suggestions button { border: 0; background: transparent; padding: .25rem 0; color: var(--color-text-muted); font: inherit; font-size: .65rem; cursor: pointer; position: relative; }
+.suggestions button::after { content: ""; position: absolute; bottom: 0; height: 1px; left: 0; right: 0; background: var(--color-text-faint); transform: scaleX(0); transform-origin: left; transition: transform 180ms ease-out; }
+.suggestions button:hover::after { transform: scaleX(1); }
+.suggestions button span { opacity: .45; }
+.dim { color: var(--color-text-faint); font-size: .7rem; }
+.linkedHome { position: relative; }
+.linkedTerminal { transform: none; }
+.textControl { border: 0; margin: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; line-height: inherit; cursor: pointer; position: relative; text-align: left; }
+.educationControl { color: var(--color-text); font-weight: 550; letter-spacing: -.015em; }
+.textControl::after { content: ""; position: absolute; bottom: -.1em; left: 0; right: 0; border-bottom: 1px dashed var(--color-text-faint); opacity: 0; transition: opacity 180ms ease-out; }
+.textControl:hover::after,.textControl:focus-visible::after,.textControl[aria-pressed="true"]::after { opacity: .6; }
+.linkedGroup { position: relative; isolation: isolate; }
+.linkedGroup::before { content: ""; position: absolute; inset: -.45rem -.65rem; background: var(--color-text); border-radius: .35rem; opacity: 0; z-index: -1; transition: opacity 200ms ease-out; }
+.linkedGroup::after { content: ""; position: absolute; left: -.65rem; top: -.15rem; bottom: -.15rem; width: 2px; background: var(--color-focus); opacity: 0; transform: scaleY(.4); transition: transform 200ms ease-out, opacity 200ms ease-out; }
+.linkedGroup[data-selected="true"]::before { opacity: .045; }
+.linkedGroup[data-selected="true"]::after { opacity: .8; transform: scaleY(1); }
+.linkedGroup > * { transition: transform 200ms ease-out; }
+.linkedGroup[data-selected="true"] > * { transform: translateX(3px); }
+.wire { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; color: var(--color-focus); }
+.wire path { fill: none; stroke: currentColor; stroke-width: 1; stroke-dasharray: 2 5; opacity: .3; animation: wire 200ms ease-out; }
+.wire circle { fill: currentColor; opacity: .6; }
+@keyframes wire { from { opacity: 0; } to { opacity: .3; } }
+.unlock { border: 0; color: var(--color-text-faint); background: none; font: inherit; font-size: 1rem; cursor: pointer; padding: 0 .25rem; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media(max-width:800px) { .instructions { margin: 0 auto; flex-direction: column; gap: .5rem; } .consoleOutput { height: 260px; } .prompt input { font-size: 16px; } .surface { padding-bottom: 6rem; } .wire { display: none; } }
+@media(max-width:800px) { .pointer .senseBody { font-size: .7rem; } .ambientLight { inset: -90px -70px; } .contactShadow { height: 100px; bottom: -56px; } }
+@media(prefers-reduced-motion:reduce) { .surface *, .surface *::before, .surface *::after { animation: none!important; transition: none!important; } .pointer figure { transform: none!important; } .linkedGroup[data-selected="true"] > * { transform: none; } }
