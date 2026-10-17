@@ -1,9 +1,15 @@
-# URL-to-page article figures
+# Computer networking course article figures
 
-Four diagrams from the accompanying explanation are preserved in both Chinese
+Four diagrams from the original conversation are preserved in both Chinese
 and English: the introductory handshake, the example handshake, the rendering
-flow, and the complete sequence with IP, port, and MAC changes. Text diagrams
-remain directly in both Markdown articles.
+flow, and the complete sequence with IP, port, and MAC changes. The introductory
+handshake belongs to the course's transport-layer section; the other three
+support the end-of-article case study. All 65 original code and text illustration
+blocks are retained in the Chinese article and translated in the English article.
+
+The article is now `computer-network-fundamentals`, organized around the course's
+six sections. Asset paths remain stable, and the original article URLs redirect
+to the new article in both locales.
 
 The `.mmd` sources are editable. Their checked-in SVG exports allow the existing
 Markdown renderer to display every figure without a client-side Mermaid dependency.
