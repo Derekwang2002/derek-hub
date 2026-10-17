@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ContentLocale } from "../../../../lib/locale";
 import type { SectionData } from "./data";
 import { Drop } from "./drop";
@@ -8,6 +8,7 @@ import { Swipe } from "./swipe";
 import styles from "./motion.module.css";
 import "../hero-motion/picker.css";
 const names=["Flow","Swipe","Drop"];
+const resetPosition=()=>{const url=new URL(location.href);url.hash="";url.searchParams.delete("section");history.replaceState(null,"",url);window.scrollTo({top:0,behavior:"instant"});};
 export function GestureStudies({locale,sections}:{locale:ContentLocale;sections:SectionData[]}) {
   const [current,setCurrent]=useState(2),[replay,setReplay]=useState(0),[ready,setReady]=useState(false);
   const picker=useRef<HTMLElement>(null),highlight=useRef<HTMLSpanElement>(null);
@@ -18,8 +19,7 @@ export function GestureStudies({locale,sections}:{locale:ContentLocale;sections:
     move();window.addEventListener("resize",move);const f=requestAnimationFrame(()=>picker.current?.setAttribute("data-ready",""));
     return()=>{window.removeEventListener("resize",move);cancelAnimationFrame(f);};
   },[current]);
-  const resetPosition=()=>{const url=new URL(location.href);url.hash="";url.searchParams.delete("section");history.replaceState(null,"",url);window.scrollTo({top:0,behavior:"instant"});};
-  const choose=(i:number)=>{resetPosition();setCurrent(i);setReplay(0);};
+  const choose=useCallback((i:number)=>{resetPosition();setCurrent(i);setReplay(0);},[]);
   useEffect(()=>{
     const key=(e:KeyboardEvent)=>{
       if(e.defaultPrevented||e.metaKey||e.ctrlKey||e.altKey||(e.target as HTMLElement).closest("input,textarea,select,[contenteditable=true]"))return;
@@ -27,7 +27,7 @@ export function GestureStudies({locale,sections}:{locale:ContentLocale;sections:
       else if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();resetPosition();setCurrent(i=>(i+(e.key==="ArrowRight"?1:names.length-1))%names.length);setReplay(0);}
       else if(e.key.toLowerCase()==="r"){resetPosition();setReplay(i=>i+1);}
     };window.addEventListener("keydown",key);return()=>window.removeEventListener("keydown",key);
-  },[]);
+  },[choose]);
   const Variant=[Flow,Swipe,Drop][current];
   return <div className={styles.surface}>
     <Variant key={`${current}-${replay}`} locale={locale} sections={sections}/>
