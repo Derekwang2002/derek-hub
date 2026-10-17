@@ -1,0 +1,75 @@
+sequenceDiagram
+    accTitle: From a URL to a rendered page, with address changes
+    accDescr: Six lifelines show the computer, NAT gateway, Internet routing path, DNS resolver, DNS authorities, and web server. ARP, DNS, TCP, TLS, HTTP, rendering, and later requests are annotated with IP addresses, ports, and per-hop MAC addresses.
+    autonumber
+    participant C as Computer / browser<br/>192.168.1.10
+    participant G as Home router / NAT<br/>LAN 192.168.1.1<br/>WAN 198.51.100.23
+    participant N as Internet routing path<br/>Multiple hops collapsed
+    participant D as Recursive DNS resolver<br/>192.0.2.53
+    participant A as DNS authorities<br/>Root / .com / example.com
+    participant S as Web server<br/>203.0.113.80
+
+    C->>C: Enter HTTPS URL<br/>shop.example.com/products/42?color=blue#35;reviews
+    Note over C,G: 1. Look up the route for the external DNS query<br/>Use default gateway 192.168.1.1
+    C->>G: ARP broadcast: who has 192.168.1.1?<br/>MAC C → FF:FF:FF:FF:FF:FF
+    G-->>C: ARP reply: 192.168.1.1 maps to GL<br/>MAC GL → C
+    C->>C: Cache gateway IP → MAC mapping
+    Note over C,G: ARP travels directly in Ethernet, no TCP/UDP ports
+
+    Note over C,A: 2. DNS: query the A record for shop.example.com
+    C->>G: DNS query / UDP<br/>192.168.1.10:53000 → 192.0.2.53:53<br/>MAC C → GL
+    G->>G: Create UDP NAT mapping<br/>192.168.1.10:53000 ↔ 198.51.100.23:63000
+    G->>N: DNS query / UDP<br/>198.51.100.23:63000 → 192.0.2.53:53<br/>MAC GW → I
+    Note over G,N: Ordinary forwarding preserves IP addresses and ports<br/>TTL decreases at each router<br/>Each router encapsulates for its outgoing link<br/>The Ethernet destination MAC identifies the next hop
+    N->>D: DNS query arrives<br/>198.51.100.23:63000 → 192.0.2.53:53<br/>Final-hop MAC RD → D
+    Note over D,A: Resolver cache also misses<br/>New DNS queries use the resolver's own IP and temporary ports
+    D->>A: Query a root server
+    A-->>D: Referral to .com name servers
+    D->>A: Query a .com name server
+    A-->>D: Referral to example.com authorities
+    D->>A: Query an example.com authority
+    A-->>D: A record: shop.example.com = 203.0.113.80
+    D-->>N: DNS response / UDP<br/>192.0.2.53:53 → 198.51.100.23:63000<br/>MAC D → RD
+    N-->>G: Same IP / UDP endpoints as above<br/>Hop to the home router: MAC I → GW
+    G->>G: Reverse translation using UDP NAT state<br/>Destination 198.51.100.23:63000 → 192.168.1.10:53000
+    G-->>C: DNS response / UDP<br/>192.0.2.53:53 → 192.168.1.10:53000<br/>MAC GL → C
+    C->>C: Learn and cache web server IP: 203.0.113.80
+
+    Note over C,S: 3. TCP three-way handshake: connect to the website on port 443
+    C->>G: SYN, SEQ=1000<br/>192.168.1.10:51514 → 203.0.113.80:443<br/>MAC C → GL
+    G->>G: Create TCP NAT mapping<br/>192.168.1.10:51514 ↔ 198.51.100.23:62001
+    G->>N: SYN, SEQ=1000<br/>198.51.100.23:62001 → 203.0.113.80:443<br/>MAC GW → I
+    N->>S: SYN arrives at the server<br/>Same IP / TCP endpoints as above<br/>Final-hop MAC RS → S
+    S-->>N: SYN + ACK, SEQ=8000, ACK=1001<br/>203.0.113.80:443 → 198.51.100.23:62001<br/>MAC S → RS
+    N-->>G: SYN + ACK<br/>Same IP / TCP endpoints as above<br/>Hop to the home router: MAC I → GW
+    G-->>C: SYN + ACK after reverse NAT<br/>203.0.113.80:443 → 192.168.1.10:51514<br/>MAC GL → C
+    C->>G: ACK, SEQ=1001, ACK=8001<br/>192.168.1.10:51514 → 203.0.113.80:443<br/>MAC C → GL
+    G->>N: ACK, reusing the TCP NAT mapping<br/>198.51.100.23:62001 → 203.0.113.80:443<br/>MAC GW → I
+    N->>S: ACK arrives, TCP is established<br/>Same IP / TCP endpoints as above<br/>MAC RS → S
+
+    Note over C,S: 4. TLS / HTTP arrows below are logical end-to-end exchanges, traffic still crosses G and N<br/>Outbound: C → GL, GW → I, intermediate hops, RS → S<br/>Return: S → RS, intermediate hops, I → GW, GL → C<br/>The same TCP ports and NAT mapping remain in use
+    C->>S: TLS ClientHello<br/>Supported algorithms and ephemeral key exchange data<br/>SNI: shop.example.com, ALPN proposes h2
+    S-->>C: TLS ServerHello<br/>Then protected extensions, certificate, CertificateVerify, Finished
+    C->>C: Validate hostname, certificate chain, and handshake proof<br/>Derive traffic keys, confirm HTTP/2 selection
+    C->>S: TLS Finished
+    Note over C,S: TLS protects subsequent HTTP data<br/>Outer IP addresses and TCP ports still identify routing and connections
+
+    Note over C,S: 5. HTTP/2: request the product page after connection initialization
+    C->>S: Encrypted HTTP/2 HEADERS, stream 1<br/>GET /products/42?color=blue<br/>authority: shop.example.com
+    Note right of C: The URL fragment #35;reviews<br/>is not sent in the HTTP request
+    S->>S: Application handles the request<br/>Read product data and generate HTML
+    S-->>C: Encrypted HTTP/2 response, stream 1<br/>HEADERS: 200, Content-Type, etc.<br/>DATA: HTML content
+    Note over C,S: Larger responses span TCP segments, TCP handles acknowledgments, ordering, and retransmission<br/>Segments still travel as IP packets, link frames, and signals, HTTP/2 frame boundaries need not align
+    C->>C: TCP delivers ordered bytes, TLS verifies and decrypts<br/>Decompress HTTP content, parse HTML, build the DOM
+
+    Note over C,S: 6. HTML reveals more resources, reuse the same TCP / TLS connection
+    C->>S: HTTP/2 requests on multiple streams<br/>Stream 3: site.css<br/>Stream 5: product.js<br/>Stream 7: keyboard-blue.webp
+    S-->>C: Response frames from different streams interleave<br/>Same IP / TCP endpoints and NAT mapping
+    C->>C: Parse CSS and compute styles<br/>Layout → paint → rasterization and compositing
+    C->>C: Display the product page<br/>Navigate to the #35;reviews fragment
+    opt JavaScript fetches stock information
+        C->>S: Encrypted HTTP/2 request<br/>GET /api/stock?product=42
+        S-->>C: Stock data as JSON
+        C->>C: Update the DOM and perform necessary rendering work
+    end
+    Note over C,S: The connection can remain open after the page appears

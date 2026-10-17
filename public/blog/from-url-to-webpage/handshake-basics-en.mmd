@@ -1,0 +1,9 @@
+sequenceDiagram
+    accTitle: A basic TCP three-way handshake
+    accDescr: The client sends initial sequence number 100. The server sends 500 and acknowledges 101. The client acknowledges 501, establishing the connection.
+    participant C as Client
+    participant S as Server
+    C->>S: SYN, SEQ=100
+    S->>C: SYN + ACK, SEQ=500, ACK=101
+    C->>S: ACK, SEQ=101, ACK=501
+    Note over C,S: Connection established, data can flow both ways

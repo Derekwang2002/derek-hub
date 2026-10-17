@@ -269,6 +269,8 @@ ponytail-review：只寻找可以删除的复杂度
 只报告过度设计，不检查正确性，也不要修改代码。
 ```
 
+在 Codex 中安装完整插件后，可以用 `@ponytail-review` 调用；其他支持 Skill 的 Agent 一般用 `/ponytail-review`。如果只需要这一个能力，把对应的 `SKILL.md` 放进项目或用户的 Skills 目录就够了，不必同时启用 Ponytail 的常驻模式、Hooks 和其他辅助 Skills。
+
 ## 接受一条删除建议前，先问四个问题
 
 拿到 `ponytail-review` 的输出后，如果觉得有问题，可以用四个问题快速复核：

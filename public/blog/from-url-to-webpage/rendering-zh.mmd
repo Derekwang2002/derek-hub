@@ -1,0 +1,13 @@
+flowchart TD
+    accTitle: 浏览器解析与渲染流程
+    accDescr: HTML 构建 DOM，CSS 参与样式计算，二者生成布局所需结构，经过布局、绘制、栅格化与合成后显示页面。JavaScript 可以修改 DOM 和样式。
+    H[HTML 字节] --> D[解析并构建 DOM]
+    C[CSS 字节] --> S[解析 CSS 与计算样式]
+    D --> R[生成布局所需的结构]
+    S --> R
+    R --> L[布局：确定大小与位置]
+    L --> P[绘制：生成绘制指令]
+    P --> Z[栅格化与合成]
+    Z --> V[屏幕显示页面]
+    J[JavaScript 执行] --> D
+    J --> S

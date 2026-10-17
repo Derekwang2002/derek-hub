@@ -1,0 +1,13 @@
+flowchart TD
+    accTitle: Browser parsing and rendering
+    accDescr: HTML builds the DOM and CSS supplies styles. Together they provide the structure for layout, painting, rasterization, and compositing. JavaScript can modify the DOM and styles.
+    H[HTML bytes] --> D[Parse and build the DOM]
+    C[CSS bytes] --> S[Parse CSS and compute styles]
+    D --> R[Build the structure for layout]
+    S --> R
+    R --> L[Layout: sizes and positions]
+    L --> P[Paint: drawing instructions]
+    P --> Z[Rasterization and compositing]
+    Z --> V[Page appears on screen]
+    J[JavaScript execution] --> D
+    J --> S

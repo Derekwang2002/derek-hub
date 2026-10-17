@@ -1,0 +1,10 @@
+sequenceDiagram
+    accTitle: The product page's TCP three-way handshake
+    accDescr: Every TCP message travels through IP, the link layer, and the physical layer. The initial client sequence is 1000, the server sequence is 8000.
+    participant C as Computer's TCP
+    participant S as Server's TCP
+    Note over C,S: Every message travels through IP, link, and physical layers
+    C->>S: SYN, SEQ=1000
+    S->>C: SYN + ACK, SEQ=8000, ACK=1001
+    C->>S: ACK, SEQ=1001, ACK=8001
+    Note over C,S: TCP connection established

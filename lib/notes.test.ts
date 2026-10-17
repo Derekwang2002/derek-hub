@@ -9,7 +9,7 @@ import sitemap from "../src/app/sitemap";
 test("notes have exclusive ownership in both languages", async () => {
   for (const locale of ["en", "zh"] as const) {
     const notes = await getAllLocalizedPosts(locale, "notes");
-    assert.deepEqual(notes.map(note => note.slug), ["mysql-notes", "leetcode-notes"]);
+    assert.deepEqual(notes.map(note => note.slug), ["computer-network-fundamentals", "mysql-notes", "leetcode-notes"]);
     assert.ok(notes.every(note => note.content.length > 0));
     const blog = await getAllLocalizedPosts(locale);
     assert.ok(blog.length > 0);
@@ -44,6 +44,8 @@ test("legacy note and course URLs redirect without capturing figure assets", asy
     const course = await getProject("csci678", "en");
     assert.ok(course);
     const moved = [
+      ["blog/computer-network-fundamentals", "notes/computer-network-fundamentals"],
+      ["blog/from-url-to-webpage", "notes/computer-network-fundamentals"],
       ["blog/mysql-notes", "notes/mysql-notes"],
       ["blog/leetcode-notes", "notes/leetcode-notes"],
       ["projects/csci678", "notes/csci678"],
@@ -63,6 +65,9 @@ test("sitemap advertises only canonical note URLs in both locales", async () => 
   const urls = (await sitemap()).map(entry => new URL(entry.url).pathname);
   assert.equal(new Set(urls).size, urls.length);
   for (const prefix of ["", "/zh"]) {
+    assert.ok(urls.includes(`${prefix}/notes/computer-network-fundamentals`));
+    assert.ok(!urls.includes(`${prefix}/blog/computer-network-fundamentals`));
+    assert.ok(!urls.includes(`${prefix}/blog/from-url-to-webpage`));
     assert.ok(urls.includes(`${prefix}/notes/mysql-notes`));
     assert.ok(urls.includes(`${prefix}/notes/leetcode-notes`));
     assert.ok(urls.includes(`${prefix}/notes/csci678/lecture-3-preview`));
