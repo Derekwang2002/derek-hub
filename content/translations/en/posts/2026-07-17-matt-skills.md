@@ -1,78 +1,48 @@
 ---
-title: "Matt Pocock Skills Workflow"
-summary: "A complete software development workflow for coding Agents such as Codex and Claude Code, covering requirements clarification, specification design, Ticket decomposition, TDD implementation, code review, and Bug diagnosis."
+title: "Stop asking your agent to “implement and test” in one go: Matt Pocock's Skills split it into five steps"
+summary: "A single “implement this feature and test it” prompt tends to make coding agents misread requirements, expand scope, and write tests after the fact. Matt Pocock's Skills break development into grill, spec, tickets, TDD implementation, and code-review, stopping for human confirmation after each step. This post collects the prompts, completion criteria, and trade-offs for each step."
 ---
 
-This workflow is intended for Codex, Claude Code, and other coding Agents that support Skills. The document focuses on a general team development process while also covering a simplified path for solo development and committing directly to `main`.
+Hand a coding agent "implement this feature and test it," and it usually starts writing code right away. The business rules haven't been pinned down, the tests get written after the feature, and the review can only check whether those tests pass, not whether the code matches the original requirement.
 
----
+Matt Pocock's [`mattpocock/skills`](https://github.com/mattpocock/skills) takes a different approach. It breaks that one big prompt into five steps (grill, spec, tickets, implement + TDD, and code-review), gives each step its own Skill, and stops at the end of each one for a human to confirm before moving on. Two more Skills handle bug diagnosis and architecture cleanup.
 
-## 1. Background
+These Skills are not a heavyweight framework you have to adopt wholesale, and they don't replace product judgment, technical design, or human review. I find it more useful to think of them as a set of working procedures: each Skill owns one stage, and the developer still decides requirements, priorities, architectural trade-offs, and whether anything gets merged.
 
-### 1.1 About This Document
+This post follows a team workflow and notes what changes for a solo developer committing directly to `main`. It applies to any coding agent with Skill support, such as Codex and Claude Code.
 
-This document is based on Matt Pocock's [`mattpocock/skills`](https://github.com/mattpocock/skills) repository. The repository provides a composable set of AI Agent Skills that turn requirements clarification, specification writing, task decomposition, test-driven implementation, code review, and fault diagnosis into a repeatable software development workflow.
+## Why one big prompt lets an agent drift
 
-These Skills are not a heavyweight development framework that must be copied in full, nor do they replace product judgment, technical design, or human review. They are better understood as a set of composable “development operating procedures”: each Skill owns a clearly defined stage, while developers still decide the requirements, priorities, architectural tradeoffs, and whether the code should ultimately be merged.
+Asking for "implement and test" in a single request commonly leads to:
 
-### 1.2 Why This Workflow Is Needed
+- **Misunderstood requirements**: the agent starts coding before key business rules are confirmed.
+- **Scope creep**: the implementation adds features, abstractions, or refactors the Spec never asked for.
+- **Tasks that are too large**: requirements, design, code, and tests compete for one context and drift out of sync.
+- **Late tests**: tests written after the feature tend to mirror the implementation instead of checking the requirement.
+- **Brittle tests**: tests that target private functions, call counts, or internal structure break under ordinary refactoring.
+- **Blind bug fixing**: repeated edits without a stable reproduction can hide symptoms or introduce new bugs.
+- **Review without a baseline**: the review checks whether tests pass, not whether the code satisfies the original requirement.
 
-Giving a coding Agent one large and broad Prompt such as “implement this feature and test it” commonly leads to the following problems:
+The workflow answers this with staged control. Reach a shared understanding first, then write it down as a Spec. Split large work into vertical Tickets that can each be verified on their own. Use TDD during implementation for fast feedback. Finally, review requirement compliance and code quality separately.
 
-- **Misunderstood requirements**: The Agent starts coding before key business rules have been confirmed.
-- **Uncontrolled scope**: The implementation introduces features, abstractions, or refactors that the Spec never requested.
-- **Tasks that are too large**: Requirements, design, code, and tests all compete for a single context, creating inconsistencies from beginning to end.
-- **Late testing**: Tests are added only after the feature is complete, making them likely to conform to the existing implementation instead of validating the actual requirements.
-- **Brittle tests**: Tests target private functions, call counts, or internal structure, so ordinary refactoring causes widespread failures.
-- **Blind Bug fixing**: Changes are attempted repeatedly without a stable reproduction, potentially hiding symptoms or introducing new problems.
-- **Review without a baseline**: Review checks only whether “the tests pass” rather than whether the code actually satisfies the original requirements.
+## Five stages, each answering one question
 
-This workflow reduces those risks through staged control: first establish a shared understanding, then produce a Spec; decompose large work into verifiable vertical Tickets; use TDD during implementation to create a fast feedback loop; and finally review requirements compliance and code quality separately.
+| Stage | Skill | Question it answers | Main output |
+|---|---|---|---|
+| grill | `/grill-with-docs` | Do we actually understand the problem? | Confirmed rules, boundaries, terminology, and decisions |
+| spec | `/to-spec` | How do we turn the discussion into a stable, reviewable baseline? | Spec / PRD, acceptance criteria, test seams |
+| tickets | `/to-tickets` | How do we split a large requirement into independently deliverable work? | Vertically sliced Tickets and their dependencies |
+| implement + TDD | `/implement` + `/tdd` | How do we implement correctly with continuous feedback? | Code, behavioral tests, verification results |
+| review | `/code-review` | Does the implementation meet the requirement and the quality bar? | Spec and Standards review results |
 
-### 1.3 Problems Solved at Each Stage
+Two more Skills sit off the main path and are used as needed:
 
-| Stage | Primary question | Primary output |
+| Situation | Skill | Main output |
 |---|---|---|
-| `grill` | Do we truly understand the problem we are trying to solve? | Confirmed rules, boundaries, terminology, and decisions |
-| `spec` | How do we turn the discussion into a stable, reviewable implementation baseline? | Spec / PRD, acceptance criteria, and test seams |
-| `tickets` | How do we decompose a large requirement into independently deliverable work? | Vertically sliced Tickets and dependency relationships |
-| `implement + TDD` | How do we implement correctly with continuous feedback? | Code, behavioral tests, and validation results |
-| `review` | Does the implementation satisfy the requirements and meet code-quality standards? | Standards and Spec review results |
-| `diagnosing-bugs` | How do we locate complex faults without guessing blindly? | Stable reproduction, root cause, regression test, and minimal fix |
-| `improve-codebase-architecture` | What should we do when the feature works but the code structure is deteriorating? | Architecture issue report and candidate improvements |
+| A bug or performance regression with no obvious cause | `/diagnosing-bugs` | Stable reproduction, root cause, regression test, minimal fix |
+| The feature works, but the code structure is degrading | `/improve-codebase-architecture` | Architecture findings and candidate improvements |
 
-### 1.4 Applicable Scenarios
-
-This workflow applies to:
-
-- New feature development.
-- Extensions to existing features.
-- Bug fixes and performance-regression investigations.
-- Changes spanning multiple modules or both front end and back end.
-- Projects with heavy AI Agent involvement that require explicit scope control.
-- Team-based development as well as independently maintained solo projects.
-
-For copy changes, simple configuration updates, or obvious one- or two-line fixes, there is no need to follow the full workflow mechanically. Depending on risk and scale, it can be shortened to:
-
-```text
-spec → implement/TDD → review
-```
-
-Or, when both the problem and the change are completely clear:
-
-```text
-implement → targeted tests → review
-```
-
-### 1.5 Relationship Between Team and Solo Development
-
-This document uses team development as the default path: create a feature branch from the main branch, then merge it after a PR, CI, and human Review.
-
-Solo development is not a separate methodology; it is a Git-workflow branch within the same process. A solo developer can commit directly to `main`, but should still record the Commit before starting the feature so that `/code-review` has a clear comparison point. Requirements clarification, Spec, Ticket, TDD, Review, and Bug-diagnosis steps remain unchanged.
-
----
-
-## 2. Overall Workflow
+The main path looks like this:
 
 ```text
 Requirement
@@ -88,39 +58,52 @@ implement + TDD
 review
   ↓
 PR / merge / release
-
-When a Bug appears: diagnosing-bugs
-When the code structure needs improvement: improve-codebase-architecture
 ```
 
-Corresponding Skills:
+A handful of principles run through every stage:
+
+- Settle requirements, boundaries, and acceptance criteria before writing code.
+- Settle the test seams before implementing.
+- Split medium and large requirements into vertical Tickets that can be verified independently.
+- Implement one observable behavior at a time.
+- When done, check both "does it match the Spec?" and "is the code quality acceptable?"
+- When a bug's cause is unclear, get a stable reproduction before changing anything.
+
+Before using these Skills in a repository for the first time, run `/setup-matt-pocock-skills` once. It configures where issues are tracked, the triage labels, and where domain docs such as `CONTEXT.md` and ADRs live. The other Skills rely on those conventions.
+
+## Small changes don't need all five steps
+
+New features, extensions to existing features, bug fixes, performance regressions, changes spanning several modules or both front end and back end, and projects where an agent does most of the work and scope needs tight control all benefit from the full workflow.
+
+Copy edits, simple configuration updates, and obvious one- or two-line fixes don't need the full sequence. Shorten it to:
 
 ```text
-/grill-with-docs
-/to-spec
-/to-tickets
-/implement + /tdd
-/code-review
-/diagnosing-bugs
-/improve-codebase-architecture
+spec → implement/TDD → review
 ```
 
-Core principles:
+When both the problem and the change are completely clear, shorter still:
 
-- Clarify requirements, boundaries, and acceptance criteria before writing code.
-- Identify test seams before implementing the feature.
-- Decompose medium and large requirements into independently verifiable vertical Tickets.
-- Complete one observable behavior at a time during implementation.
-- After implementation, check both “does it satisfy the Spec?” and “is the code quality acceptable?”
-- When the cause of a Bug is unclear, do not modify code blindly; establish a stable reproduction first.
+```text
+implement → targeted tests → review
+```
 
----
+Different sizes of work combine the steps roughly like this:
 
-## 3. Choosing a Development Mode
+| Situation | Workflow |
+|---|---|
+| Small change | grill → spec → implement + TDD → review |
+| Medium or large feature | grill → spec → tickets → implement + TDD one Ticket at a time → review → PR |
+| Several people in parallel | grill → spec → tickets (with blocking edges) → parallel feature branches → code-review on each branch → separate PRs + CI → merge in dependency order |
+| A bug appears | diagnosing-bugs → regression test → minimal fix → full test suite → review |
+| Restructuring an existing feature | code-review → improve-codebase-architecture → pick one improvement → spec → tickets → implement + TDD → review |
 
-### 3.1 Team Development: Feature Branch + PR Recommended
+## Teams use feature branches; solo developers record a starting point on main
 
-Usually, create a feature branch from the latest main branch:
+Team and solo development differ only in the Git workflow. The grill → spec → tickets → implement/TDD → review path stays the same. What changes is the starting point `/code-review` compares against.
+
+### Team development: feature branch + PR
+
+Start a feature branch from the latest main branch:
 
 ```bash
 git switch main
@@ -128,15 +111,13 @@ git pull
 git switch -c feature/order-cancellation
 ```
 
-After development is complete, use:
+When the work is done, run:
 
 ```text
 /code-review main
 ```
 
-It reviews the current feature branch's changes since its merge base with `main`.
-
-Recommended flow:
+It reviews the changes on the current feature branch since its merge base with `main`. The full flow:
 
 ```text
 main
@@ -148,70 +129,45 @@ code-review main
 push
   ↓
 create PR
-  ↓ CI + human Review
+  ↓ CI + human review
 merge into main
 ```
 
-### 3.2 Solo Development: Commit Directly to main
+### Solo development: commit directly to main
 
-A solo project does not always require a feature branch. When developing directly on `main`, record the current Commit before starting a new feature:
+A solo project doesn't have to use feature branches. If you develop directly on `main`, record the current commit before starting a new feature:
 
 ```bash
 git rev-parse HEAD
 ```
 
-For example, it may return:
-
-```text
-a1b2c3d
-```
-
-After the feature is complete, use:
+If that prints `a1b2c3d`, run this when the feature is done:
 
 ```text
 /code-review a1b2c3d
 ```
 
-You can also create a local tag:
+You can also mark the starting point with a local tag:
 
 ```bash
 git tag review/order-cancel-start
 ```
 
-After development is complete:
+When development is complete:
 
 ```text
 /code-review review/order-cancel-start
 ```
 
-Delete the tag after the review if desired:
+Delete the tag after the review:
 
 ```bash
 git tag -d review/order-cancel-start
 ```
 
-The only major difference between solo and team development is the Git workflow; the primary `grill → spec → tickets → implement/TDD → review` process remains unchanged.
+## grill: pin down the business rules before any code
 
----
-
-## 4. Grill: Clarify Requirements
-
-### Objective
-
-Use an interview to clarify:
-
-- User problems and expected behavior
-- Business rules
-- Permission rules
-- Edge cases
-- Error handling
-- Data and interface impact
-- Technical constraints
-- Acceptance criteria
-- Test boundaries
-- Out of Scope
-
-### Prompt
+This step uses interview-style questioning to confirm the user problem and expected behavior, business rules, permission rules, edge cases, error handling, data and interface impact, technical constraints, acceptance criteria, test boundaries, and what is out of scope.
 
 ```text
 /grill-with-docs
@@ -233,25 +189,19 @@ At this stage, only clarify requirements and make necessary updates to project d
 After confirmation is complete, output a summary and stop. Wait for me to run /to-spec.
 ```
 
-### Completion Criteria
+The last two lines matter. Without an explicit "stop," the agent will often finish its questions and start coding anyway.
 
-Before moving to the next stage, clarify:
+Before moving on, you should be able to answer:
 
-- Under which conditions the operation succeeds and under which conditions it fails.
-- What result the user can ultimately observe.
-- How errors are expressed and handled.
-- Which behaviors must be verified through automated tests.
-- Which items are explicitly outside the scope of this work.
+- When does the operation succeed, and when does it fail?
+- What result can the user ultimately observe?
+- How are errors expressed and handled?
+- Which behaviors must be covered by automated tests?
+- What is explicitly out of scope?
 
----
+## spec: write the discussion down as a reviewable baseline
 
-## 5. Spec: Produce a Formal Specification
-
-### Objective
-
-Turn the confirmed discussion into a shared baseline for subsequent development, testing, and Review.
-
-### Prompt
+This step turns the confirmed discussion into the shared reference for development, testing, and review.
 
 ```text
 /to-spec
@@ -274,14 +224,14 @@ At this stage, only create or update the Spec; do not modify business code.
 Stop when finished and wait for my review.
 ```
 
-### Minimum Spec Structure
+A Spec needs at least these sections:
 
 ```markdown
 ## Problem Statement
-The problem the user currently faces.
+The problem the user currently has.
 
 ## Solution
-The user experience and system behavior after the feature is complete.
+The user experience and system behavior once the feature is done.
 
 ## User Stories
 1. As a ...
@@ -294,40 +244,27 @@ The user experience and system behavior after the feature is complete.
 ## Implementation Decisions
 - Module and interface decisions
 - State transitions
-- API, Schema, or permission handling
+- API, schema, or permission handling
 
 ## Testing Decisions
 - Test seams
-- Normal scenarios
-- Error scenarios
+- Happy paths
+- Error cases
 - Edge cases
 
 ## Acceptance Criteria
-- [ ] Criterion one
-- [ ] Criterion two
+- [ ] Condition one
+- [ ] Condition two
 
 ## Out of Scope
-- Items not included in this work
+- What this change will not do
 ```
 
-### Whether Tickets Are Required
+For a small change, go straight from the Spec to implementation. For medium and large features, split into Tickets first.
 
-- Small change: `spec → implement/TDD → review`
-- Medium or large feature: `spec → tickets → implement/TDD → review`
+## tickets: slice vertically by user behavior, not by technical layer
 
----
-
-## 6. Tickets: Decompose into Vertical Tasks
-
-### When They Are Needed
-
-- The feature involves multiple modules.
-- A single Agent context cannot reasonably complete the work.
-- There are multiple behaviors that can be accepted independently.
-- Multiple developers or Agents need to work in parallel.
-- The tasks have explicit dependencies.
-
-### Prompt
+Splitting into Tickets pays off when the feature spans several modules, doesn't fit in one agent context, has several independently verifiable behaviors, needs several people or agents working in parallel, or has clear dependencies between tasks.
 
 ```text
 /to-tickets <Spec path, Issue, or URL>
@@ -346,7 +283,7 @@ Show the proposed decomposition first and publish only after confirmation.
 Stop after publishing; do not start implementation automatically.
 ```
 
-### Horizontal Decomposition Is Not Recommended
+With a horizontal split by layer, no single Ticket delivers a behavior anyone can verify:
 
 ```text
 Ticket 1: Modify the database
@@ -355,7 +292,7 @@ Ticket 3: Implement the front end
 Ticket 4: Add tests
 ```
 
-### Recommended Vertical Decomposition
+A vertical split ties every Ticket to a result the user can observe:
 
 ```text
 Ticket 1: The user can complete the core operation
@@ -364,21 +301,17 @@ Ticket 3: The operation supports idempotency or concurrency protection
 Ticket 4: The front end provides a complete entry point and result feedback
 ```
 
-Each Ticket should include the code, tests, and necessary documentation required to implement that behavior.
+Each Ticket should contain the code, tests, and any documentation needed for that behavior.
 
-### Notes for Parallel Team Development
+For parallel team work, also keep in mind:
 
-- Only Tickets with no unfinished Blockers may begin.
-- Minimize multiple Tickets changing the same file at the same time.
-- Define shared cross-module interfaces through a Spec or ADR first.
-- Using a separate branch and PR for each Ticket makes Review easier.
-- When multiple parallel Tickets depend on the same foundational change, create a foundation or prefactoring Ticket first.
+- Only start a Ticket with no unfinished blockers.
+- Avoid having several Tickets edit the same files at once.
+- Settle shared cross-module interfaces in the Spec or an ADR first.
+- One branch and one PR per Ticket makes review easier.
+- When several parallel Tickets depend on the same groundwork, create a separate prefactoring Ticket for it first.
 
----
-
-## 7. Implement + TDD: Implement One Ticket at a Time
-
-### Prompt
+## implement + TDD: turn one test green at a time
 
 ```text
 /implement <Ticket URL, number, or path>
@@ -405,7 +338,7 @@ When implementation is complete, run:
 Then run /code-review and report the results.
 ```
 
-### TDD Loop
+The TDD loop itself is simple:
 
 ```text
 Choose one behavior
@@ -421,29 +354,18 @@ Test passes
 Move to the next behavior
 ```
 
-Example:
+For an operation with permission and state rules:
 
 ```text
-Test 1: An authorized user can perform the operation
-Write the minimum code
-Test turns green
-
-Test 2: An unauthorized user is rejected
-Add the permission check
-Test turns green
-
-Test 3: An invalid state is rejected
-Add the state rule
-Test turns green
-
-Test 4: Repeated operations remain idempotent
-Add idempotency protection
-Test turns green
+Test 1: An authorized user can perform the operation → minimum code → green
+Test 2: An unauthorized user is rejected → add the permission check → green
+Test 3: An invalid state is rejected → add the state rule → green
+Test 4: Repeated operations remain idempotent → add idempotency protection → green
 ```
 
-### Testing Principles
+"Confirm that the test fails for the correct reason" is the step that gets skipped. If a test fails because a function name was misspelled, watching it turn green later proves nothing.
 
-Prefer testing public behavior:
+Test public behavior first:
 
 ```text
 Calling the API returns the correct result
@@ -461,27 +383,16 @@ The order of internal function calls
 The intermediate state of a private field
 ```
 
-### Completion Criteria
+This step is done when all of the Ticket's acceptance criteria are met; the tests failed before they passed; targeted tests, related tests, and the full suite pass; typecheck, lint, and build pass; and no debug logging, temporary code, or unrelated changes remain.
 
-- All acceptance criteria for the current Ticket are satisfied.
-- Tests failed first, then passed.
-- Targeted and related tests pass.
-- The complete test suite passes.
-- typecheck, lint, and build pass.
-- No debug logs, temporary code, or unrelated changes remain.
+## code-review: check against the Spec and the project standards separately
 
----
+`/code-review` checks the implemented code along two axes:
 
-## 8. Review: Check Again
+1. **Spec Review**: is the requirement implemented correctly and completely?
+2. **Standards Review**: does the code follow the project's conventions and sensible design principles?
 
-### Objective
-
-Review the implemented code from two perspectives:
-
-1. **Spec Review**: Whether it implements the requirements correctly and completely.
-2. **Standards Review**: Whether the code follows project conventions and sound design principles.
-
-### Team Development Prompt
+For team development:
 
 ```text
 /code-review main
@@ -501,25 +412,9 @@ Focus on:
 Report issues first; do not modify the code immediately.
 ```
 
-### Prompt for Solo Development Directly on main
+When developing solo on `main`, replace `main` with the commit SHA or tag recorded before the feature started. The review then covers everything from that fixed point to the current HEAD, with the same focus list.
 
-```text
-/code-review <Commit SHA or Tag from before the feature started>
-
-Review all changes from that fixed point through the current HEAD.
-
-Focus on:
-- Whether the implementation fully satisfies the Spec
-- Whether edge cases were missed
-- Whether there is Scope Creep
-- Whether tests verify real external behavior
-- Whether there is duplicated code or excessive abstraction
-- Whether module boundaries are reasonable
-
-Report issues first; do not modify the code immediately.
-```
-
-### Handling Review Results
+"Report issues first; do not modify the code immediately" gives a human the chance to decide which findings actually hold. Once that's settled, have the agent fix them:
 
 ```text
 Fix the confirmed valid issues from code-review.
@@ -535,39 +430,9 @@ After fixing them, rerun:
 Then run /code-review <original fixed point> again.
 ```
 
-### Final Gate for Team Development
+## diagnosing-bugs: get a stable reproduction before changing code
 
-Before merging the PR, confirm:
-
-```text
-[ ] Spec Review has no blocking issues
-[ ] Standards Review has no blocking issues
-[ ] Automated tests pass
-[ ] typecheck passes
-[ ] lint passes
-[ ] build passes
-[ ] CI passes
-[ ] Human Review is complete
-[ ] The PR description matches the actual changes
-[ ] No unresolved Review Comments remain
-```
-
----
-
-## 9. Bug Path: Diagnosing Bugs
-
-### When to Use It
-
-- Feature behavior is incorrect.
-- A test fails but the cause is unclear.
-- CI fails while the same test passes locally.
-- A Bug occurs intermittently.
-- There is a concurrency or timing problem.
-- Performance declines significantly.
-- Fixing one location causes a regression elsewhere.
-- The Agent begins guessing repeatedly and making arbitrary changes.
-
-### Prompt
+Switch to this Skill when behavior is wrong, a test fails for unclear reasons, CI fails but local runs pass, a bug is intermittent, there's a concurrency or timing issue, performance drops noticeably, fixing one place breaks another, or the agent starts guessing and making random edits.
 
 ```text
 /diagnosing-bugs
@@ -590,7 +455,7 @@ Then:
 7. Rerun the original reproduction and the complete test suite
 ```
 
-### Diagnostic Process
+The diagnostic process runs roughly:
 
 ```text
 Establish a stable failure signal
@@ -599,222 +464,77 @@ Minimize the reproduction
   ↓
 Form 3–5 hypotheses
   ↓
-Test them with logs, a debugger, or experiments
+Verify them with logs, a debugger, or experiments
   ↓
-Write a regression test first
+Write the regression test first
   ↓
 Apply the minimal fix
   ↓
-Run the original reproduction
+Rerun the original reproduction
   ↓
 Run the complete test suite
   ↓
 code-review
 ```
 
-### Prohibited Practices
+Rule these out explicitly:
 
-- Modifying code before establishing a stable reproduction.
-- Changing multiple variables at once.
-- Resolving a failure by deleting a test.
-- Resolving a failure by skipping a test or weakening its assertions.
-- Confirming only that “there is no error” without verifying the user's actual symptom.
-- Failing to add a regression test after the fix.
+- Changing code without a stable reproduction.
+- Changing several variables at once.
+- Deleting tests to make a failure go away.
+- Skipping tests or loosening assertions to make a failure go away.
+- Confirming only that "there's no error" without checking the symptom the user actually saw.
+- Fixing the bug without adding a regression test.
 
----
+## When it works but the structure is degrading: improve-codebase-architecture
 
-## 10. Further Improvement of Implemented Features
-
-### Comprehensive Feature and Code Review
-
-```text
-/code-review <main, starting Commit, or Tag>
-```
-
-Suitable for:
-
-- Checking whether the requirement was fully implemented.
-- Checking whether edge cases were missed.
-- Checking test coverage and code quality.
-- Checking whether the scope drifted.
-
-### A Clear Bug or Test Failure
-
-```text
-/diagnosing-bugs
-```
-
-Suitable for:
-
-- Locating a specific error.
-- Fixing intermittent or complex Bugs.
-- Adding a reliable regression test.
-
-### Code Runs but Its Structure Is Disorganized
-
-```text
-/improve-codebase-architecture
-```
-
-Prompt:
+When a feature has shipped but the code gets messier with each change, start with `/code-review` for requirement coverage and tests, then use this Skill for structure:
 
 ```text
 /improve-codebase-architecture
 
-Review the code structure related to <feature or module name>.
+Inspect the code structure related to <feature name or module>.
 
-Focus on finding:
+Look especially for:
 - Unclear module boundaries
 - Scattered business logic
 - Excessive coupling
-- Expanding change scope
-- Designs that are difficult to test
-- Opportunities to create a deep module
+- Changes that ripple widely
+- Designs that are hard to test
+- Opportunities to form deep modules
 
-First produce an analysis and candidate improvements. Do not immediately perform a large-scale refactor.
+Produce analysis and candidate improvements first; do not perform a large-scale refactor directly.
 ```
 
-For a selected architecture improvement, the recommended path is:
+For any improvement you pick, go through spec → tickets → implement/TDD → review again. A large refactor with no Spec, acceptance criteria, or regression tests carries about the same risk as a big PR nobody reviewed.
+
+## What this workflow costs
+
+Staging buys control, and it has real costs:
+
+- **More turns and more time.** Every stage stops for confirmation, so a small feature can take several round trips. When the requirement is already clear, those pauses are mostly overhead, which is why the workflow should be trimmed to fit the change.
+- **A human has to be present.** Someone has to answer the grill questions and review the Spec and Tickets. If every output just gets approved, the process is ceremony.
+- **The docs need upkeep.** `CONTEXT.md`, ADRs, and Specs go stale as requirements change, and stale docs steer the agent the wrong way.
+- **Skills are prompts, not enforcement.** An agent can still skip "confirm the test fails first" or add a feature during implementation. The "stop" and "implement only the current Ticket" instructions in the prompts, plus the final review, are the backstop.
+
+## Pre-merge checklist
 
 ```text
-spec → tickets → implement/TDD → review
-```
-
-Do not perform a large-scale refactor without a Spec, acceptance criteria, and regression tests.
-
----
-
-## 11. Common Workflow Combinations
-
-### Small Change
-
-```text
-grill
-  ↓
-spec
-  ↓
-implement + TDD
-  ↓
-review
-```
-
-### Medium or Large Feature
-
-```text
-grill
-  ↓
-spec
-  ↓
-tickets
-  ↓
-implement + TDD one by one
-  ↓
-review
-  ↓
-PR / merge
-```
-
-### Parallel Development by Multiple People
-
-```text
-grill
-  ↓
-spec
-  ↓
-tickets + blocking edges
-  ↓
-parallel implement + TDD on multiple feature branches
-  ↓
-code-review for each branch
-  ↓
-independent PRs + CI
-  ↓
-merge in dependency order
-```
-
-### When a Bug Appears
-
-```text
-diagnosing-bugs
-  ↓
-regression test
-  ↓
-minimal fix
-  ↓
-complete test suite
-  ↓
-review
-```
-
-### Structural Improvement of an Existing Feature
-
-```text
-code-review
-  ↓
-improve-codebase-architecture
-  ↓
-select one improvement
-  ↓
-spec
-  ↓
-tickets
-  ↓
-implement + TDD
-  ↓
-review
-```
-
-### Solo Development Directly on main
-
-```text
-Record the starting Commit
-  ↓
-grill
-  ↓
-spec
-  ↓
-tickets (optional)
-  ↓
-implement + TDD
-  ↓
-Create small Commits
-  ↓
-code-review <starting Commit>
-  ↓
-Fix and revalidate
-```
-
----
-
-## 12. Final Checklist
-
-```text
-[ ] Requirements have been clarified through Grill
-[ ] A clear Spec exists
-[ ] Acceptance criteria are observable and testable
-[ ] Medium and large features have been decomposed into vertical Tickets
-[ ] Dependencies between Tickets are clear
-[ ] Each behavior was implemented through TDD
-[ ] No private implementation details are tested
-[ ] Targeted tests pass
-[ ] Related tests pass
-[ ] The complete test suite passes
-[ ] typecheck passes
-[ ] lint passes
-[ ] build passes
-[ ] code-review has been run
-[ ] Valid issues from Review have been addressed
+[ ] The requirement has been clarified through grill
+[ ] There is a clear Spec with observable, testable acceptance criteria
+[ ] Medium and large features are split into vertical Tickets with clear dependencies
+[ ] Each behavior was implemented with TDD, and its test failed first
+[ ] No tests target private implementation details
+[ ] Targeted tests, related tests, and the full test suite pass
+[ ] typecheck, lint, and build pass
+[ ] code-review has run, with no blocking Spec Review or Standards Review issues
 [ ] Bug fixes include regression tests
-[ ] No debug logs or temporary code remain
-[ ] The team project's PR, CI, and human Review are complete
+[ ] No debug logging or temporary code remains
+[ ] For team projects: CI and human review are done, the PR description matches the changes, and no review comments are unresolved
 ```
 
----
+## Try it on one small requirement first
 
-## 13. One-Sentence Reminder
+There's no need to start with the full workflow on a big feature. Pick a real but small requirement, such as adding one validation rule to an existing endpoint, run `/setup-matt-pocock-skills`, and go through grill → spec → implement + TDD → code-review once.
 
-```text
-Clarify first, then write the specification;
-decompose the specification into tasks, and implement each task with TDD;
-Review when finished, and diagnose before fixing a Bug.
-```
+Afterward, compare the result with what you used to get from asking the agent to "implement and test." Which edge cases did grill surface that you hadn't thought of? Did the Spec Review catch anything that drifted from the requirement? That comparison will tell you more about whether these Skills belong in your project than any description of the process. Full documentation for each Skill is in [`mattpocock/skills`](https://github.com/mattpocock/skills).
