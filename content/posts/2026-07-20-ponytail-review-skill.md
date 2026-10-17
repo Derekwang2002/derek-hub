@@ -1,5 +1,5 @@
 ---
-title: "Ponytail Review skill 介绍"
+title: "Ponytail Review skill : 精简冗余代码"
 date: 2026-07-20
 summary: "ponytail-review 只看当前 Diff 里的过度设计，用 delete、stdlib、native、yagni、shrink 五个标签给出一行一条的删除建议。它适合放在常规 Code Review 之后，但不能替代它。"
 tags: [ai-agent, code-review, software-engineering]
