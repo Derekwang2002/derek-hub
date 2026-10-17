@@ -17,6 +17,19 @@
 .about span { transition: transform 180ms ease; }
 @media (hover: hover) and (pointer: fine) {
 :where(:global(html:not([data-input="touch"]))) .about:hover span { transform: translate(2px, -2px); } }
+@media (max-width: 800px) {
+  .compact { position: relative; flex-wrap: nowrap; gap: .25rem; margin: 0; }
+  .compact::before { content: ""; position: absolute; inset: .5rem 0; border-radius: 999px; background: color-mix(in srgb, var(--color-text) 3.5%, var(--color-bg)); pointer-events: none; }
+  .compact .label, .compact .about { display: none; }
+  .compact a { justify-content: center; flex-shrink: 0; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: color 120ms ease-out; }
+  .compact a::after { inset: .5rem 0; width: auto; height: auto; border-radius: 999px; background: transparent; transform: none; pointer-events: none; transition: background-color 120ms ease-out; }
+  .compact .email::before { content: ""; position: absolute; left: -.125rem; top: 50%; width: 1px; height: .625rem; background: var(--color-border-soft); opacity: .7; transform: translateY(-50%); pointer-events: none; }
+  .compact svg { position: relative; z-index: 1; width: 1.125rem; height: 1.125rem; }
+  .compact .email svg { width: 1.575rem; height: 1.575rem; }
+  .compact a:active { color: var(--color-text); }
+  .compact a:active::after { background: var(--color-surface-raised); }
+  .compact a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+}
 @media (hover: hover) and (pointer: fine) {
 :where(:global(html:not([data-input="touch"]))):global(html[data-theme="dark"]) .github:hover svg { fill: #a371f7; } }
-@media (prefers-reduced-motion: reduce) { .links a::after, .links svg, .about span { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .links a, .links a::after, .links svg, .about span { transition: none; } }

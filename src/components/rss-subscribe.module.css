@@ -1,0 +1,46 @@
+.trigger { display: flex; align-items: center; justify-content: center; gap: .4rem; width: max-content; height: 36px; padding: 0 .5rem; border: 0; border-radius: 6px; background: transparent; color: var(--color-text-muted); font: inherit; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+.trigger[aria-expanded="true"] { background: var(--color-surface-muted); color: var(--color-text); }
+.trigger:active, .iconButton:active, .sourceButton:active, .closeButton:active { transform: scale(.97); }
+.rssIcon { width: 17px; height: 17px; }
+.dialog { position: fixed; inset: 0; width: 100%; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 20px; border: 0; background: transparent; color: var(--color-text); overflow: auto; overscroll-behavior: contain; }
+.dialog[open] { display: grid; place-items: center; }
+.dialog:focus { outline: none; }
+.dialog::backdrop { background: rgb(0 0 0 / .26); backdrop-filter: blur(3px); }
+.panel { width: min(440px, 100%); min-width: 0; padding: 20px; background: var(--color-surface); border: 1px solid var(--color-border-soft); border-radius: 14px; box-shadow: 0 20px 60px rgb(0 0 0 / .16), 0 3px 12px rgb(0 0 0 / .06); }
+.dialog[open] .panel { animation: appear 160ms cubic-bezier(.22,1,.36,1); }
+.dialogHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.dialogHeader h2 { margin: 0; font-size: .95rem; font-weight: 600; letter-spacing: 0; line-height: 1.5; }
+.closeButton { display: grid; place-items: center; width: 36px; height: 36px; margin: -6px -6px -6px 0; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--color-text-muted); cursor: pointer; }
+.closeButton svg { width: 18px; height: 18px; }
+.feedRow { display: flex; align-items: center; gap: 6px; }
+.addressRow { display: flex; align-items: center; flex: 1; min-width: 0; background: var(--color-bg); border: 1px solid var(--color-border-soft); border-radius: 5px; }
+.addressRow input { flex: 1; min-width: 0; width: 100%; height: 36px; padding: 0 9px; border: 0; border-radius: 5px; background: transparent; color: var(--color-text-muted); font: .75rem ui-monospace, SFMono-Regular, Menlo, monospace; text-overflow: ellipsis; }
+.addressRow input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: -2px; }
+.iconButton, .sourceButton { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--color-text-muted); cursor: pointer; text-decoration: none; }
+.iconButton svg, .sourceButton svg { width: 17px; height: 17px; }
+.iconButton[data-copied="true"] { color: var(--color-focus); }
+.status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.articleSubscribe { border-top: 1px solid var(--color-border); margin-top: 2.8rem; padding-top: 2rem; }
+.eyebrow { display: block; color: var(--color-text-faint); font-size: .68rem; font-weight: 500; letter-spacing: .09em; }
+.articleSubscribe > h2 { margin: .65rem 0 .5rem; font-size: 1.25rem; line-height: 1.5; letter-spacing: -.025em; }
+.articleSubscribe > p { margin-bottom: 1rem; color: var(--color-text-muted); font-size: .85rem; }
+.articleSubscribe .trigger { height: 40px; padding-inline: .9rem; background: var(--color-text); color: var(--color-bg); }
+@media (hover: hover) and (pointer: fine) {
+  :where(:global(html:not([data-input="touch"]))) .trigger:hover,
+  :where(:global(html:not([data-input="touch"]))) .iconButton:hover,
+  :where(:global(html:not([data-input="touch"]))) .sourceButton:hover,
+  :where(:global(html:not([data-input="touch"]))) .closeButton:hover { background: var(--color-surface-muted); color: var(--color-text); }
+  :where(:global(html:not([data-input="touch"]))) .articleSubscribe .trigger:hover { background: var(--color-text-soft); color: var(--color-bg); }
+}
+@media (max-width: 640px) {
+  .dialog { padding: 16px; }
+  .panel { padding: 16px; }
+  .feedRow { gap: 4px; }
+  .addressRow input { height: 40px; font-size: .7rem; }
+  .iconButton, .sourceButton { width: 40px; height: 40px; }
+  .closeButton { width: 44px; height: 44px; margin: -10px -8px -10px 0; }
+  .articleSubscribe .trigger { height: 44px; }
+  .articleSubscribe > h2 { font-size: 1.15rem; }
+}
+@keyframes appear { from { opacity: 0; transform: translateY(5px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dialog[open] .panel { animation: none; } }

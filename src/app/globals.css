@@ -81,8 +81,8 @@ html[data-theme="dark"] ::selection {
   gap: clamp(1.5rem, 3.5vw, 3.1rem);
   height: var(--site-header-height);
   margin: 0 auto;
-  max-width: 1760px;
-  padding: 0 var(--site-gutter);
+  max-width: var(--site-nav-width, 1760px);
+  padding: 0 var(--site-nav-gutter, var(--site-gutter));
 }
 
 .site-brand {
@@ -226,6 +226,16 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .site-brand { margin-right: auto; }
   .site-controls { margin-left: auto; }
   .site-nav-links { align-items: center; gap: 0.75rem; order: 3; height: 2.85rem; justify-content: space-between; width: 100%; }
+}
+
+/* A shared reading column above phone widths; navigation extends slightly beyond it. */
+@media (min-width: 441px) and (max-width: 800px) {
+  :root {
+    --site-nav-width: 560px;
+    --site-nav-gutter: clamp(20px, calc((100vw - 400px) / 2), 28px);
+    --page-column-width: 560px;
+    --page-column-gutter: clamp(20px, calc((100vw - 400px) / 2), 40px);
+  }
 }
 
 .meta-badge {

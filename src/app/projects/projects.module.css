@@ -1,4 +1,4 @@
-.indexPage { margin: 0 auto; max-width: 960px; padding: 3.5rem var(--site-gutter) 4rem; }
+.indexPage { margin: 0 auto; max-width: var(--page-column-width, 960px); padding: 3.5rem var(--page-column-gutter, var(--site-gutter)) 4rem; }
 .indexHero { margin-bottom: 2rem; }
 .indexHero h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.1; margin: 0; }
 .indexHeading { align-items: center; display: flex; gap: 0.35rem; position: relative; }
@@ -9,7 +9,7 @@
 .projectList strong { font-size: 1.08rem; letter-spacing: -0.015em; line-height: 1.35; }
 .projectList small { color: var(--color-text-muted); font-size: 0.88rem; line-height: 1.5; margin-top: 0.3rem; }
 .projectMeta { color: var(--color-text-faint); flex: 0 0 auto; font-size: 0.78rem; padding-top: 0.25rem; }
-.projectPage { margin: 0 auto; max-width: 1184px; padding: 3rem var(--site-gutter) 5rem; }
+.projectPage { margin: 0 auto; max-width: var(--page-column-width, 1184px); padding: 3rem var(--page-column-gutter, var(--site-gutter)) 5rem; }
 .projectMain { margin: 0 auto; max-width: 1068px; min-width: 0; }
 .projectNavLinks { align-items: center; display: flex; gap: 1.5rem; }
 .projectNavLinks > a, .documentMenu summary { color: var(--color-text-muted); font-size: 0.85rem; text-decoration: none; }
@@ -56,9 +56,9 @@
 .interactiveIntro > div { color: var(--color-text-muted); max-width: 720px; }
 .interactiveIntro a { flex: 0 0 auto; }
 .interactiveFrame { background: #0c1016; border: 0; border-radius: 0.45rem; height: min(76vh, 820px); min-height: 560px; width: 100%; }
-@media (max-width: 1099px) { .projectPage { max-width: 880px; } }
+@media (max-width: 1099px) { .projectPage { max-width: var(--page-column-width, 880px); } }
 @media (max-width: 680px) {
-  .projectPage { padding: 1.5rem var(--site-gutter) 3rem; }
+  .projectPage { padding: 1.5rem var(--page-column-gutter, var(--site-gutter)) 3rem; }
   .projectNavLinks { gap: 1.2rem; }
   .projectHero h1, .updatesHero h1 { font-size: 1.8rem; }
   .projectList a, .interactiveIntro { display: block; }

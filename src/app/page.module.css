@@ -1,6 +1,6 @@
 .about {
-  max-width: 960px;
-  padding: 3.5rem var(--site-gutter) 4rem;
+  max-width: var(--page-column-width, 960px);
+  padding: 3.5rem var(--page-column-gutter, var(--site-gutter)) 4rem;
 }
 
 .intro h1 {

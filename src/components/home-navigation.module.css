@@ -7,7 +7,6 @@
 .heroPin > div { transform-origin: center; }
 .droppedHeader { position: fixed; inset: 0; z-index: 7; pointer-events: none; }
 .droppedHeader :global(.site-header) { background: transparent; }
-.droppedHeader :global(.site-nav) { max-width: 1760px; }
 .droppedHeader :global(.site-brand),.droppedHeader :global(.site-controls),.droppedHeader :global(.site-nav-links a) { transform-origin: top left; }
 .droppedHeader :global(a),.droppedHeader :global(button) { pointer-events: auto; }
 .droppedHeader :global(.site-nav-links a) { white-space: nowrap; transition: none; }

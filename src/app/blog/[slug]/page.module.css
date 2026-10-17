@@ -1,4 +1,4 @@
-.postPage { max-width: 1184px; margin: 0 auto; padding: 3rem var(--site-gutter) 5rem; }
+.postPage { max-width: var(--page-column-width, 1184px); margin: 0 auto; padding: 3rem var(--page-column-gutter, var(--site-gutter)) 5rem; }
 .backWrap { margin: 0 0 1.25rem; }
 .backLink, .seriesContext a { color: var(--color-text-muted); text-decoration: none; }
 .seriesContext { display: flex; gap: 0.4rem; color: var(--color-text-muted); font-size: 0.8rem; }
@@ -359,7 +359,7 @@
   .tocBackdrop { display: none; }
 }
 @media (max-width: 1099px) {
-  .postPage { max-width: 880px; }
+  .postPage { max-width: var(--page-column-width, 880px); }
   .bodyLayout { display: flex; flex-direction: column; position: relative; }
   .articleNavigation { width: 100%; order: 0; }
   .articleHeader { width: 100%; order: 1; }
@@ -377,10 +377,10 @@
 
 @media (max-width: 640px) {
   .postPage {
-    max-width: 100%;
+    max-width: var(--page-column-width, 100%);
     overflow-x: clip;
-    padding: 1.5rem max(1rem, env(safe-area-inset-right)) 3rem
-      max(1rem, env(safe-area-inset-left));
+    padding: 1.5rem max(var(--page-column-gutter, 1rem), env(safe-area-inset-right)) 3rem
+      max(var(--page-column-gutter, 1rem), env(safe-area-inset-left));
     width: 100%;
   }
 

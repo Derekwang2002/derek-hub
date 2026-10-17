@@ -91,7 +91,11 @@
 }
 @media (max-width: 800px) {
   .home { align-content: center; gap: 2.75rem; grid-template-columns: 1fr; max-width: 620px; padding-block: 3.5rem 4rem; }
-  .intro h1 { margin-bottom: 1rem; }
+  .intro { display: grid; grid-template-columns: max-content minmax(0, 1fr); align-items: center; column-gap: .5rem; }
+  .intro h1 { grid-column: 1 / -1; margin-bottom: 1rem; }
+  .educationRow { grid-column: 1; grid-row: 2; }
+  .focusRow { grid-column: 1 / -1; grid-row: 3; }
+  .contacts { grid-column: 2; grid-row: 2; justify-self: start; }
   .intro p { font-size: 1rem; }
   .terminalBody { font-size: 0.75rem; padding: 1.1rem 1.2rem 1.25rem; }
   .terminalStack > div { grid-template-columns: 5rem minmax(0, 1fr); }
@@ -112,4 +116,8 @@
   .intro, .terminal { width: calc(100% - 24px); max-width: 360px; justify-self: center; }
   .terminalBody { font-size: .72rem; line-height: 1.7; padding: 1rem; }
   .profileResult { line-height: 1.7; margin-top: 1rem; }
+}
+
+@media (min-width: 441px) and (max-width: 800px) {
+  .intro, .terminal { max-width: clamp(360px, calc(100vw - 80px), 480px); }
 }

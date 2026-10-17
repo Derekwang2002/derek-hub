@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMarkdownHeadings, renderMarkdown } from "@/components/markdown-renderer";
 import { PostBodyLayout } from "@/components/post-body-layout";
+import { BlogRssFooter } from "@/components/rss-subscribe";
 import { getAllPosts } from "../../../../lib/posts";
 import { getLocalizedPostBySlug } from "../../../../lib/localized-posts";
 import styles from "./page.module.css";
@@ -79,7 +80,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <main className={`page-enter ${styles.postPage}`}>
-      <PostBodyLayout navigation={<ContentNavigation section="blog" locale="en" />} header={<BlogPostHeader post={post} locale="en" />} articleTitle={post.title} tocItems={tocItems}>
+      <PostBodyLayout navigation={<ContentNavigation section="blog" locale="en" />} header={<BlogPostHeader post={post} locale="en" />} articleTitle={post.title} tocItems={tocItems} footer={<BlogRssFooter locale="en" />}>
         {renderedContent}
       </PostBodyLayout>
     </main>
