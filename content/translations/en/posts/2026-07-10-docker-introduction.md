@@ -1,20 +1,22 @@
 ---
-title: "Introduction to Docker"
-summary: "A fictional five-service shop explains how Docker builds Images, starts Containers, and connects Compose, networking, Volumes, and the underlying runtime."
+title: "Docker basics: build doesn't start your program, and deleting a Container doesn't always lose data"
+summary: "A fictional five-service shop walks from a Dockerfile to running processes: how Images differ from Containers, how Compose organizes services, when data is lost, and what containerd, runc, and the Linux kernel do behind docker run."
 ---
 
-The first time you see Docker output, several questions naturally come up:
+The first time you run `docker compose up`, the terminal fills with `Built`, `Created`, `Started`, and `Healthy`, with the words Image and Container mixed throughout. Most of the confusion comes from treating them as the same thing: build doesn't start your program, and deleting a Container doesn't necessarily lose data.
+
+The usual questions look like this:
 
 - Why do both `Image` and `Container` exist?
 - Does `Building Image` mean Docker is starting a Container?
 - Why can one project contain many Containers?
 - If a Container is deleted, does its database data disappear too?
 
-This article assumes no previous context. Starting from a fictional project, it connects the complete Docker execution flow from build to runtime.
+Starting from a fictional project, this post walks the whole path from a Dockerfile to a running process, then ends with a few commands you can run to see where data actually lives.
 
 > **Maple Shop** is a fictional project created solely for this explanation. It does not correspond to any real repository, company, or production system.
 
-## 1. What problem is Docker trying to solve?
+## "Works on my machine": the problem Docker solves
 
 Suppose we write a Java application. It works on our own computer, but handing it to a colleague or deploying it to a server can expose several problems:
 
@@ -51,7 +53,7 @@ Therefore:
 
 If the requested Image is not available locally, `docker run` can first download it from a Registry. It does not automatically run `docker build` from a Dockerfile.
 
-## 2. Meet the example project: Maple Shop
+## The example: Maple Shop, five services, five Containers
 
 Maple Shop is a small online store made of five services with different responsibilities:
 
@@ -82,7 +84,7 @@ This does not mean that a project may have only one Container, nor that each Con
 
 > A Container is an isolated process environment. It may contain multiple processes, but its lifecycle is normally maintained by the PID 1 process.
 
-## 3. Dockerfile, Image, and Container
+## Dockerfile, Image, Container: recipe, template, instance
 
 | Object | What it is | Is it running? | Is it reusable? |
 |---|---|---:|---:|
@@ -110,7 +112,7 @@ maple-api:1.0 Image
 
 They share the same read-only Image layers but have separate writable layers, processes, network identities, and runtime states.
 
-## 4. How a Dockerfile describes an Image
+## A four-line Dockerfile for the api Image
 
 Assume `api` has been compiled into `app.jar`. It can use this Dockerfile:
 
@@ -140,7 +142,7 @@ Here:
 - `-t maple-api:1.0` gives the Image a name and tag;
 - the final `.` is the build context: the file scope Docker is allowed to read during the build.
 
-## 5. What actually happens when Docker builds an Image?
+## docker build doesn't start your program; it builds read-only layers
 
 Building an Image does not start the business application. BuildKit follows the Dockerfile to produce filesystem layers and records metadata such as startup configuration.
 
@@ -162,25 +164,25 @@ Image: maple-api:1.0
 
 Key Image properties:
 
-### 5.1 An Image is a read-only template
+### An Image is a read-only template
 
 After a build, the layers are reused as read-only content. Temporary changes made while a Container runs are not written back into the original Image.
 
-### 5.2 An Image consists of layers
+### An Image consists of layers
 
 Dockerfile steps that change the filesystem usually create new layers. Different Images can share base layers, reducing storage and download size.
 
-### 5.3 BuildKit reuses cache
+### BuildKit reuses cache
 
 If a step's inputs are unchanged, BuildKit can reuse its previous result. Put stable dependency installation early and frequently changing application code later to improve cache reuse.
 
-### 5.4 An Image normally has no independent kernel
+### An Image normally has no independent kernel
 
 An Image may contain Linux user-space files and tools, but its Container shares the host Linux kernel at runtime. It is not a disk snapshot of a complete virtual machine.
 
 On macOS or Windows, Linux Containers share the kernel of the lightweight Linux VM managed by Docker Desktop, not the macOS or Windows kernel.
 
-## 6. How an Image becomes a Container
+## From Image to Container: create, start, and PID 1
 
 The following forms express the same main flow.
 
@@ -217,7 +219,7 @@ PID 1: java -jar app.jar
 
 When PID 1 exits, the Container normally enters the stopped state. Stopping does not immediately delete it: it can be started again with `docker start` or removed with `docker rm`.
 
-## 7. A Container is not a small virtual machine
+## Containers share the host kernel; they are not small VMs
 
 Containers and VMs both provide isolation, but by different mechanisms.
 
@@ -236,7 +238,7 @@ Docker on Linux mainly relies on two kernel facilities:
 
 A Container is therefore closer to “a group of isolated and restricted processes” than to “a reduced virtual machine.”
 
-## 8. Why files fall into three categories
+## Where data goes when a Container is deleted: writable layer, Volume, Bind Mount
 
 Separate three sources when reasoning about Docker data:
 
@@ -253,11 +255,11 @@ Separate three sources when reasoning about Docker data:
 └────────────────────────────────────────────┘
 ```
 
-### 8.1 The writable layer suits temporary changes
+### The writable layer suits temporary changes
 
 Programs can write files while running, but those changes belong to that specific Container. Deleting it also deletes its writable layer.
 
-### 8.2 A Volume suits persistent data
+### A Volume suits persistent data
 
 Database files should not live only in the Container writable layer. Mount a named Volume:
 
@@ -288,7 +290,7 @@ The original database files still exist
 
 `docker compose down` does not delete named Volumes by default. `docker compose down -v` requests their deletion too and should be used carefully.
 
-### 8.3 A Bind Mount directly maps a host directory
+### A Bind Mount directly maps a host directory
 
 During development, source code is often mapped into a Container:
 
@@ -301,7 +303,7 @@ services:
 
 This is a Bind Mount. It corresponds directly to a host path and is useful in local development or whenever explicit access to host files is required.
 
-## 9. How Containers communicate
+## Containers talk by service name, and localhost means the Container itself
 
 Docker Compose normally creates a private network for a project. Services reach each other by service name:
 
@@ -315,7 +317,7 @@ web Container ─────► api:8080
 
 A common mistake is:
 
-> Inside the `api` Container, `localhost` means the `api` Container itself—not the `db` Container and not the host.
+> Inside the `api` Container, `localhost` means the `api` Container itself, not the `db` Container and not the host.
 
 The database address should therefore look like:
 
@@ -348,7 +350,7 @@ host port:Container port
 
 The host can now access `localhost:8080`, and traffic is forwarded to port `8080` in the `api` Container.
 
-## 10. How Docker Compose organizes multiple services
+## Starting five services with Compose: three builds, five Containers
 
 Typing a separate `docker run` for five services produces long commands and inconsistent team configuration. A Compose file records their relationships centrally.
 
@@ -430,20 +432,9 @@ The main process is:
 
 Compose orchestrates the services; it does not merge them into one large Container.
 
-## 11. What work does Compose perform?
+Keep the two kinds of results apart. Building `web`, `api`, and `worker` produces three Images, which are reusable read-only templates. Starting `web`, `api`, `db`, `files`, and `worker` produces five Containers, which are the running instances. Real output varies with the Compose version, the cache, and existing resources, and network, Volume, and image-pull operations may appear as separate lines, so read the resource type and action at the start of each line first.
 
-In the Maple Shop example, Compose handles two different kinds of resources:
-
-| Resource operation | Count |
-|---|---:|
-| Build Images for `web`, `api`, and `worker` | 3 |
-| Start Containers for `web`, `api`, `db`, `files`, and `worker` | 5 |
-
-Do not describe both as “several Containers.” The first three results are reusable read-only templates; the latter five are runtime instances. The project ultimately runs five Containers.
-
-Actual output varies with the Compose version, command, cache, and current resource state. Network, Volume, and Image-pull operations may appear separately. Read each line's resource type and action.
-
-## 12. The difference between `Built`, `Started`, and `Healthy`
+## `Started` is not ready: Built vs Started vs Healthy
 
 | State | Meaning | Proves the application is usable? |
 |---|---|---:|
@@ -458,7 +449,7 @@ Actual output varies with the Compose version, command, cache, and current resou
 
 Also, a simple `depends_on: [db]` mainly controls startup order; it does not guarantee that the database accepts connections. Use `condition: service_healthy`, retry logic, or application-level fault tolerance when readiness matters.
 
-## 13. Docker's internal runtime path
+## Behind docker run: CLI, dockerd, containerd, runc, and the kernel
 
 We type Docker commands, but several components cooperate behind them:
 
@@ -493,7 +484,7 @@ In simplified terms:
 
 Docker is therefore more than compressing a program into an archive. It covers build artifacts, runtime isolation, networking, storage, and lifecycle management.
 
-## 14. Common command reference
+## Docker command cheat sheet
 
 | Command | Purpose |
 |---|---|
@@ -513,7 +504,7 @@ Docker is therefore more than compressing a program into an archive. It covers b
 | `docker compose down` | Stop and delete Compose Containers and networks |
 | `docker compose down -v` | Also delete named Volumes |
 
-## 15. Common misconceptions
+## Seven common Docker misconceptions
 
 ### Misconception 1: build instantiates an Image as a Container
 
@@ -543,43 +534,38 @@ Not necessarily. The writable layer is lost; data mounted in a named Volume or B
 
 Docker hides repetitive configuration, but the foundation remains processes, ports, file permissions, signals, networking, and storage. Understanding them makes troubleshooting much easier.
 
-## 16. Complete review: from zero to running
+## Try it: the writable layer versus a Volume
 
-The whole flow can be summarized as:
+You can check "does deleting a Container lose data?" yourself with a few commands. They use the small `alpine` Image, which Docker downloads first if it isn't available locally:
 
-```text
-Developer prepares code and Dockerfile
-              │
-              ▼
-BuildKit executes docker build
-              │
-              ▼
-Produces a layered, read-only, reusable Image
-              │
-              ▼
-Docker creates a Container from the Image
-              │
-              ├── Adds a private writable layer
-              ├── Connects a private network
-              ├── Mounts Volumes
-              ├── Sets environment and resource limits
-              └── Starts PID 1
-              │
-              ▼
-The Container becomes an isolated process environment
+```bash
+# Write a file into one Container's writable layer; the Container stops when the process exits but is not removed
+docker run --name note-demo alpine:3.20 sh -c 'echo hello > /note.txt'
+
+# Show what this Container changed relative to its Image; the output includes A /note.txt
+docker diff note-demo
+
+# A new Container from the same Image can't see the file and reports No such file or directory
+docker run --rm alpine:3.20 cat /note.txt
+
+# Removing the Container removes its writable layer too
+docker rm note-demo
 ```
 
-For Maple Shop:
+Depending on your Docker environment, `docker diff` may list a few other changes as well. The line to look for is `A /note.txt`.
 
-- three custom services build three Images;
-- PostgreSQL and MinIO use existing Images;
-- five services start five Containers;
-- Compose declares and coordinates them;
-- services communicate through a private network and service names;
-- the database stores persistent files outside the Container lifecycle through a Volume.
+Now repeat it with a Volume:
 
-Remember these three statements and most Docker output becomes straightforward:
+```bash
+docker volume create note-data
 
-1. **A Dockerfile describes how to build; an Image stores the result.**
-2. **A Container is an isolated runtime instance created from an Image.**
-3. **Compose organizes multiple services together; it does not turn them into one Container.**
+# The first Container writes to the Volume and is removed automatically because of --rm
+docker run --rm -v note-data:/data alpine:3.20 sh -c 'echo hello > /data/note.txt'
+
+# A brand-new second Container mounts the same Volume and reads hello
+docker run --rm -v note-data:/data alpine:3.20 cat /data/note.txt
+
+docker volume rm note-data
+```
+
+Both experiments use the same Image. The only difference is where the file was written. The questions from the start of this post break down the same way: `Building` produces an Image, `Started` refers to a Container, and whether data survives depends on whether it lives in the writable layer or a Volume. As a next step, swap Maple Shop's Compose file for your own project's services, run `docker compose up --build`, and for each line of output, check whether it is handling an Image, a Container, a network, or a Volume.

@@ -1,225 +1,211 @@
 ---
-title: "Ponytail Review Skill: Streamlining Redundant Code"
-summary: "An introduction to how ponytail-review checks only the current diff for overengineering, using five categories of suggestions—delete, stdlib, native, yagni, and shrink—to add the deletion perspective that ordinary code review rarely covers."
+title: "It works, but it shouldn't exist: reviewing agent overengineering with ponytail-review"
+summary: "ponytail-review looks only for overengineering in the current diff and reports one-line deletion suggestions tagged delete, stdlib, native, yagni, or shrink. It belongs after a normal code review, not in place of one."
 ---
 
-Most code reviews look for “what is still missing”: Is error handling incomplete? Are there security issues? Are there enough tests? Are the requirements fully implemented?
+AI-generated code doesn't only go wrong by being incorrect. A lot of it is correct and unnecessary: a component library pulled in for one date input, a factory for an interface with a single implementation. The tests pass, and a normal review has nothing to flag.
 
-[`ponytail-review`](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) turns that around and asks only one question:
+[`ponytail-review`](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) exists for that second kind of problem. It asks one question:
 
 > What in this diff does not need to exist at all?
 
-It is an Agent Skill in the [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail) project, dedicated to reviewing overengineering. It does not check correctness, security, or performance, does not modify code directly, and does not produce an exhaustive review report. It only lists code that can be deleted, inlined, or replaced with existing capabilities, and requires every suggestion to explain the replacement.
+It is an Agent Skill in the [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail) project. It **does not check correctness, security, or performance**, and it does not modify code. It lists code that can be deleted, inlined, or replaced with something that already exists, and every suggestion has to name the replacement. Ponytail ships six Skills, and I think review is the easiest one to adopt as-is. The reasons are further down.
 
-The protagonist of the Ponytail project is a “lazy senior engineer”: rather than discussing grand architecture, he reduces code to the few lines actually needed. `ponytail-review` is the most restrained and practical version of this persona.
+## Correct but unnecessary code slips past normal review
 
----
+Say the requirement is a single date field on a form. An agent might deliver:
 
-## It Addresses Another Kind of Error in AI-Generated Code
+- A new third-party date-component dependency.
+- A project wrapper component around it.
+- A new stylesheet.
+- Time-zone configuration added in advance.
+- A generic interface abstracted for one caller.
 
-AI coding agents do not merely write incorrect code; they also readily write **correct but unnecessary code**.
+All of this may compile, and the tests may pass. A conventional review focused on functionality and risk may not flag any of it.
 
-For example, a date field might be implemented by:
+The repository still now carries the cost of dependency upgrades, style compatibility, and understanding the abstractions, and it pays that cost on every future change.
 
-- Adding a third-party date-component dependency.
-- Wrapping it in a project component.
-- Creating a new stylesheet.
-- Adding time-zone configuration in advance.
-- Abstracting a generic interface for a single caller.
-
-This code may compile, and its tests may pass. A conventional review focused on functionality and risk may not even flag it. Yet the repository has now acquired the costs of dependency upgrades, style compatibility, understanding abstractions, and long-term maintenance.
-
-`ponytail-review` makes “overengineering” a review dimension of its own. Rather than asking whether the code works, it keeps asking:
+`ponytail-review` treats overengineering as a review dimension of its own. Instead of asking whether the code works, it keeps asking:
 
 - Does the requirement actually call for this capability?
 - Does the repository already contain an implementation?
 - Does the standard library already provide it?
-- Is it supported natively by the browser, database, or operating system?
+- Does the browser, database, or operating system support it natively?
 - Does this abstraction really have a second implementation?
 - Can the same logic be expressed more directly?
 
-This review is particularly suitable for agent-generated diffs. Human developers may copy code under time pressure, while agents often generate scaffolding, extension points, and explanatory wrappers because they “want to appear complete.” The causes of redundancy differ, but maintainers pay for both in the end.
+This kind of review fits agent-generated diffs especially well. Humans usually write redundant code because they copied something under time pressure. Agents tend to add scaffolding, extension points, and explanatory wrappers because they are trying to look thorough. The causes differ, but the maintainer pays for both.
 
-## Five Categories of Findings
+## Five tags: delete, stdlib, native, yagni, shrink
 
-`ponytail-review` constrains its output with five tags. The tags are not decoration; they force the reviewer to explain what kind of complexity this is and what will replace it after deletion.
+Every `ponytail-review` finding carries one of five tags. The tag forces the reviewer to say what kind of complexity this is and what replaces it once it's gone.
 
 | Tag | What it looks for | Common replacement |
 |---|---|---|
-| `delete` | Dead code, unused flexibility, speculative features | Nothing is needed |
-| `stdlib` | Handwritten implementations of standard-library capabilities | A specific standard-library function or type |
-| `native` | Dependencies or custom code that duplicate platform capabilities | Native browser, database, or operating-system functionality |
-| `yagni` | Single-implementation interfaces, single-product factories, immutable configuration, single-caller layers | Inline directly; abstract when a real need appears |
-| `shrink` | Unchanged logic that can be expressed much more briefly | A more direct equivalent implementation |
+| `delete` | Dead code, unused flexibility, speculative features | Nothing |
+| `stdlib` | Handwritten versions of standard-library capabilities | A specific standard-library function or type |
+| `native` | Dependencies or custom code that duplicate platform features | Native browser, database, or OS functionality |
+| `yagni` | Single-implementation interfaces, config nobody sets, single-caller layers | Inline it; abstract when a real need appears |
+| `shrink` | Same logic, expressible much more briefly | A more direct equivalent |
 
-### `delete`: Remove Code with No Real Requirement
+The examples below are adapted from the ones in SKILL.md.
+
+### `delete`: remove code with no real requirement behind it
 
 ```text
 L52-71: delete: Retry wrapper around an idempotent local call. No replacement needed.
 ```
 
-This category does not demand removing all protective code. It looks for mechanisms unsupported by a failure model, branches that can never be reached, and features that “might be useful someday.”
+This category is not a mandate to strip every safeguard. It looks for mechanisms with no failure model behind them, branches that can never run, and features that "might be useful someday." A local call that is already idempotent and can't fail on a flaky network has nothing for a retry wrapper to protect against.
 
-### `stdlib`: Do Not Reimplement the Standard Library
+### `stdlib`: don't reimplement the standard library
 
 ```text
-utils.py:L30-44: stdlib: Hand-written loop builds a dict from two sets of values. Use dict(zip(keys, values)).
+L12-38: stdlib: 27-line email validator class. "@" in email, one line; real validation is the confirmation email.
 ```
 
-Standard-library implementations are usually shorter and more broadly tested. The point is not to chase one-line code, but to avoid making the team own an implementation it never needed to build.
+Standard-library code is usually shorter and much more widely tested. The goal isn't one-liners. It's not making the team own an implementation it never needed to write.
 
-### `native`: Use Capabilities the Platform Already Provides First
+### `native`: use what the platform already provides
 
 ```text
 date-picker.tsx:L4: native: Component library imported for one date input. Use <input type="date">, removing a dependency.
 ```
 
-`native` is Ponytail's most distinctive category. Browser controls, CSS, database constraints, and operating-system features are often cheaper than reimplementing them at the application layer.
+`native` is Ponytail's most distinctive category. Browser controls, CSS, database constraints, and OS features are often cheaper than rebuilding them in the application layer.
 
-Native capabilities must, of course, genuinely satisfy the product requirements. If a date picker needs interaction, formatting, or accessibility behavior that browsers do not support, it should not be forcibly replaced merely to save a few lines.
+The native option does have to meet the product requirement. If the date picker needs interaction, formatting, or accessibility behavior the browser control lacks, saving a few lines is not a reason to swap it.
 
-### `yagni`: Do Not Design for the Second Requirement Before It Appears
+### `yagni`: don't design for the second requirement before it exists
 
 ```text
 repo.py:L88: yagni: AbstractRepository has one implementation. Inline until a second appears.
 ```
 
-Interfaces and factories are not inherently bad; the question is whether they address variation that actually exists. With one implementation, one caller, and one parameter that will not vary, an abstraction layer only lengthens the reading path.
+Interfaces and factories aren't bad in themselves. The question is whether they handle variation that actually exists. With one implementation, one caller, and one parameter that never changes, the abstraction layer only lengthens the reading path.
 
-### `shrink`: Preserve the Logic, Reduce the Cost of Expressing It
+### `shrink`: same logic, fewer lines
 
 ```text
 L30-44: shrink: Hand-written loop builds a dict. Replace with dict(zip(keys, values)).
 ```
 
-This category is the easiest to misuse as code golf. A good `shrink` reduces both line count and cognitive load. If the shorter form makes readers stop and puzzle over it, it is not an effective simplification.
+This is the category most easily abused as code golf. A good `shrink` cuts both line count and reading effort. If the shorter version makes readers stop and decode it, it isn't a simplification.
 
-## Why the Output Is Deliberately Limited to One Line
+## Each finding gets one line, and that limit matters
 
-`ponytail-review` requires every finding to use a fixed format:
+`ponytail-review` requires a fixed format for every finding:
 
 ```text
 <file>:L<line>: <tag> <what to remove>. <what replaces it>.
 ```
 
-For a multi-file diff, it includes the filename; for a single-file diff, a line number is enough. It ends with one line summarizing the theoretical reduction:
+Multi-file diffs include the filename; single-file diffs can use just the line number. The review ends with one line estimating the possible reduction:
 
 ```text
 net: -42 lines possible.
 ```
 
-If nothing can be removed, it need not invent a problem to prove that it did work. It outputs only:
+Treat that number as a hint; the actual code decides what changes. I also wouldn't turn it into a team KPI. Trading away readability or necessary safeguards to make the negative number bigger defeats the point of the Skill.
+
+When nothing can be removed, it doesn't invent a problem to prove it did some work. It prints:
 
 ```text
 Lean already. Ship.
 ```
 
-This format solves several common problems with AI reviews.
+The format avoids several habits of AI reviews. It has to point at specific lines instead of saying "the structure seems somewhat complex." It has to propose a replacement instead of voicing a preference. And the one-line limit squeezes out the hedging and preamble, so the author can judge each suggestion at a glance.
 
-First, it must point to specific code rather than vaguely saying “the structure seems somewhat complex.” Second, it must provide a replacement instead of merely expressing a personal preference. Third, the one-line limit compresses review noise so the author can quickly judge whether the suggestion is valid.
+## What it doesn't check: "Lean already" is not "ready to ship"
 
-`net: -N lines possible.` works as a summary of deletion opportunities in this review, but should not become a team KPI. Fewer lines are an outcome, not the objective; sacrificing readability or necessary safeguards to produce a larger negative number betrays the Skill itself.
-
-## What It Explicitly Does Not Do
-
-Whether a narrow Skill is useful depends largely on whether it knows its boundaries. `ponytail-review` explicitly excludes:
+How useful a narrow Skill is depends a lot on whether it knows its boundaries. `ponytail-review` explicitly excludes:
 
 - Correctness bugs.
 - Security vulnerabilities.
 - Performance issues.
-- Automatically applying changes.
+- Applying changes automatically.
 
-Those belong in a conventional code review. It also explicitly preserves minimal smoke tests and `assert`-based self-checks; it does not treat tests as bloat merely because they add lines.
+Those belong in a normal code review. It also keeps minimal smoke tests and `assert`-based self-checks, and never flags them as bloat just because they add lines.
 
-Consequently, `ponytail-review` cannot serve as the only merge gate. A diff may receive `Lean already. Ship.` while still containing SQL injection, a race condition, or completely incorrect business logic. The statement means only “there is no obvious overengineering,” not that the code as a whole is ready to ship.
+So `ponytail-review` can't be the only merge gate. A diff can get `Lean already. Ship.` and still contain SQL injection, a race condition, or completely wrong business logic. The verdict only means there's no obvious overengineering.
 
-## Why It Is More Practical Than the Other Ponytail Skills
+## Compared with the other five Ponytail Skills, review costs the least to adopt
 
-The Ponytail repository currently provides six Skills. They share one philosophy, but their costs of use differ.
+The Ponytail repository currently provides six Skills. They share one philosophy, but their cost of use varies a lot.
 
-### `ponytail`: Continuously Constrain the Entire Coding Process
+### `ponytail`: constrain the whole coding process, all the time
 
-The main Skill organizes YAGNI, reuse of existing code, standard-library-first, and platform-native-first into a decision ladder, with three intensity levels: `lite`, `full`, and `ultra`. The plugin can also continuously inject rules into every conversation turn and sub-agent through lifecycle Hooks.
+The main Skill turns YAGNI, reuse of existing code, standard-library-first, and platform-native-first into a decision ladder with three intensity levels: `lite`, `full`, and `ultra`. The plugin can also inject rules into every conversation turn and sub-agent through lifecycle Hooks.
 
-This suits teams that want to enforce a uniform agent coding style, but it is not a lightweight mechanism: modes are stateful, environment variables and configuration files are involved, and installation and injection differ between agents. Many projects only need to put a few core principles in `AGENTS.md`; they do not necessarily need a plugin continuously changing every implementation decision.
+That can help a team that wants to enforce one agent coding style, but it isn't lightweight. Modes are stateful, there are environment variables and config files, and installation and injection differ across agents. Many projects only need a few core principles in `AGENTS.md`.
 
-`ponytail-review` does not have this problem. It is one-shot: run it when needed, and it ends after reading the diff without changing the mode of subsequent sessions.
+`ponytail-review` carries none of that. It runs once when you ask, ends after reading the diff, and leaves later sessions unchanged.
 
-### `ponytail-audit`: Extend Review to the Entire Repository
+### `ponytail-audit`: extend the review to the whole repository
 
-`ponytail-audit` scans the entire repository using the same tags and sorts findings by estimated deletion volume. It suits a dedicated legacy-code cleanup, but not a routine default action.
+`ponytail-audit` scans the entire repository with the same tags and sorts findings by estimated deletion size. It suits a dedicated legacy cleanup, not a routine default.
 
-Repository-wide code lacks the requirement boundary of the current diff. An interface that appears to have one implementation may serve external plugins; configuration that appears never to change may be overridden by the deployment system. The broader the scope, the harder it is for the agent to recover the full history, increasing false positives and manual verification costs.
+Repository-wide code lacks the requirement boundary a diff has. An interface that looks single-implementation may serve external plugins; config that looks untouched may be overridden by the deployment system. The wider the scope, the less history the agent can see, and the more false positives a human has to check.
 
-By contrast, the current diff usually has a clear requirement, author, and tests, making it much more reliable to judge whether a new abstraction is unnecessary.
+A diff usually has a clear requirement, author, and tests. Judging whether a new abstraction is unnecessary is far more reliable inside that boundary.
 
-### `ponytail-debt`: Create a Dedicated Ledger for Simplifications
+### `ponytail-debt`: a dedicated ledger for simplifications
 
-`ponytail-debt` scans `ponytail:` comments in code and compiles deliberately chosen simplifications, capability limits, and upgrade conditions into a list. This convention can help some teams, but if a project already uses issues, TODOs, or technical-debt labels, another Ponytail-specific protocol is redundant.
+`ponytail-debt` scans `ponytail:` comments and compiles deliberate simplifications, capability limits, and upgrade conditions into a list. If a project already tracks this with issues, TODOs, or tech-debt labels, a Ponytail-specific convention duplicates it.
 
-`ponytail-review`, meanwhile, requires no new comments or governance process; it only consumes an existing diff.
+`ponytail-review` needs no new comments or process. It reads the diff you already have.
 
-### `ponytail-gain` and `ponytail-help`: Supporting Information Does Not Necessarily Need to Be a Skill
+### `ponytail-gain` and `ponytail-help`: not everything needs to be a Skill
 
-`ponytail-help` is a command cheat sheet, a role the README can already fulfill. `ponytail-gain` is a fixed benchmark card and does not analyze the current repository.
+`ponytail-help` is a command cheat sheet, which the README already covers. `ponytail-gain` is a fixed benchmark card that doesn't analyze the current repository.
 
-Moreover, the [`ponytail-gain` reviewed for this article](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-gain/SKILL.md) still uses the early single-turn generation experiment's “80–94% less code” figures. The project's current [README](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md) acknowledges that the old baseline also counted model explanations and alternatives, inflating the gains. Updated real agent experiments report averages of about 54% fewer LOC, 20% lower cost, and 27% less time.
+The [`ponytail-gain` I looked at](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-gain/SKILL.md) also still quotes the early single-turn experiment's "80–94% less code." The project's current [README](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/README.md) acknowledges that the old baseline counted model explanations and alternatives, which inflated the gains. The updated real-agent experiments report averages of about 54% fewer lines of code, 20% lower cost, and 27% less time.
 
-Benchmark reports are certainly worth reading, but baking changing data into a Skill costs more maintenance than the capability it provides.
+The benchmark report is worth reading. Freezing numbers that keep changing into a Skill costs more to maintain than it gives back.
 
-That is the key difference between `ponytail-review` and the other files: it is not a persistent methodology, repository-governance protocol, global scanner, or promotional page, but a review tool with clear boundaries.
+That's the real difference between `ponytail-review` and the rest: it isn't a standing methodology, a governance protocol, a global scanner, or a promo page. It's a review tool with clear edges.
 
-## Recommended Workflow: Put It in the Second Review Pass
+## Recommended workflow: run it as a second pass after normal review
 
-The safest use is not to replace normal review with `ponytail-review`, but to perform two consecutive passes:
+The safe setup is two consecutive passes, not a replacement for normal review:
 
 ```text
 Feature implementation complete
   ↓
-Conventional review: requirements, correctness, security, error handling, performance, tests
+Normal review: requirements, correctness, security, error handling, performance, tests
   ↓
-ponytail-review: look only for complexity that can be removed
+ponytail-review: look only for removable complexity
   ↓
-Human verifies suggestions and makes changes
+Human checks the suggestions and edits
   ↓
-Run tests again
+Run the tests again
 ```
 
-It is best suited to situations where:
+It's most worth running when:
 
-- An agent-generated diff is clearly larger than the requirement suggested.
-- A dependency, interface, factory, Provider, Wrapper, or configuration layer was added.
-- A requirement that should use browser, database, or standard-library capabilities was implemented as a custom system.
-- The PR is functionally correct and tests pass, yet maintainers still feel that “such a small requirement should not need this much code.”
+- An agent-generated diff is clearly bigger than the requirement suggested.
+- The diff adds a dependency, interface, factory, Provider, Wrapper, or config layer.
+- Something the browser, database, or standard library could handle was built as a custom system.
+- The PR is correct and green, yet a maintainer still feels "a change this small shouldn't need this much code."
 
-You can specify the review scope when using it, for example:
+You can state the scope when invoking it:
 
 ```text
 Use ponytail-review to inspect the current branch's diff against main.
 Report only overengineering, do not check correctness, and do not modify code.
 ```
 
-In Codex, after installing the full plugin, invoke `@ponytail-review`; other agents with Skill support generally use `/ponytail-review`. If this is the only capability needed, you can retain only the corresponding `SKILL.md`; there is no need to enable Ponytail's persistent modes, Hooks, and other supporting Skills as well.
+In Codex, after installing the full plugin, invoke `@ponytail-review`. Other agents with Skill support usually use `/ponytail-review`. If this is the only piece you want, putting its `SKILL.md` in your project or user Skills directory is enough; you don't need Ponytail's persistent modes, Hooks, or the other Skills.
 
-## How to Decide Whether to Accept a Deletion Suggestion
+## Four questions before accepting a deletion suggestion
 
-After seeing `ponytail-review` output, quickly check it with four questions:
+When the output comes back, check each suggestion with four questions:
 
-1. Does the replacement completely cover the current explicit requirements?
+1. Does the replacement fully cover the current explicit requirements?
 2. Does the removed code protect a security, data, or accessibility boundary?
-3. Does this abstraction truly have only one implementation and one axis of change?
-4. After the change, is the code not only shorter but also easier to understand and test?
+3. Does this abstraction really have only one implementation and one axis of change?
+4. After the change, is the code easier to understand and test, not just shorter?
 
-Apply the suggestion when all four answers support simplification. If any answer depends on business context unknown to the agent, a human should decide rather than mechanically deleting code because the output says `delete`.
+Apply the suggestion when all four answers favor simplifying. If any answer depends on business context the agent doesn't have, a human should decide, rather than deleting code because the output said `delete`.
 
-## Conclusion
-
-The value of `ponytail-review` is not teaching an agent to write the shortest possible code, but adding a long-absent direction to code review.
-
-A normal review asks: What else do we need to deliver this correctly and safely?
-
-Ponytail Review asks: Once all of that is satisfied, what else can cease to exist?
-
-It looks only at the current diff, searches only for overengineering, provides only actionable deletion suggestions, makes no automatic changes, and does not pretend to cover all aspects of code quality. This narrow scope makes it easier to adopt—and less likely to create new process complexity—than Ponytail's persistent mode, repository-wide Audit, debt ledger, and scorecard.
-
-After conducting a normal review of AI-generated code, let `ponytail-review` take another pass. Even if the final line is only `Lean already. Ship.`, that is more reliable than accepting every abstraction an agent writes by default.
+Next time an agent hands you a diff that's correct but surprisingly large, finish the normal review, then run the [SKILL.md](https://github.com/DietrichGebert/ponytail/blob/16f29800fd2681bdf24f3eb4ccffe38be3baec6b/skills/ponytail-review/SKILL.md) as a second pass. Even if all you get back is `Lean already. Ship.`, that beats accepting every layer of abstraction an agent writes by default.

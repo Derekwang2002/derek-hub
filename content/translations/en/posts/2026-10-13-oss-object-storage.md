@@ -3,7 +3,7 @@ title: "OSS object storage: where does an uploaded avatar actually go?"
 summary: "Follow an avatar upload to understand buckets, objects, and keys, distinguish object storage from disks, databases, and CDNs, and trace direct browser uploads through application confirmation."
 ---
 
-I first heard the term “OSS object storage” during my internship. A concrete question helps explain it: where should a website keep the images people upload?
+Where should a website keep the images people upload? I first heard the term “OSS object storage” during my internship, and that question is how I came to understand it.
 
 Take an avatar upload feature. An application server's `uploads/` directory works, but a second server may not be able to read the same image. If that directory lives in a container's temporary filesystem, rebuilding the container can remove the image too.
 
