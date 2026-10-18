@@ -34,8 +34,8 @@ export function AboutContent({ locale }: { locale: ContentLocale }) {
     <main className={styles.about} lang={zh ? "zh-CN" : "en"}>
       <header className={styles.intro}>
         <h1>{zh ? "关于我" : "About me"}</h1>
-        <p>{zh ? "我是 " : "I’m "}<ProfileName showPortrait={false} href={localePath(locale, "/")} title={zh ? "首页" : "Home"} />{zh ? "，南加利福尼亚大学计算机科学硕士在读，主要做 AI Agent 与后端开发。" : ", a computer science master’s student at the University of Southern California. I work on AI agents and backend systems."}</p>
-        <p>{zh ? "参与过语音外呼和运维 Agent 的开发，关注任务执行、工具调用与系统可靠性。这里记录我的学习笔记和工程实践。" : "I’ve worked on voice and operations agents, with a focus on task execution, tool use, and system reliability. This site holds my study notes and engineering work."}</p>
+        <p>{zh ? "我是 " : "I’m "}<strong><ProfileName showPortrait={false} href={localePath(locale, "/")} title={zh ? "首页" : "Home"} /></strong>{zh ? "，" : ", a computer science master’s student at the "}<a className={styles.resumeLink} href="https://www.usc.edu/" target="_blank" rel="noreferrer">{zh ? "南加利福尼亚大学" : "University of Southern California"}</a>{zh ? "计算机科学硕士在读。" : "."}</p>
+        <p>{zh ? "参与过语音外呼和运维 Agent 的开发，关注 AI Agent 与后端开发。这里记录我的所见所想与所做。" : "I’ve worked on voice and operations agents, with a focus on AI agents and backend development. This site records what I see, think, and build."}</p>
         <ContactLinks locale={locale} />
       </header>
 
