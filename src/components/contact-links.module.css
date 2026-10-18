@@ -12,6 +12,9 @@
 :where(:global(html:not([data-input="touch"]))) .github:hover svg { fill: #8957e5; } }
 .github:focus-visible svg { fill: #8957e5; }
 @media (hover: hover) and (pointer: fine) {
+:where(:global(html:not([data-input="touch"]))) .linkedin:hover svg { fill: #0a66c2; } }
+.linkedin:focus-visible svg { fill: #0a66c2; }
+@media (hover: hover) and (pointer: fine) {
 :where(:global(html:not([data-input="touch"]))) .email:hover svg { fill: #ea4335; } }
 .email:focus-visible svg { fill: #ea4335; }
 .about span { transition: transform 180ms ease; }
@@ -23,7 +26,7 @@
   .compact .label, .compact .about { display: none; }
   .compact a { justify-content: center; flex-shrink: 0; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: color 120ms ease-out; }
   .compact a::after { inset: .5rem 0; width: auto; height: auto; border-radius: 999px; background: transparent; transform: none; pointer-events: none; transition: background-color 120ms ease-out; }
-  .compact .email::before { content: ""; position: absolute; left: -.125rem; top: 50%; width: 1px; height: .625rem; background: var(--color-border-soft); opacity: .7; transform: translateY(-50%); pointer-events: none; }
+  .compact a + a::before { content: ""; position: absolute; left: -.125rem; top: 50%; width: 1px; height: .625rem; background: var(--color-border-soft); opacity: .7; transform: translateY(-50%); pointer-events: none; }
   .compact svg { position: relative; z-index: 1; width: 1.125rem; height: 1.125rem; }
   .compact .email svg { width: 1.575rem; height: 1.575rem; }
   .compact a:active { color: var(--color-text); }
